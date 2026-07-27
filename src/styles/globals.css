@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .transform-gpu {
+    transform: translateZ(0);
+  }
+}

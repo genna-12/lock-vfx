@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "home": "Home",
+    "portfolio": "Portfolio",
+    "about": "Chi Siamo",
+    "contact": "Contatti",
+    "getInTouch": "Parla con noi"
+  },
+  "hero": {
+    "badge": "STUDIO EFFETTI VISIVI",
+    "title": "Plasmiamo la Realtà Cinematografica",
+    "subtitle": "Effetti visivi ad alto impatto, compositing e ambienti 3D per cinema e produzioni commerciali.",
+    "ctaWork": "Esplora i Lavori",
+    "ctaContact": "Inizia un Progetto"
+  },
+  "footer": {
+    "rights": "Tutti i diritti riservati.",
+    "tagline": "Architettura VFX di Precisione."
+  }
+}

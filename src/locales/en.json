@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "home": "Home",
+    "portfolio": "Portfolio",
+    "about": "About",
+    "contact": "Contact",
+    "getInTouch": "Get in Touch"
+  },
+  "hero": {
+    "badge": "VISUAL EFFECTS STUDIO",
+    "title": "We Craft Cinematic Reality",
+    "subtitle": "High-end visual effects, compositing, and 3D environments for feature films and commercial projects.",
+    "ctaWork": "Explore Works",
+    "ctaContact": "Start a Project"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "tagline": "Precision VFX Architecture."
+  }
+}
