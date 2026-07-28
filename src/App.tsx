@@ -3,14 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './utils/i18n';
 
 import { AmbientBackground } from './components/layout/AmbientBackground';
-import { VerticalNavbar } from './components/layout/VerticalNavbar';
+import { LockNavbar } from './components/layout/LockNavbar';
 import { HeaderOverlay } from './components/layout/HeaderOverlay';
 
-// Pagine
 import { HomePage } from './pages/HomePage';
-import { PortfolioPage } from './pages/PortfolioPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
+//import { PortfolioPage } from './pages/PortfolioPage';
+//import { AboutPage } from './pages/AboutPage';
+//import { ContactPage } from './pages/ContactPage';
 
 export const App: React.FC = () => {
   return (
@@ -19,17 +18,17 @@ export const App: React.FC = () => {
         {/* Sfondo dinamico morbido */}
         <AmbientBackground />
 
-        {/* UI Layout Elements */}
-        <VerticalNavbar />
+        {/* Navbar con Lucchetto Interattivo & Overlay Lingua */}
+        <LockNavbar />
         <HeaderOverlay />
 
-        {/* Contenuto Principale Multi-Pagina */}
-        <main className="relative z-10 md:pl-28 min-h-screen flex flex-col justify-between">
+        {/* Rotte Multi-Pagina */}
+        <main className="relative z-10">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
+            {/* <Route path="/portfolio" element={<PortfolioPage />} /> */}
+            {/* <Route path="/about" element={<AboutPage />} /> */}
+            {/* <Route path="/contact" element={<ContactPage />} /> */}
           </Routes>
         </main>
       </div>
