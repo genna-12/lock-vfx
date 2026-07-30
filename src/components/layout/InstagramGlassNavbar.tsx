@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Lock, Unlock, Home, Film, User, Mail } from 'lucide-react';
 
 interface NavItem {
@@ -16,26 +16,21 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/contact', label: 'Contatti', icon: Mail },
 ];
 
-export const InstagramGlassNavbar: React.FC = () => {
+export const LockVfxNavbar: React.FC = () => {
   const location = useLocation();
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  
+  const { scrollY } = useScroll();
 
-  // Gestione Scroll: Giù -> Contrai in alto a sinistra, Su -> Espandi al centro
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 60) {
-        setIsExpanded(false);
-      } else if (currentScrollY < lastScrollY) {
-        setIsExpanded(true);
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  // Gestione performante dello scroll senza re-render superflui
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    if (latest > previous && latest > 100) {
+      setIsExpanded(false); // Nascondi/contrai quando si scende
+    } else if (latest < previous) {
+      setIsExpanded(true);  // Mostra/espandi quando si sale
+    }
+  });
 
   const toggleNavbar = () => {
     setIsExpanded((prev) => !prev);
@@ -43,46 +38,37 @@ export const InstagramGlassNavbar: React.FC = () => {
 
   return (
     <>
-      {/* DESKTOP MORPHING GLASS DOCK */}
+      {/* DESKTOP SIDEBAR (Style: Revolut / Instagram Glass) */}
       <motion.aside
         layout
-        initial={false}
-        animate={{
-          top: isExpanded ? '50%' : '1.5rem', // Center (50%) vs Top-6 (1.5rem)
-          y: isExpanded ? '-50%' : '0%',
-          left: '1.5rem', // Left-6
-        }}
-        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-        className="fixed z-50 hidden md:flex flex-col items-center bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-white/[0.06] backdrop-blur-3xl border border-white/[0.14] rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_20px_60px_rgba(0,0,0,0.7)] transform-gpu p-3"
+        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+        className="fixed left-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col items-center p-2 rounded-full bg-neutral-950/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
       >
-        {/* Tasto Lucchetto (Toggle Espansione / Contrazione) */}
-        <motion.button
-          layout
+        {/* Pulsante Lucchetto (Toggle) */}
+        <button
           onClick={toggleNavbar}
-          whileHover={{ scale: 1.12 }}
-          whileTap={{ scale: 0.92 }}
-          className={`p-3 rounded-full bg-white/[0.05] border border-white/[0.12] text-zinc-400 hover:text-[#D3121B] hover:border-[#D3121B]/40 hover:shadow-[0_0_20px_rgba(211,18,27,0.3)] transition-colors duration-300 cursor-pointer group flex items-center justify-center ${
-            isExpanded ? 'mb-6' : 'mb-0'
-          }`}
-          title={isExpanded ? 'Chiudi Navbar' : 'Apri Navbar'}
+          className="relative p-3 rounded-full text-neutral-400 hover:text-white transition-colors duration-200 focus:outline-none group flex items-center justify-center"
+          aria-label={isExpanded ? 'Blocca Navbar' : 'Sblocca Navbar'}
         >
           {isExpanded ? (
-            <Unlock className="w-4 h-4 text-[#D3121B] transition-transform duration-300 group-hover:scale-110" />
+            <Unlock className="w-4 h-4 text-white/80 transition-transform duration-200 group-hover:scale-110" />
           ) : (
-            <Lock className="w-4 h-4 text-zinc-400 transition-transform duration-300 group-hover:text-white" />
+            <Lock className="w-4 h-4 text-neutral-400 transition-transform duration-200 group-hover:text-white" />
           )}
-        </motion.button>
+        </button>
 
-        {/* Voci di Navigazione (Visibili solo se isExpanded è true) */}
+        {/* Lista Voci di Navigazione */}
         <AnimatePresence>
           {isExpanded && (
             <motion.nav
-              initial={{ opacity: 0, height: 0, scale: 0.8 }}
-              animate={{ opacity: 1, height: 'auto', scale: 1 }}
-              exit={{ opacity: 0, height: 0, scale: 0.8 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="flex flex-col items-center gap-4 overflow-hidden"
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center gap-2 overflow-hidden"
             >
+              <div className="w-8 h-px bg-white/10 my-1" />
+
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -92,33 +78,26 @@ export const InstagramGlassNavbar: React.FC = () => {
                     key={item.path}
                     to={item.path}
                     aria-label={item.label}
-                    className="relative p-3.5 rounded-full text-zinc-400 hover:text-white transition-colors group flex items-center justify-center cursor-pointer"
+                    className="relative p-3 rounded-full text-neutral-400 hover:text-white transition-colors duration-200 group flex items-center justify-center"
                   >
-                    {/* Lente Fluida Glassmorphic */}
+                    {/* Indicatore Attivo Stile Revolut */}
                     {isActive && (
                       <motion.div
-                        layoutId="satinGlassLens"
-                        className="absolute inset-0 bg-gradient-to-b from-white/20 to-white/5 border border-white/30 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_0_20px_rgba(211,18,27,0.25)]"
-                        transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                        layoutId="activePill"
+                        className="absolute inset-0 bg-white/15 border border-white/20 rounded-full"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
                     )}
 
                     {/* Icona Navigazione */}
-                    <motion.div
-                      whileHover={{ scale: 1.2 }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                      className="relative z-10"
-                    >
-                      <Icon
-                        className={`w-5 h-5 transition-colors duration-200 ${
-                          isActive ? 'text-[#D3121B]' : 'text-zinc-400 group-hover:text-white'
-                        }`}
-                      />
-                    </motion.div>
+                    <Icon
+                      className={`w-5 h-5 relative z-10 transition-colors duration-200 ${
+                        isActive ? 'text-white' : 'text-neutral-400 group-hover:text-neutral-200'
+                      }`}
+                    />
 
-                    {/* Tooltip Glass al Passaggio del Mouse */}
-                    <span className="absolute left-16 px-3.5 py-1.5 rounded-xl bg-[#08090C]/85 border border-white/[0.15] backdrop-blur-2xl text-xs font-medium text-white opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-2xl">
+                    {/* Tooltip Minimale al Hover */}
+                    <span className="absolute left-16 px-3 py-1.5 rounded-lg bg-neutral-900/90 border border-white/10 backdrop-blur-md text-xs font-medium text-neutral-200 opacity-0 -translate-x-1 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-xl">
                       {item.label}
                     </span>
                   </NavLink>
@@ -129,15 +108,15 @@ export const InstagramGlassNavbar: React.FC = () => {
         </AnimatePresence>
       </motion.aside>
 
-      {/* MOBILE FLOATING DOCK (Barra inferiore per smartphone) */}
+      {/* MOBILE BOTTOM DOCK */}
       <AnimatePresence>
         {isExpanded && (
           <motion.nav
-            initial={{ y: 80, opacity: 0 }}
+            initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 80, opacity: 0 }}
+            exit={{ y: 100, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-            className="fixed bottom-6 inset-x-6 z-50 md:hidden flex items-center justify-around py-3 px-4 bg-[#08090C]/70 backdrop-blur-3xl border border-white/[0.15] rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_10px_30px_rgba(0,0,0,0.8)]"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden flex items-center gap-3 px-4 py-2 bg-neutral-950/70 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl"
           >
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -148,18 +127,18 @@ export const InstagramGlassNavbar: React.FC = () => {
                   key={item.path}
                   to={item.path}
                   aria-label={item.label}
-                  className="relative p-3 rounded-full flex items-center justify-center"
+                  className="relative p-3 rounded-full flex items-center justify-center text-neutral-400"
                 >
                   {isActive && (
                     <motion.div
-                      layoutId="satinGlassLensMobile"
-                      className="absolute inset-0 bg-white/10 border border-white/20 rounded-full"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      layoutId="activePillMobile"
+                      className="absolute inset-0 bg-white/15 border border-white/20 rounded-full"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
                   <Icon
-                    className={`w-5 h-5 relative z-10 ${
-                      isActive ? 'text-[#D3121B]' : 'text-zinc-400'
+                    className={`w-5 h-5 relative z-10 transition-colors duration-200 ${
+                      isActive ? 'text-white' : 'text-neutral-400'
                     }`}
                   />
                 </NavLink>
