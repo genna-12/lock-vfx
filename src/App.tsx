@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './utils/i18n';
 
 import { AmbientBackground } from './components/layout/AmbientBackground';
-import { LockNavbar } from './components/layout/LockNavbar';
+import { InstagramGlassNavbar } from './components/layout/InstagramNavbar';
 import { HeaderOverlay } from './components/layout/HeaderOverlay';
 
 import { HomePage } from './pages/HomePage';
@@ -19,7 +19,7 @@ export const App: React.FC = () => {
         <AmbientBackground />
 
         {/* Navbar con Lucchetto Interattivo & Overlay Lingua */}
-        <LockNavbar />
+        <InstagramGlassNavbar />
         <HeaderOverlay />
 
         {/* Rotte Multi-Pagina */}
