@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './utils/i18n';
 
 import { AmbientBackground } from './components/layout/AmbientBackground';
-import { InstagramGlassNavbar } from './components/layout/InstagramNavbar';
+import { InstagramGlassNavbar } from './components/layout/InstagramGlassNavbar';
 import { HeaderOverlay } from './components/layout/HeaderOverlay';
 
 import { HomePage } from './pages/HomePage';
@@ -15,15 +15,13 @@ export const App: React.FC = () => {
   return (
     <Router>
       <div className="min-h-screen bg-[#08090C] text-zinc-100 font-sans relative antialiased selection:bg-[#D3121B] selection:text-white">
-        {/* Sfondo dinamico morbido */}
         <AmbientBackground />
 
-        {/* Navbar con Lucchetto Interattivo & Overlay Lingua */}
+        {/* Sidebar Verticale Glassmorphism stile Instagram */}
         <InstagramGlassNavbar />
         <HeaderOverlay />
 
-        {/* Rotte Multi-Pagina */}
-        <main className="relative z-10">
+        <main className="relative z-10 md:pl-24">
           <Routes>
             <Route path="/" element={<HomePage />} />
             {/* <Route path="/portfolio" element={<PortfolioPage />} /> */}
