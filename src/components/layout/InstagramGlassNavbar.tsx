@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Lock, Unlock, Home, Film, User, Mail } from 'lucide-react';
@@ -21,13 +21,21 @@ export const LockVfxNavbar: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   
   const { scrollY } = useScroll();
+  const lastScrollY = useRef(0);
 
+  // GESTIONE SCROLL FLUIDA E SENZA BLOCCHI
   useMotionValueEvent(scrollY, 'change', (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    if (latest > previous && latest > 100) {
-      setIsExpanded(false);
-    } else if (latest < previous) {
-      setIsExpanded(true);
+    const previous = lastScrollY.current;
+    const diff = latest - previous;
+
+    // Triggera il cambio stato solo con scostamento significativo (>15px)
+    if (Math.abs(diff) > 15) {
+      if (diff > 0 && latest > 80) {
+        setIsExpanded(false); // Scroll verso il basso
+      } else if (diff < 0) {
+        setIsExpanded(true);  // Scroll verso l'alto
+      }
+      lastScrollY.current = latest;
     }
   });
 
@@ -35,9 +43,17 @@ export const LockVfxNavbar: React.FC = () => {
     setIsExpanded((prev) => !prev);
   };
 
+  // Fix TypeScript: "as const" forza TS a riconoscere type come 'spring' letterale
+  const transitionConfig = {
+    type: 'spring',
+    stiffness: 300,
+    damping: 28,
+    mass: 0.8,
+  } as const;
+
   return (
     <>
-      {/* 💻 DESKTOP SIDEBAR (Verticale - in alto a sx quando chiusa) */}
+      {/* 💻 DESKTOP SIDEBAR */}
       <div 
         className={`fixed left-6 inset-y-0 z-50 hidden md:flex flex-col pointer-events-none ${
           isExpanded ? 'justify-center' : 'justify-start pt-6'
@@ -45,32 +61,31 @@ export const LockVfxNavbar: React.FC = () => {
       >
         <motion.aside
           layout
-          initial={false}
-          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-          className="pointer-events-auto flex flex-col items-center p-2 rounded-full bg-neutral-950/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
+          transition={transitionConfig}
+          className="pointer-events-auto flex flex-col items-center p-2 rounded-full bg-neutral-950/70 backdrop-blur-xl border border-white/10 shadow-2xl transform-gpu will-change-transform"
         >
           <button
             onClick={toggleNavbar}
-            className="relative p-3 rounded-full text-neutral-400 hover:text-white transition-colors duration-200 focus:outline-none group flex items-center justify-center"
+            className="relative p-3 rounded-full text-neutral-400 hover:text-white transition-colors duration-200 focus:outline-none flex items-center justify-center cursor-pointer"
             aria-label={isExpanded ? 'Blocca Navbar' : 'Sblocca Navbar'}
           >
             {isExpanded ? (
-              <Unlock className="w-4 h-4 text-white/80 transition-transform duration-200 group-hover:scale-110" />
+              <Unlock className="w-4 h-4 text-white/80" />
             ) : (
-              <Lock className="w-4 h-4 text-neutral-400 transition-transform duration-200 group-hover:text-white" />
+              <Lock className="w-4 h-4 text-neutral-400" />
             )}
           </button>
 
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {isExpanded && (
               <motion.nav
-                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
-                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col items-center gap-2 overflow-hidden"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+                className="flex flex-col items-center gap-2 pt-2"
               >
-                <div className="w-8 h-px bg-white/10 my-1" />
+                <div className="w-8 h-[1px] bg-white/10 my-1" />
 
                 {NAV_ITEMS.map((item) => {
                   const Icon = item.icon;
@@ -87,7 +102,7 @@ export const LockVfxNavbar: React.FC = () => {
                         <motion.div
                           layoutId="activePill"
                           className="absolute inset-0 bg-white/15 border border-white/20 rounded-full"
-                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                          transition={transitionConfig}
                         />
                       )}
                       <Icon
@@ -95,7 +110,6 @@ export const LockVfxNavbar: React.FC = () => {
                           isActive ? 'text-white' : 'text-neutral-400 group-hover:text-neutral-200'
                         }`}
                       />
-                      {/* Tooltip Minimale al Hover (Solo Desktop) */}
                       <span className="absolute left-16 px-3 py-1.5 rounded-lg bg-neutral-900/90 border border-white/10 backdrop-blur-md text-xs font-medium text-neutral-200 opacity-0 -translate-x-1 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-xl">
                         {item.label}
                       </span>
@@ -108,7 +122,7 @@ export const LockVfxNavbar: React.FC = () => {
         </motion.aside>
       </div>
 
-      {/* 📱 MOBILE BOTTOM DOCK (Orizzontale - in basso a sx quando chiusa) */}
+      {/* 📱 MOBILE BOTTOM DOCK */}
       <div 
         className={`fixed bottom-6 inset-x-0 z-50 flex md:hidden pointer-events-none ${
           isExpanded ? 'justify-center' : 'justify-start pl-6'
@@ -116,35 +130,31 @@ export const LockVfxNavbar: React.FC = () => {
       >
         <motion.nav
           layout
-          initial={false}
-          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-          className="pointer-events-auto flex items-center p-2 bg-neutral-950/60 backdrop-blur-2xl border border-white/10 rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
+          transition={transitionConfig}
+          className="pointer-events-auto flex items-center p-2 bg-neutral-950/70 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl transform-gpu will-change-transform"
         >
-          {/* Pulsante Lucchetto (Toggle su Mobile) */}
           <button
             onClick={toggleNavbar}
-            className="relative p-3 rounded-full text-neutral-400 hover:text-white transition-colors duration-200 focus:outline-none flex items-center justify-center shrink-0"
+            className="relative p-3 rounded-full text-neutral-400 hover:text-white transition-colors duration-200 focus:outline-none flex items-center justify-center flex-shrink-0 cursor-pointer"
             aria-label={isExpanded ? 'Blocca Navbar' : 'Sblocca Navbar'}
           >
             {isExpanded ? (
-              <Unlock className="w-4 h-4 text-white/80 transition-transform duration-200" />
+              <Unlock className="w-4 h-4 text-white/80" />
             ) : (
-              <Lock className="w-4 h-4 text-neutral-400 transition-transform duration-200" />
+              <Lock className="w-4 h-4 text-neutral-400" />
             )}
           </button>
 
-          {/* Voci di navigazione Mobile (si espandono in orizzontale) */}
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {isExpanded && (
               <motion.div
-                initial={{ opacity: 0, width: 0, marginLeft: 0 }}
-                animate={{ opacity: 1, width: 'auto', marginLeft: 8 }}
-                exit={{ opacity: 0, width: 0, marginLeft: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="flex items-center gap-2 overflow-hidden flex-nowrap"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+                className="flex items-center gap-2 pl-2"
               >
-                {/* Separatore Verticale */}
-                <div className="w-px h-8 bg-white/10 mx-1 shrink-0" />
+                <div className="w-[1px] h-8 bg-white/10 mx-1 flex-shrink-0" />
 
                 {NAV_ITEMS.map((item) => {
                   const Icon = item.icon;
@@ -155,13 +165,13 @@ export const LockVfxNavbar: React.FC = () => {
                       key={item.path}
                       to={item.path}
                       aria-label={item.label}
-                      className="relative p-3 rounded-full flex items-center justify-center text-neutral-400 shrink-0"
+                      className="relative p-3 rounded-full flex items-center justify-center text-neutral-400 flex-shrink-0"
                     >
                       {isActive && (
                         <motion.div
                           layoutId="activePillMobile"
                           className="absolute inset-0 bg-white/15 border border-white/20 rounded-full"
-                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                          transition={transitionConfig}
                         />
                       )}
                       <Icon
