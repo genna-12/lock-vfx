@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './utils/i18n';
 
 import { AmbientBackground } from './components/layout/AmbientBackground';
-import { InstagramGlassNavbar } from './components/layout/InstagramGlassNavbar';
+import { LockVfxNavbar } from './components/layout/InstagramGlassNavbar';
 import { HeaderOverlay } from './components/layout/HeaderOverlay';
 
 import { HomePage } from './pages/HomePage';
@@ -19,7 +19,7 @@ export const App: React.FC = () => {
         <AmbientBackground />
 
         {/* Overlay Navbar Glassmorphic */}
-        <InstagramGlassNavbar />
+        <LockVfxNavbar />
         <HeaderOverlay />
 
         {/* Contenuto Principale: 100% larghezza reale, NESSUN padding laterale */}
