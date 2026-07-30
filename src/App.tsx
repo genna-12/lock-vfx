@@ -14,14 +14,16 @@ import { HomePage } from './pages/HomePage';
 export const App: React.FC = () => {
   return (
     <Router>
-      <div className="min-h-screen bg-[#08090C] text-zinc-100 font-sans relative antialiased selection:bg-[#D3121B] selection:text-white">
+      <div className="min-h-screen bg-[#08090C] text-zinc-100 font-sans relative antialiased selection:bg-[#D3121B] selection:text-white overflow-x-hidden">
+        {/* Sfondo dinamico morbido */}
         <AmbientBackground />
 
-        {/* Sidebar Verticale Glassmorphism stile Instagram */}
+        {/* Overlay Navbar Glassmorphic */}
         <InstagramGlassNavbar />
         <HeaderOverlay />
 
-        <main className="relative z-10 md:pl-24">
+        {/* Contenuto Principale: 100% larghezza reale, NESSUN padding laterale */}
+        <main className="relative z-10 w-full min-h-screen">
           <Routes>
             <Route path="/" element={<HomePage />} />
             {/* <Route path="/portfolio" element={<PortfolioPage />} /> */}
