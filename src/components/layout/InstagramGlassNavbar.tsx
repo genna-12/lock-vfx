@@ -26,9 +26,9 @@ export const LockVfxNavbar: React.FC = () => {
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const previous = scrollY.getPrevious() ?? 0;
     if (latest > previous && latest > 100) {
-      setIsExpanded(false); // Nascondi/contrai quando si scende
+      setIsExpanded(false); // Nascondi/contrai in alto a sinistra quando si scende
     } else if (latest < previous) {
-      setIsExpanded(true);  // Mostra/espandi quando si sale
+      setIsExpanded(true);  // Riporta al centro quando si sale
     }
   });
 
@@ -41,8 +41,13 @@ export const LockVfxNavbar: React.FC = () => {
       {/* DESKTOP SIDEBAR (Style: Revolut / Instagram Glass) */}
       <motion.aside
         layout
+        initial={false}
+        animate={{
+          top: isExpanded ? '50%' : '1.5rem', // 50% = centro, 1.5rem = top-6 (alto a sinistra)
+          y: isExpanded ? '-50%' : '0%',      // Compensa il centro o si allinea all'alto
+        }}
         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        className="fixed left-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col items-center p-2 rounded-full bg-neutral-950/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
+        className="fixed left-6 z-50 hidden md:flex flex-col items-center p-2 rounded-full bg-neutral-950/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
       >
         {/* Pulsante Lucchetto (Toggle) */}
         <button
@@ -108,7 +113,7 @@ export const LockVfxNavbar: React.FC = () => {
         </AnimatePresence>
       </motion.aside>
 
-      {/* MOBILE BOTTOM DOCK */}
+      {/* MOBILE BOTTOM DOCK (Invariata: si nasconde verso il basso quando si scorre giù) */}
       <AnimatePresence>
         {isExpanded && (
           <motion.nav
