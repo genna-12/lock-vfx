@@ -1,11 +1,17 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './styles/globals.css'
-import './utils/i18n.ts' // <-- AGGIUNGI QUESTA RIGA PER INIZIALIZZARE I18N
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './config/i18n';
+import './styles/globals.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Elemento root non trovato nel DOM.');
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);

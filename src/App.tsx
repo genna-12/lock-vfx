@@ -1,39 +1,28 @@
-import React from 'react';
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './utils/i18n';
-
-import { AmbientBackground } from './components/layout/AmbientBackground';
-import { LockVfxNavbar } from './components/layout/InstagramGlassNavbar';
-import { HeaderOverlay } from './components/layout/HeaderOverlay';
-
+import { LockVfxNavbar } from './components/layout/LockVfxNavbar';
+import { LanguageSwitcher } from './components/ui/LanguageSwitcher';
+import { CustomCursor } from './components/ui/CustomCursor';
 import { HomePage } from './pages/HomePage';
-//import { PortfolioPage } from './pages/PortfolioPage';
-//import { AboutPage } from './pages/AboutPage';
-//import { ContactPage } from './pages/ContactPage';
+// Altre pagine: Portfolio, About, Contact...
 
-export const App: React.FC = () => {
+function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#08090C] text-zinc-100 font-sans relative antialiased selection:bg-[#D3121B] selection:text-white overflow-x-hidden">
-        {/* Sfondo dinamico morbido */}
-        <AmbientBackground />
-
-        {/* Overlay Navbar Glassmorphic */}
+      <div className="bg-[#020202] min-h-screen text-[#F3F4F6] selection:bg-[#E60B18] selection:text-white font-sans antialiased">
+        <CustomCursor />
         <LockVfxNavbar />
-        <HeaderOverlay />
-
-        {/* Contenuto Principale: 100% larghezza reale, NESSUN padding laterale */}
-        <main className="relative z-10 w-full min-h-screen">
+        <LanguageSwitcher />
+        
+        <main className="relative z-0">
           <Routes>
             <Route path="/" element={<HomePage />} />
             {/* <Route path="/portfolio" element={<PortfolioPage />} /> */}
-            {/* <Route path="/about" element={<AboutPage />} /> */}
-            {/* <Route path="/contact" element={<ContactPage />} /> */}
           </Routes>
         </main>
       </div>
     </Router>
   );
-};
+}
 
 export default App;
