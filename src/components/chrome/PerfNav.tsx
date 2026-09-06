@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SETS, type SetId } from '../../brand/tokens';
+import { holdScroll } from '../../lib/camera';
 
 /**
  * Navigazione = quattro perforazioni di pellicola, una per HOLD.
@@ -35,6 +38,19 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
     return () => io.disconnect();
   }, []);
 
+  // Con la carrellata attiva il salto nativo non serve a niente: i quattro
+  // set sono impilati nello stesso punto della pagina, e cio' che li separa
+  // e' la posizione di scroll dentro il pin. Se lo smoother non c'e'
+  // (reduced motion, JS a terra) non si intercetta il click: l'ancora resta
+  // un'ancora e funziona da sola.
+  function goToHold(event: MouseEvent<HTMLAnchorElement>, id: SetId) {
+    const stage = ScrollTrigger.getById('stage');
+    const smoother = ScrollSmoother.get();
+    if (!stage || !smoother) return;
+    event.preventDefault();
+    smoother.scrollTo(holdScroll(stage, id), true);
+  }
+
   return (
     <nav
       aria-label={t('nav.label')}
@@ -53,6 +69,7 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
             <li key={id} className="flex justify-end">
               <a
                 href={`#${id}`}
+                onClick={(event) => goToHold(event, id)}
                 aria-current={isActive ? 'true' : undefined}
                 className="group flex min-h-11 min-w-11 items-center justify-end gap-3 md:min-h-0 md:min-w-0"
               >

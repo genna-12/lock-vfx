@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { assertTokensInSync } from './brand/tokens';
+import { assertTokensInSync, type SetId } from './brand/tokens';
 import { Loader } from './components/Loader';
 import { Wordmark } from './components/chrome/Wordmark';
 import { LangPill } from './components/chrome/LangPill';
@@ -19,6 +19,11 @@ import { Footer } from './components/Footer';
 export default function App() {
   const { i18n, t } = useTranslation();
   const lang = i18n.resolvedLanguage ?? 'it';
+
+  // Quale HOLD e' inquadrato: lo Stage lo comunica solo quando cambia, quindi
+  // qui si rirenderizza tre volte in tutta la carrellata, non a ogni frame.
+  const [active, setActive] = useState<SetId>('reel');
+  const handleActiveChange = useCallback((id: SetId) => setActive(id), []);
 
   useEffect(() => assertTokensInSync(), []);
   useEffect(() => {
@@ -41,12 +46,12 @@ export default function App() {
         <Wordmark />
         <LangPill />
       </header>
-      <PerfNav />
+      <PerfNav active={active} />
 
       <div id="smooth-wrapper">
         <div id="smooth-content">
           <main id="top">
-            <Stage />
+            <Stage onActiveChange={handleActiveChange} />
           </main>
           <Footer />
         </div>

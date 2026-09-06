@@ -170,6 +170,41 @@
     padding-inline: var(--pad);
   }
 
+  /* ---- Lo spazio ----------------------------------------------------
+     Tre gusci: `.stage` e' il palco pinnato, `.camera` mette la
+     prospettiva, `.world` e' il volume dove vivono i set con profondita'.
+
+     DENTRO `.world` non entrano mai: `will-change`, un `opacity` < 1 su un
+     contenitore, un `overflow` diverso da `visible`. Ognuna delle tre
+     appiattisce il `preserve-3d` e la profondita' sparisce senza errori in
+     console. L'opacita' si anima sulle foglie ([data-leaf], [data-line]),
+     mai sui wrapper. */
+  .stage {
+    position: relative;
+    height: 100svh;
+    overflow: hidden;
+    background-color: var(--color-void);
+  }
+
+  .camera {
+    position: absolute;
+    inset: 0;
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+  }
+
+  .world {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .set {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
   /* Nascosto agli occhi, presente per screen reader e SEO. */
   .u-sr-only {
     position: absolute;
@@ -196,3 +231,38 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Modalita' statica -------------------------------------------
+   `prefers-reduced-motion`, oppure GSAP che non parte: niente camera, i set
+   tornano in flusso normale, uno per schermata, luci spente.
+
+   Queste regole stanno FUORI da `@layer` di proposito: il CSS non stratificato
+   vince su quello stratificato, e devono poter scavalcare le utility di
+   Tailwind (`absolute`, `inset-0`, `opacity-0`) senza un solo `!important`.
+   Le proprieta' inline che scrive GSAP non sono un problema: in questa
+   modalita' GSAP non gira, e se l'utente cambia impostazione a pagina aperta
+   il `ctx.revert()` dello Stage le rimuove prima che queste entrino in gioco.
+   ------------------------------------------------------------------------ */
+
+.static .stage { height: auto; overflow: visible; }
+.static .camera { position: static; perspective: none; }
+.static .world { position: static; transform-style: flat; }
+
+.static .stage [data-set] {
+  position: relative;
+  inset: auto;
+  min-height: 100svh;
+  transform: none;
+  opacity: 1;
+}
+.static .stage [data-set="work"] { pointer-events: auto; }
+
+.static .stage [data-leaf],
+.static .stage [data-statement],
+.static .stage [data-line] {
+  transform: none;
+  opacity: 1;
+}
+
+.static .stage [data-veil] { opacity: 0; }
+.static .stage [data-light] { display: none; }
