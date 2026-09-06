@@ -1,20 +1,15 @@
 {
   "nav": {
-    "home": "Home",
-    "portfolio": "Portfolio",
-    "about": "Chi Siamo",
-    "contact": "Contatti",
-    "getInTouch": "Parla con noi"
+    "label": "Sezioni",
+    "reel": "Reel",
+    "studio": "Studio",
+    "work": "Lavori",
+    "contact": "Contatti"
   },
-  "hero": {
-    "badge": "STUDIO EFFETTI VISIVI",
-    "title": "Plasmiamo la Realtà Cinematografica",
-    "subtitle": "Effetti visivi ad alto impatto, compositing e ambienti 3D per cinema e produzioni commerciali.",
-    "ctaWork": "Esplora i Lavori",
-    "ctaContact": "Inizia un Progetto"
+  "a11y": {
+    "skip": "Vai al contenuto"
   },
-  "footer": {
-    "rights": "Tutti i diritti riservati.",
-    "tagline": "Architettura VFX di Precisione."
+  "meta": {
+    "description": "LockVFX — effetti visivi per cinema, serie e pubblicità: compositing, CGI, environment, cleanup e finishing. Il nome con cui [Nome] e [Nome] lavorano insieme."
   }
 }

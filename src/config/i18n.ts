@@ -32,8 +32,14 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
+    // Regola: si parte dalla lingua del dispositivo se il sito ce l'ha,
+    // altrimenti inglese. `supportedLngs` si autoalimenta dai file in
+    // locales/, quindi aggiungere una lingua = aggiungere un JSON (piu' la
+    // voce nella LangPill).
     fallbackLng: 'en',
     supportedLngs: availableLanguages,
+    load: 'languageOnly',            // it-IT -> it
+    nonExplicitSupportedLngs: true,  // pt-BR accettato se esiste pt
     interpolation: {
       escapeValue: false,
     },

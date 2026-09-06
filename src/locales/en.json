@@ -1,20 +1,15 @@
 {
   "nav": {
-    "home": "Home",
-    "portfolio": "Portfolio",
-    "about": "About",
-    "contact": "Contact",
-    "getInTouch": "Get in Touch"
+    "label": "Sections",
+    "reel": "Reel",
+    "studio": "Studio",
+    "work": "Work",
+    "contact": "Contact"
   },
-  "hero": {
-    "badge": "VISUAL EFFECTS STUDIO",
-    "title": "We Craft Cinematic Reality",
-    "subtitle": "High-end visual effects, compositing, and 3D environments for feature films and commercial projects.",
-    "ctaWork": "Explore Works",
-    "ctaContact": "Start a Project"
+  "a11y": {
+    "skip": "Skip to content"
   },
-  "footer": {
-    "rights": "All rights reserved.",
-    "tagline": "Precision VFX Architecture."
+  "meta": {
+    "description": "LockVFX — visual effects for film, series and advertising: compositing, CGI, environments, cleanup and finishing. The name under which [Name] and [Name] work together."
   }
 }

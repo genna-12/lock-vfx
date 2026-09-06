@@ -1,28 +1,56 @@
-// src/App.tsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { LockVfxNavbar } from './components/layout/LockVfxNavbar';
-import { LanguageSwitcher } from './components/ui/LanguageSwitcher';
-import { CustomCursor } from './components/ui/CustomCursor';
-import { HomePage } from './pages/HomePage';
-// Altre pagine: Portfolio, About, Contact...
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { assertTokensInSync } from './brand/tokens';
+import { Loader } from './components/Loader';
+import { Wordmark } from './components/chrome/Wordmark';
+import { LangPill } from './components/chrome/LangPill';
+import { PerfNav } from './components/chrome/PerfNav';
+import { Stage } from './components/stage/Stage';
+import { Footer } from './components/Footer';
 
-function App() {
+/**
+ * Struttura della pagina.
+ *
+ * Il chrome (marchio, lingua, nav) sta FUORI da `#smooth-wrapper`: gli
+ * elementi `fixed` dentro il wrapper di ScrollSmoother vengono trascinati
+ * dal transform e smettono di essere fissi. Lo smoother vero viene montato
+ * allo step 2; qui esistono già i due nodi che gli servono.
+ */
+export default function App() {
+  const { i18n, t } = useTranslation();
+  const lang = i18n.resolvedLanguage ?? 'it';
+
+  useEffect(() => assertTokensInSync(), []);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute('content', t('meta.description'));
+  }, [lang, t]);
+
   return (
-    <Router>
-      <div className="bg-[#020202] min-h-screen text-[#F3F4F6] selection:bg-[#E60B18] selection:text-white font-sans antialiased">
-        <CustomCursor />
-        <LockVfxNavbar />
-        <LanguageSwitcher />
-        
-        <main className="relative z-0">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            {/* <Route path="/portfolio" element={<PortfolioPage />} /> */}
-          </Routes>
-        </main>
+    <Loader>
+      <a
+        href="#top"
+        className="u-sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 focus-visible:bg-obsidian focus-visible:px-4 focus-visible:py-2"
+      >
+        {t('a11y.skip')}
+      </a>
+
+      <header className="u-pad pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between py-[var(--pad)]">
+        <Wordmark />
+        <LangPill />
+      </header>
+      <PerfNav />
+
+      <div id="smooth-wrapper">
+        <div id="smooth-content">
+          <main id="top">
+            <Stage />
+          </main>
+          <Footer />
+        </div>
       </div>
-    </Router>
+    </Loader>
   );
 }
-
-export default App;
