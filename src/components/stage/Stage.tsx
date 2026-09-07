@@ -13,6 +13,7 @@ import {
   amplitude,
   snapProgress,
 } from '../../lib/camera';
+import { publishProgress, setStageStatic } from '../../lib/stageProgress';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
 import { Reel } from './Reel';
@@ -87,10 +88,14 @@ export function Stage({ onActiveChange }: StageProps) {
     // l'utente cambia impostazione a pagina aperta.
     if (reduce) {
       html.classList.add('static');
+      // Niente carrellata: i set sono tutti in scena e si comportano di
+      // conseguenza (video, HUD, `inert`).
+      setStageStatic(true);
       notify('reel');
       return () => html.classList.remove('static');
     }
     html.classList.remove('static');
+    setStageStatic(false);
 
     // Su mobile la barra degli indirizzi che entra ed esce cambia innerHeight
     // in continuazione: senza questo, ogni scroll rifà il layout di un pin da
@@ -192,6 +197,9 @@ export function Stage({ onActiveChange }: StageProps) {
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
+            // Un trigger solo: la progress la calcola questo, gli altri set
+            // se la fanno dare (`lib/stageProgress`).
+            publishProgress(self.progress);
             const id = activeSetAt(self.progress);
             if (id !== lastId) {
               lastId = id;

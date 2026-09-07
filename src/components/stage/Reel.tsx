@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useTranslation } from 'react-i18next';
-import { STAGE_VH } from '../../lib/camera';
+import { useStageWindow } from '../../lib/stageProgress';
 import { loadProgress, whenImageReady, whenReelReady } from '../../lib/loadProgress';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 
@@ -51,6 +50,9 @@ export function Reel() {
   // quello che c'e', e un pulsante che non fa nulla e' peggio di nessun
   // pulsante.
   const still = HAS_VIDEO && (reduce || lightMode) && !manualPlay;
+  // La reel è in scena fino a quando la camera non l'ha lasciata indietro.
+  // La progress la dà lo Stage: qui non si crea un secondo trigger.
+  const inScene = useStageWindow(-1, PAUSE_AFTER);
 
   /* ---- progresso di caricamento --------------------------------------- */
   useEffect(() => {
@@ -78,23 +80,14 @@ export function Reel() {
     const video = videoRef.current;
     if (!HAS_VIDEO || !video || still) return;
 
-    // Un trigger di sola lettura sugli stessi estremi del pin: non tocca la
-    // timeline della carrellata, la osserva.
-    const st = ScrollTrigger.create({
-      trigger: '.stage',
-      start: 'top top',
-      end: `+=${STAGE_VH}%`,
-      onUpdate: (self) => {
-        if (self.progress > PAUSE_AFTER) {
-          if (!video.paused) video.pause();
-        } else if (video.paused) {
-          void video.play().catch(() => undefined);
-        }
-      },
-    });
-    void video.play().catch(() => undefined);
-    return () => st.kill();
-  }, [still]);
+    // Fuori scena il girato si ferma: un video che continua a girare dietro
+    // a un altro set è lavoro della GPU per niente.
+    if (inScene) {
+      if (video.paused) void video.play().catch(() => undefined);
+    } else if (!video.paused) {
+      video.pause();
+    }
+  }, [still, inScene]);
 
   /* ---- linea del tempo ------------------------------------------------ */
   useEffect(() => {

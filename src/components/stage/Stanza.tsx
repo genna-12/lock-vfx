@@ -11,9 +11,9 @@ import {
 } from 'react';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MOTION } from '../../brand/tokens';
 import { STAGE_VH } from '../../lib/camera';
+import { useStageWindow } from '../../lib/stageProgress';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { SendError, THROTTLE_MS, remainingThrottle, sendContact } from '../../lib/emailjs';
 import { CONTACT, PEOPLE } from '../../data/people';
@@ -77,7 +77,9 @@ export function Stanza() {
   const [consent, setConsent] = useState(false);
   const [consentInvalid, setConsentInvalid] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
-  const [inHold, setInHold] = useState(false);
+  // Dentro l'HOLD 4 o no: la progress arriva dallo Stage, non da un secondo
+  // trigger che rifarebbe lo stesso conto.
+  const inHold = useStageWindow(HOLD_FROM, 1.01);
   const [markW, setMarkW] = useState(markWidth);
 
   const shackleRef = useRef<SVGPathElement>(null);
@@ -94,17 +96,6 @@ export function Stanza() {
   const locked = status === 'sending' || status === 'sent';
   const closed = status === 'sent';
   const markH = (markW * MARK_VIEWBOX.h) / MARK_VIEWBOX.w;
-
-  /* ---- dentro la carrellata -------------------------------------------- */
-  useEffect(() => {
-    const st = ScrollTrigger.create({
-      trigger: '.stage',
-      start: 'top top',
-      end: `+=${STAGE_VH}%`,
-      onUpdate: (self) => setInHold(self.progress > HOLD_FROM),
-    });
-    return () => st.kill();
-  }, []);
 
   useEffect(() => {
     const onResize = () => setMarkW(markWidth());

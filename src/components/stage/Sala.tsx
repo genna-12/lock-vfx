@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useTranslation } from 'react-i18next';
-import { STAGE_VH } from '../../lib/camera';
+import { useStageWindow } from '../../lib/stageProgress';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { WORKS_HAVE_VIDEO, type Work } from '../../data/works';
 import { Deck, type DeckHandle } from './Deck';
@@ -57,7 +56,8 @@ export function Sala({ works }: SalaProps) {
 
   const [index, setIndex] = useState(0);
   const [awake, setAwake] = useState(false);
-  const [inHold, setInHold] = useState(false);
+  // Dentro il suo HOLD o no: lo dice lo Stage, che la progress ce l'ha già.
+  const inHold = useStageWindow(HOLD.from, HOLD.to);
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [portrait, setPortrait] = useState(false);
@@ -113,19 +113,6 @@ export function Sala({ works }: SalaProps) {
   // In verticale su telefono l'HUD non si nasconde: lì è impaginazione, non
   // un velo che copre il film.
   const hudVisible = portrait || reduced || awake;
-
-  /* ---- dentro la carrellata ------------------------------------------- */
-  useEffect(() => {
-    const st = ScrollTrigger.create({
-      trigger: '.stage',
-      start: 'top top',
-      end: `+=${STAGE_VH}%`,
-      onUpdate: (self) => {
-        setInHold(self.progress > HOLD.from && self.progress < HOLD.to);
-      },
-    });
-    return () => st.kill();
-  }, []);
 
   // Fuori dall'HOLD il video si ferma e l'HUD sparisce: durante T2 e T3 la
   // sala è un oggetto che si muove nello spazio, non un player.
