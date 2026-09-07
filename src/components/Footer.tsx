@@ -1,16 +1,30 @@
 import type { ComponentType } from 'react';
+import { useTranslation } from 'react-i18next';
+import { CONTACT, PEOPLE } from '../data/people';
+import { openPrivacy } from '../lib/privacy';
 
 /**
- * Footer — provvisorio.
+ * Il footer.
  *
- * Contenuti e struttura sono quelli di prima; qui è stato fatto solo il
- * lavoro necessario per non trascinarsi dietro le dipendenze rimosse
- * (react-router-dom, lucide-react, GlassPanel) e per parlare la lingua dei
- * token nuovi invece degli hex.
+ * Struttura e contenuti sono quelli del sito precedente, come chiesto da
+ * LockVFX: riquadro con l'invito a scrivere, quattro colonne, riga finale.
+ * Quello che è cambiato è la materia: niente vetro, niente tilt, niente
+ * pillola traslucida — un pannello fermo con un filo di bordo, e il
+ * pulsante è lo stesso del form, perché fanno la stessa cosa.
  *
- * Lo step 7 lo ridisegna: servono le due P.IVA, le due email individuali,
- * la riga sul nome collettivo, la privacy e l'i18n completo.
+ * Il footer è anche l'unico posto del sito dove la legge chiede di essere
+ * esplicita: le due partite IVA in chiaro e la frase sul nome collettivo
+ * (`handoff-legale.md` §1) non sono decorazione e non si abbreviano. I dati
+ * vengono da `data/people.ts`: oggi segnaposto, domani i numeri veri, e non
+ * si tocca questo file.
  */
+
+/**
+ * Variante del titolo dell'invito. `full` = "Parliamone su info@…" com'era;
+ * `email` = la sola email grande, per quando la ripetizione con la Stanza
+ * (che dice già "Parliamone.") dà fastidio. Da mostrare a LockVFX.
+ */
+const FOOTER_CTA_VARIANT: 'full' | 'email' = 'full';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
@@ -41,77 +55,98 @@ const ArrowUpRight = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type LinkItem = { label: string; href: string };
-const NAV_COLUMNS: { title: string; links: LinkItem[] }[] = [
-  { title: 'Studio', links: [{ label: 'Reel', href: '#reel' }, { label: 'Studio', href: '#studio' }, { label: 'Lavori', href: '#work' }] },
-  { title: 'Contatti', links: [{ label: 'Scrivici', href: '#contact' }, { label: 'info@lockvfx.com', href: 'mailto:info@lockvfx.com' }] },
-];
-
-const SOCIALS: { label: string; href: string; icon: ComponentType<{ className?: string }> }[] = [
-  { label: 'Instagram', href: 'https://instagram.com', icon: InstagramIcon },
-  { label: 'LinkedIn', href: 'https://linkedin.com', icon: LinkedinIcon },
-  { label: 'Email', href: 'mailto:info@lockvfx.com', icon: MailIcon },
+const SOCIALS: { key: string; href: string; icon: ComponentType<{ className?: string }> }[] = [
+  { key: 'instagram', href: 'https://instagram.com', icon: InstagramIcon },
+  { key: 'linkedin', href: 'https://linkedin.com', icon: LinkedinIcon },
+  { key: 'email', href: `mailto:${CONTACT.email}`, icon: MailIcon },
 ];
 
 export function Footer() {
+  const { t } = useTranslation();
+  const year = new Date().getFullYear();
+  const link = 'text-t3 text-stone transition-colors duration-200 hover:text-ink';
+
   return (
     <footer
       id="site-footer"
       className="u-pad relative w-full bg-void pb-20 md:pb-28"
       style={{ paddingTop: 'max(calc(var(--pad) * 2), 5rem)' }}
     >
-      <section className="mx-auto mb-16 max-w-5xl rounded-frame border border-dust/25 p-10 md:p-14">
+      {/* L'invito. Un pannello fermo: il raggio grande è l'unica forma
+          arrotondata del sito oltre alle anteprime, ed è voluta — questo
+          blocco è un cartello, non una superficie dello spazio. */}
+      <section className="mx-auto mb-16 max-w-5xl rounded-[24px] border border-dust/25 p-10 md:p-14">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="u-cap mb-4 text-crimson">Hai un progetto in mente?</p>
+            <p className="u-cap mb-4 text-crimson">{t('footer.cta.kicker')}</p>
             <h2 className="u-display text-d3 text-ink">
-              Parliamone su <span className="text-crimson">info@lockvfx.com</span>
+              {FOOTER_CTA_VARIANT === 'full' ? `${t('footer.cta.title')} ` : null}
+              <a
+                href={`mailto:${CONTACT.email}`}
+                className="font-medium transition-colors duration-200 hover:text-crimson"
+              >
+                {CONTACT.email}
+              </a>
             </h2>
           </div>
           <a
-            href="mailto:info@lockvfx.com"
-            className="group flex shrink-0 items-center gap-2 self-start rounded-frame border border-dust/40 px-6 py-3 text-t3 text-ink transition-colors duration-200 hover:border-crimson hover:text-crimson"
+            href={`mailto:${CONTACT.email}`}
+            className="u-cap group flex h-[46px] shrink-0 items-center gap-2 self-start bg-ink px-6 text-void transition-colors duration-[var(--f5)] hover:bg-crimson hover:text-ink"
           >
-            Scrivici
+            {t('footer.cta.button')}
             <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </div>
       </section>
 
       <div className="mx-auto mb-16 grid max-w-5xl grid-cols-2 gap-10 md:grid-cols-4">
+        {/* Chi siamo, per davvero: la frase sul nome collettivo e le due
+            partite IVA. La sostanza è fissata dal Legale. */}
         <div className="col-span-2 md:col-span-1">
           <span className="text-t1 font-medium text-ink">LockVFX</span>
-          <p className="mt-2 max-w-55 text-t3 text-stone">
-            Effetti visivi per il cinema e la pubblicità.
+          <p className="mt-3 max-w-[42ch] text-t4 text-stone">
+            {t('footer.legal.collective', { a: PEOPLE[0].name, b: PEOPLE[1].name })}
           </p>
+          <ul className="mt-4 flex flex-col gap-1.5 font-mono text-[12px] leading-[1.6] text-stone">
+            {PEOPLE.map((person) => (
+              <li key={person.email}>
+                {person.name} — P.IVA {person.vat} —{' '}
+                <a href={`mailto:${person.email}`} className="transition-colors duration-200 hover:text-ink">
+                  {person.email}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {NAV_COLUMNS.map((col) => (
-          <div key={col.title}>
-            <p className="u-cap mb-4 text-dust">{col.title}</p>
-            <ul className="flex flex-col gap-2.5">
-              {col.links.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-t3 text-stone transition-colors duration-200 hover:text-ink">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div>
+          <p className="u-cap mb-4 text-stone">{t('footer.columns.studio.title')}</p>
+          <ul className="flex flex-col gap-2.5">
+            <li><a href="#reel" className={link}>{t('nav.reel')}</a></li>
+            <li><a href="#studio" className={link}>{t('nav.studio')}</a></li>
+            <li><a href="#work" className={link}>{t('nav.work')}</a></li>
+          </ul>
+        </div>
 
         <div>
-          <p className="u-cap mb-4 text-dust">Seguici</p>
+          <p className="u-cap mb-4 text-stone">{t('footer.columns.contact.title')}</p>
+          <ul className="flex flex-col gap-2.5">
+            <li><a href="#contact" className={link}>{t('footer.columns.contact.write')}</a></li>
+            <li><a href={`mailto:${CONTACT.email}`} className={link}>{CONTACT.email}</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="u-cap mb-4 text-stone">{t('footer.columns.social.title')}</p>
           <div className="flex gap-3">
-            {SOCIALS.map(({ label, href, icon: Icon }) => (
+            {SOCIALS.map(({ key, href, icon: Icon }) => (
               <a
-                key={label}
+                key={key}
                 href={href}
-                aria-label={label}
+                aria-label={t(`footer.social.${key}`)}
                 target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noreferrer' : undefined}
-                className="flex h-10 w-10 items-center justify-center rounded-frame border border-dust/30 text-stone transition-colors duration-200 hover:border-stone hover:text-ink"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-dust/30 text-stone transition-colors duration-200 hover:border-stone hover:text-ink"
               >
                 <Icon className="h-4 w-4" />
               </a>
@@ -120,9 +155,18 @@ export function Footer() {
         </div>
       </div>
 
+      {/* Riga finale: il copyright a sinistra e, dove prima c'era la firma
+          dell'estetica, le due informative — che è quello che serve. */}
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 border-t border-dust/20 pt-8 sm:flex-row">
-        <span className="font-mono text-t4 text-dust">
-          © {new Date().getFullYear()} LockVFX — tutti i diritti riservati.
+        <span className="text-t4 text-stone">© {year} LockVFX</span>
+        <span className="flex items-center gap-2 text-t4 text-stone">
+          <button type="button" onClick={openPrivacy} className="underline underline-offset-[3px] transition-colors duration-200 hover:text-ink">
+            {t('footer.legal.privacy')}
+          </button>
+          <span aria-hidden>·</span>
+          <button type="button" onClick={openPrivacy} className="underline underline-offset-[3px] transition-colors duration-200 hover:text-ink">
+            {t('footer.legal.cookie')}
+          </button>
         </span>
       </div>
     </footer>

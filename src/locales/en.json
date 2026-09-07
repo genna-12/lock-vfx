@@ -72,5 +72,34 @@
     "short": "We use what you send us (name, email, message) only to reply. No newsletter, no sharing with third parties. We keep it for 24 months after our last exchange, then delete it. Your message is delivered to our inboxes through EmailJS. You can ask us to access or delete your data at any time at {{email}}. Full details in the privacy notice.",
     "body": "The full privacy notice is being prepared and will be published here before the site goes live.",
     "close": "Close"
+  },
+  "footer": {
+    "cta": {
+      "kicker": "Got a project in mind?",
+      "title": "Let’s talk at",
+      "button": "Write to us"
+    },
+    "columns": {
+      "studio": {
+        "title": "Studio"
+      },
+      "contact": {
+        "title": "Contact",
+        "write": "Write to us"
+      },
+      "social": {
+        "title": "Follow us"
+      }
+    },
+    "social": {
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "email": "Email"
+    },
+    "legal": {
+      "collective": "LockVFX is the collective name under which {{a}} and {{b}} present their work. It is not a company: each of them works with their own VAT number and in their own name.",
+      "privacy": "Privacy policy",
+      "cookie": "Cookie policy"
+    }
   }
 }

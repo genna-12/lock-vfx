@@ -7,6 +7,7 @@ import { LangPill } from './components/chrome/LangPill';
 import { PerfNav } from './components/chrome/PerfNav';
 import { Stage } from './components/stage/Stage';
 import { Footer } from './components/Footer';
+import { PrivacyDialog } from './components/ui/PrivacyDialog';
 
 /**
  * Struttura della pagina.
@@ -56,6 +57,10 @@ export default function App() {
           <Footer />
         </div>
       </div>
+
+      {/* Fuori dallo smooth wrapper e fuori dallo stage: è modale, e la sua
+          posizione non deve dipendere dalle trasformazioni della camera. */}
+      <PrivacyDialog />
     </Loader>
   );
 }

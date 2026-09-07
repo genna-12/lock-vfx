@@ -12,11 +12,13 @@
 export type Person = {
   name: string;
   email: string;
+  /** Partita IVA: obbligatoria in home page (art. 35 D.P.R. 633/1972). */
+  vat: string;
 };
 
 export const PEOPLE: readonly Person[] = [
-  { name: '[Nome Cognome]', email: '[nome1]@lockvfx.com' },
-  { name: '[Nome Cognome]', email: '[nome2]@lockvfx.com' },
+  { name: '[Nome Cognome]', email: '[nome1]@lockvfx.com', vat: '[00000000000]' },
+  { name: '[Nome Cognome]', email: '[nome2]@lockvfx.com', vat: '[00000000000]' },
 ];
 
 /** L'indirizzo collettivo: la riga sotto i nomi, e il rimedio se l'invio fallisce. */

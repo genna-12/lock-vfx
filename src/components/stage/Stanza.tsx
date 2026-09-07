@@ -17,8 +17,8 @@ import { STAGE_VH } from '../../lib/camera';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { SendError, THROTTLE_MS, remainingThrottle, sendContact } from '../../lib/emailjs';
 import { CONTACT, PEOPLE } from '../../data/people';
+import { openPrivacy } from '../../lib/privacy';
 import { MARK_VIEWBOX, Mark, SHACKLE_CLOSED } from '../brand/Mark';
-import { PrivacyDialog } from '../ui/PrivacyDialog';
 
 /**
  * La stanza.
@@ -76,7 +76,6 @@ export function Stanza() {
   const [consent, setConsent] = useState(false);
   const [consentInvalid, setConsentInvalid] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
-  const [privacy, setPrivacy] = useState(false);
   const [inHold, setInHold] = useState(false);
   const [markW, setMarkW] = useState(markWidth);
 
@@ -359,7 +358,7 @@ export function Stanza() {
                 {t('contact.consent.before')}
                 <button
                   type="button"
-                  onClick={() => setPrivacy(true)}
+                  onClick={openPrivacy}
                   className="text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
                 >
                   {t('contact.consent.link')}
@@ -410,10 +409,6 @@ export function Stanza() {
           </form>
         </div>
       </div>
-
-      {/* Fuori dal blocco `inert`: il dialog è modale e deve restare usabile
-          anche se la stanza non è il set attivo. */}
-      <PrivacyDialog open={privacy} onClose={() => setPrivacy(false)} />
     </>
   );
 }

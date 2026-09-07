@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CONTACT } from '../../data/people';
+import { closePrivacy, usePrivacyOpen } from '../../lib/privacy';
 
 /**
  * L'informativa, in un `<dialog>` nativo.
@@ -14,14 +15,14 @@ import { CONTACT } from '../../data/people';
  *
  * Il testo è quello del Legale (informativa breve, cinque elementi non
  * rimovibili); `privacy.body` è il segnaposto dell'informativa completa.
+ *
+ * Sta in cima all'albero e lo aprono in due (la presa visione del form e il
+ * footer) attraverso `lib/privacy`: un solo dialog in pagina.
  */
-type PrivacyDialogProps = {
-  open: boolean;
-  onClose: () => void;
-};
-
-export function PrivacyDialog({ open, onClose }: PrivacyDialogProps) {
+export function PrivacyDialog() {
   const { t } = useTranslation();
+  const open = usePrivacyOpen();
+  const onClose = closePrivacy;
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 

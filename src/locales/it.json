@@ -72,5 +72,34 @@
     "short": "I dati che ci lasci (nome, email, messaggio) li usiamo solo per risponderti. Non finiscono in nessuna newsletter e non li cediamo a nessuno. Li conserviamo per 24 mesi dall’ultimo scambio, poi li cancelliamo. L’email viene inoltrata alle nostre caselle tramite EmailJS. Puoi chiederci in qualsiasi momento di accedere ai tuoi dati o di cancellarli scrivendo a {{email}}. Dettagli nell’informativa completa.",
     "body": "L’informativa completa è in preparazione e sarà pubblicata qui prima che il sito vada online.",
     "close": "Chiudi"
+  },
+  "footer": {
+    "cta": {
+      "kicker": "Hai un progetto in mente?",
+      "title": "Parliamone su",
+      "button": "Scrivici"
+    },
+    "columns": {
+      "studio": {
+        "title": "Studio"
+      },
+      "contact": {
+        "title": "Contatti",
+        "write": "Scrivici"
+      },
+      "social": {
+        "title": "Seguici"
+      }
+    },
+    "social": {
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "email": "Email"
+    },
+    "legal": {
+      "collective": "LockVFX è il nome collettivo con cui {{a}} e {{b}} presentano i propri lavori. Non è una società: ciascuno opera con la propria partita IVA e in proprio.",
+      "privacy": "Privacy policy",
+      "cookie": "Cookie policy"
+    }
   }
 }
