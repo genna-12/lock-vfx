@@ -222,7 +222,11 @@ export function Stage({ onActiveChange }: StageProps) {
           <section id="reel" data-set="reel" className="set" aria-label="Showreel">
             <div data-leaf="reel" className="absolute inset-0">
               <Reel />
-              <div data-veil="reel" aria-hidden className="absolute inset-0 bg-void opacity-0" />
+              <div
+                data-veil="reel"
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-void opacity-0"
+              />
             </div>
           </section>
 
@@ -247,7 +251,13 @@ export function Stage({ onActiveChange }: StageProps) {
       >
         <div data-leaf="sala" className="absolute inset-0">
           <Sala works={works} />
-          <div data-veil="sala" aria-hidden className="absolute inset-0 bg-void" />
+          {/* Il velo è una decorazione: se prende i click, la Sala smette di
+              rispondere al mouse e al dito anche quando è invisibile. */}
+          <div
+            data-veil="sala"
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-void"
+          />
         </div>
       </section>
 

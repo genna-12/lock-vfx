@@ -35,6 +35,8 @@ type DeckProps = {
   onCommit: (index: number) => void;
   /** Ogni gesto sulla deck tiene sveglio l'HUD. */
   onWake: () => void;
+  /** Trascinamento in corso: l'HUD non deve sparire a mano ferma. */
+  onDrag: (active: boolean) => void;
   /** Fuori dall'HOLD la rotella non si tocca: la pagina deve scorrere. */
   interceptWheel: boolean;
   reduced: boolean;
@@ -55,7 +57,7 @@ const WHEEL = { threshold: 45, resetAfter: 180, minGap: 260 } as const;
 const DRAG = { decide: 4, sampleMs: 90, friction: 0.92, launch: 1.2, stop: 0.5 } as const;
 
 export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
-  { works, index, onCommit, onWake, interceptWheel, reduced, compact, className = '' },
+  { works, index, onCommit, onWake, onDrag, interceptWheel, reduced, compact, className = '' },
   ref
 ) {
   const { t } = useTranslation();
@@ -111,11 +113,16 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
 
         card.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${ry}deg)`;
         card.style.zIndex = String(100 - Math.round(10 * a));
-        card.style.pointerEvents = opacity === 0 ? 'none' : 'auto';
+        // Stringa vuota, non 'auto': così la card eredita dall'HUD, che è
+        // inerte quando dorme. Con 'auto' una card invisibile resterebbe
+        // cliccabile sopra il video.
+        card.style.pointerEvents = opacity === 0 ? 'none' : '';
         card.style.setProperty('--card-op', String(opacity));
         card.style.setProperty('--card-sat', a >= 0.5 ? '0.6' : '1');
+        // `is-center` è visivo e segue il gesto; `aria-selected` no: dice
+        // qual è il lavoro scelto, e lo scrive il JSX da `index`. Mentre
+        // l'anello gira il lavoro non è ancora cambiato.
         card.classList.toggle('is-center', a < 0.5);
-        card.setAttribute('aria-selected', String(a < 0.5));
       });
     },
     [geometry, n]
@@ -181,7 +188,13 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
     d.horizontal = null;
     d.moved = 0;
     d.samples = [{ x: event.clientX, t: performance.now() }];
-    deckRef.current?.setPointerCapture(event.pointerId);
+    try {
+      // Il browser può rifiutare la cattura (puntatore già sparito, o un
+      // ambiente di prova): il trascinamento deve partire lo stesso.
+      deckRef.current?.setPointerCapture(event.pointerId);
+    } catch {
+      /* niente cattura: si va avanti con gli eventi normali */
+    }
   };
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -195,7 +208,10 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
     // deve poter scorrere anche partendo dalla deck.
     if (d.horizontal === null && (Math.abs(dx) > DRAG.decide || Math.abs(dy) > DRAG.decide)) {
       d.horizontal = Math.abs(dx) >= Math.abs(dy);
-      if (d.horizontal) deckRef.current?.classList.add('is-dragging');
+      if (d.horizontal) {
+        deckRef.current?.classList.add('is-dragging');
+        onDrag(true);
+      }
     }
     if (d.horizontal !== true) return;
 
@@ -225,6 +241,7 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
     }
     if (d.horizontal !== true) {
       deckRef.current?.classList.remove('is-dragging');
+      onDrag(false);
       return;
     }
 
@@ -239,6 +256,7 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
 
     const settle = () => {
       deckRef.current?.classList.remove('is-dragging');
+      onDrag(false);
       curRef.current += Math.round(liveRef.current);
       commit();
     };

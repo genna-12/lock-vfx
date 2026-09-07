@@ -47,6 +47,13 @@ export function Sala({ works }: SalaProps) {
   const blackRef = useRef<HTMLDivElement>(null);
   const deckRef = useRef<DeckHandle>(null);
   const awakeTimer = useRef<number | undefined>(undefined);
+  // Mentre la mano tiene una card l'HUD non se ne va, anche se la mano si
+  // ferma: sparire a metà gesto è come spegnere la luce mentre si sfoglia.
+  const draggingRef = useRef(false);
+  // Specchi per gli effetti che non devono rieseguirsi quando questi valori
+  // cambiano (il caricamento del video, per esempio).
+  const inHoldRef = useRef(false);
+  const reducedRef = useRef(false);
 
   const [index, setIndex] = useState(0);
   const [awake, setAwake] = useState(false);
@@ -82,8 +89,24 @@ export function Sala({ works }: SalaProps) {
   const wake = useCallback(() => {
     setAwake(true);
     window.clearTimeout(awakeTimer.current);
-    awakeTimer.current = window.setTimeout(() => setAwake(false), AWAKE_MS);
+    const sleep = () => {
+      if (draggingRef.current) {
+        // Ancora in mano: si riprova più tardi, non si spegne.
+        awakeTimer.current = window.setTimeout(sleep, AWAKE_MS);
+        return;
+      }
+      setAwake(false);
+    };
+    awakeTimer.current = window.setTimeout(sleep, AWAKE_MS);
   }, []);
+
+  const onDeckDrag = useCallback(
+    (active: boolean) => {
+      draggingRef.current = active;
+      wake();
+    },
+    [wake]
+  );
 
   useEffect(() => () => window.clearTimeout(awakeTimer.current), []);
 
@@ -184,14 +207,22 @@ export function Sala({ works }: SalaProps) {
     [index, reduced]
   );
 
-  // Cambiato lavoro: nuova sorgente, poster subito, tempo da zero.
+  useEffect(() => {
+    inHoldRef.current = inHold;
+    reducedRef.current = reduced;
+  }, [inHold, reduced]);
+
+  // Solo il cambio di lavoro ricarica la sorgente. Entrare e uscire
+  // dall'HOLD mette in pausa e riprende: non riavvolge il film.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     video.load();
     if (fillRef.current) fillRef.current.style.width = '0%';
-    if (inHold && WORKS_HAVE_VIDEO && !reduced) void video.play().catch(() => undefined);
-  }, [index, inHold, reduced]);
+    if (inHoldRef.current && WORKS_HAVE_VIDEO && !reducedRef.current) {
+      void video.play().catch(() => undefined);
+    }
+  }, [index]);
 
   /* ---- controlli ------------------------------------------------------- */
   const togglePlay = useCallback(() => {
@@ -270,6 +301,10 @@ export function Sala({ works }: SalaProps) {
 
   /* ---- fine video: gira l'anello --------------------------------------- */
   const onEnded = useCallback(() => {
+    // Il nero comincia subito: dodici fotogrammi di buio, non dodici
+    // fotogrammi dell'ultimo fotogramma congelato.
+    const black = blackRef.current;
+    if (black && !reducedRef.current) black.style.opacity = '1';
     window.setTimeout(() => deckRef.current?.step(1), END_BLACK_MS);
   }, []);
 
@@ -415,6 +450,7 @@ export function Sala({ works }: SalaProps) {
           index={index}
           onCommit={commit}
           onWake={wake}
+          onDrag={onDeckDrag}
           interceptWheel={inHold && !portrait}
           reduced={reduced}
           compact={compact}

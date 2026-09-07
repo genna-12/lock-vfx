@@ -106,20 +106,19 @@ export function Loader({ children }: { children: ReactNode }) {
         closing = true;
         gsap.ticker.remove(watch);
         window.clearTimeout(ceiling);
-        gsap
-          .timeline({ onComplete: cut })
-          // gli ultimi 3 px: il lucchetto si chiude
-          .to(shackle, {
-            strokeDashoffset: 0,
-            y: 0,
-            duration: MOTION.f2 / 1000,
-            ease: EASE.cut,
-          })
-          // un fotogramma rosso, poi il taglio
-          .call(() => {
-            if (markRef.current) markRef.current.style.color = 'var(--color-crimson)';
-          })
-          .to({}, { duration: MOTION.f2 / 1000 });
+        // L'animazione può stare su GSAP: è decorazione. Il fotogramma rosso
+        // e lo stacco no — sono le due cose che DEVONO succedere, e in una
+        // scheda in secondo piano il ticker è fermo. Vanno sui timer.
+        gsap.to(shackle, {
+          strokeDashoffset: 0,
+          y: 0,
+          duration: MOTION.f2 / 1000,
+          ease: EASE.cut,
+        });
+        window.setTimeout(() => {
+          if (markRef.current) markRef.current.style.color = 'var(--color-crimson)';
+          window.setTimeout(cut, MOTION.f2);
+        }, MOTION.f2);
       };
 
       const watch = () => {
