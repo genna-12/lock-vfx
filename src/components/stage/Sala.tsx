@@ -316,6 +316,11 @@ export function Sala({ works }: SalaProps) {
   return (
     <div
       ref={rootRef}
+      // Fuori dalla sua finestra la sala esce anche dal giro del Tab: il
+      // puntatore lo ferma già lo Stage, ma un `pointer-events: none` non
+      // ferma la tastiera, e chi naviga a tastiera si troverebbe dentro un
+      // set che non sta guardando.
+      inert={!inHold}
       className={`absolute inset-0 bg-void ${portrait ? 'flex flex-col' : ''}`}
       onPointerMove={portrait ? undefined : wake}
       onPointerDown={portrait ? undefined : wake}
