@@ -3,12 +3,13 @@ import { Mark } from '../brand/Mark';
 /**
  * Marchio + nome, in alto a sinistra, sempre presente: è l'unico elemento
  * che non cambia mai durante la carrellata, quindi è anche il punto fermo
- * dell'orientamento. Click = si torna in cima.
+ * dell'orientamento. Click = si torna in cima; dalla pagina Studio si torna
+ * alla home, che per chi legge è la stessa cosa.
  */
-export function Wordmark() {
+export function Wordmark({ href = '#top' }: { href?: string }) {
   return (
     <a
-      href="#top"
+      href={href}
       className="pointer-events-auto flex items-center gap-2.5 text-ink transition-opacity duration-200 hover:opacity-70"
     >
       <Mark size={18} />

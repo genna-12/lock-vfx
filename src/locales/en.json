@@ -28,7 +28,8 @@
       "a": "[Name] · compositing",
       "b": "[Name] · 3D/CGI",
       "c": "[City]"
-    }
+    },
+    "cta": "What we do →"
   },
   "sala": {
     "deck": "Choose a work",
@@ -100,6 +101,83 @@
       "collective": "LockVFX is the collective name under which {{a}} and {{b}} present their work. It is not a company: each of them works with their own VAT number and in their own name.",
       "privacy": "Privacy policy",
       "cookie": "Cookie policy"
+    }
+  },
+  "landing": {
+    "back": "Back to the site",
+    "nav": {
+      "label": "On this page",
+      "chi": "About",
+      "servizi": "What we do",
+      "come": "How we work",
+      "persone": "The people",
+      "contatti": "Contact"
+    },
+    "chi": {
+      "h1": "Visual effects for film, series and advertising.",
+      "lead": "LockVFX is the shared name [Name 1] and [Name 2] work under: from a single shot cleanup to a sequence built from scratch, held to the same standard.",
+      "paragraph": "[...]"
+    },
+    "servizi": {
+      "h2": "What we do",
+      "intro": "A full service, or just the piece missing from your pipeline.",
+      "compositing": {
+        "title": "Compositing",
+        "body": "Element integration, keying and roto, 2D/3D tracking, shot-by-shot grading."
+      },
+      "cgi": {
+        "title": "3D and CGI",
+        "body": "Modeling, look development, lighting and rendering of assets and environments integrated into the plate."
+      },
+      "matte": {
+        "title": "Matte painting and environments",
+        "body": "Set extensions, skies, landscapes and cities: the ones that don’t exist, or do but not quite like that."
+      },
+      "cleanup": {
+        "title": "Cleanup and removals",
+        "body": "Wires, rigs, logos, reflections, anything that shouldn’t be in frame: gone without a trace."
+      },
+      "sim": {
+        "title": "Simulations",
+        "body": "Fire, smoke, water, destruction, particles and cloth, scaled to the shot."
+      },
+      "finishing": {
+        "title": "Finishing",
+        "body": "Conform, quality control, delivery in the formats post and distributors need."
+      }
+    },
+    "come": {
+      "h2": "How we work",
+      "step1": {
+        "title": "Brief and breakdown",
+        "body": "We read the script or the cut, count the shots, and say what post needs and what shooting can save."
+      },
+      "step2": {
+        "title": "On set, if needed",
+        "body": "VFX supervision, references, HDRIs, measurements: whatever makes post shorter."
+      },
+      "step3": {
+        "title": "Post and revisions",
+        "body": "Numbered versions, notes in one place, timelines agreed before we start."
+      },
+      "step4": {
+        "title": "Delivery",
+        "body": "In post’s formats, with separate passes if you need them."
+      }
+    },
+    "persone": {
+      "h2": "The people",
+      "placeholder": "[Role · city · two lines on what they do and for how long]",
+      "transparency": "Two freelancers with separate VAT numbers, working together and with others: LockVFX isn’t a company."
+    },
+    "contatti": {
+      "h2": "Let’s talk.",
+      "paragraph": "A project, a sequence, a doubt about what’s possible: get in touch.",
+      "cta": "Get in touch →"
+    },
+    "meta": {
+      "title": "LockVFX — Studio and services",
+      "description": "LockVFX is the name two VFX artists work under: compositing, 3D and CGI, matte painting, simulations, finishing. The method, the services, the contacts."
     }
   }
 }

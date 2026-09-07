@@ -21,6 +21,11 @@ import { STATEMENT_WEIGHT } from '../../brand/tokens';
  */
 export function Statement() {
   const { t } = useTranslation();
+  // La freccia sta dentro il testo tradotto: qui si stacca per poterla
+  // muovere all'hover senza toglierla ai traduttori.
+  const cta = t('statement.cta');
+  const match = /^(.*?)\s*(→)\s*$/.exec(cta);
+  const [label, arrow] = match ? [match[1], match[2]] : [cta, null];
 
   return (
     <div
@@ -43,13 +48,35 @@ export function Statement() {
         <p data-line className="max-w-[40ch] text-[clamp(16px,1.3vw,19px)] leading-[1.5] text-stone">
           {t('statement.paragraph')}
         </p>
-        {/* `stone` e non `dust`: qui non c'è un'etichetta, ci sono i nomi delle
-            due persone — è contenuto, e in `dust` starebbe a 3,56:1. */}
-        <p data-line className="u-cap flex flex-wrap gap-x-6 gap-y-2 text-stone">
-          <span>{t('statement.credits.a')}</span>
-          <span>{t('statement.credits.b')}</span>
-          <span>{t('statement.credits.c')}</span>
-        </p>
+        {/* Terza riga: i nomi e, sotto, l'unica porta verso la pagina di
+            testo. Stanno nello stesso `[data-line]` perché la camera ne
+            muove tre, e tre devono restare. */}
+        <div data-line className="flex flex-col gap-5">
+          {/* `stone` e non `dust`: qui non c'è un'etichetta, ci sono i nomi
+              delle due persone — è contenuto. */}
+          <p className="u-cap flex flex-wrap gap-x-6 gap-y-2 text-stone">
+            <span>{t('statement.credits.a')}</span>
+            <span>{t('statement.credits.b')}</span>
+            <span>{t('statement.credits.c')}</span>
+          </p>
+          {/* Navigazione vera, non un pannello: la home si smonta e al
+              ritorno il loader dura 300 ms. È cliccabile solo quando lo
+              Studio è il set inquadrato (lo Stage toglie `inert`). */}
+          <a
+            href="/studio/"
+            className="group pointer-events-auto inline-flex items-center gap-2 self-start text-[15px] font-medium text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
+          >
+            {label}
+            {arrow ? (
+              <span
+                aria-hidden
+                className="transition-transform duration-[var(--f5)] ease-[var(--ease-arrive)] group-hover:translate-x-1"
+              >
+                {arrow}
+              </span>
+            ) : null}
+          </a>
+        </div>
       </div>
     </div>
   );

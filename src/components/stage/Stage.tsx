@@ -23,6 +23,14 @@ import { loadWorks } from '../../data/works';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
+/**
+ * Quando lo Statement è in scena: dalla fine di T1 (le righe sono arrivate)
+ * all'inizio di T2 (la camera comincia ad attraversarlo). Fuori di qui è
+ * `inert`, altrimenti il link alla pagina Studio resterebbe cliccabile e
+ * raggiungibile col tab anche a opacità 0.
+ */
+const STUDIO_LIVE = { from: 150 / STAGE_VH, to: 300 / STAGE_VH } as const;
+
 
 /**
  * Lo spazio, e la camera che lo attraversa.
@@ -106,6 +114,7 @@ export function Stage({ onActiveChange }: StageProps) {
       const [reelScreen] = q('[data-leaf="reel"]');
       const [reelVeil] = q('[data-veil="reel"]');
       const [statement] = q('[data-statement]');
+      const [studio] = q('[data-set="studio"]');
       const lines = q('[data-line]');
       const [sala] = q('[data-set="work"]');
       const [salaLeaf] = q('[data-leaf="sala"]');
@@ -115,6 +124,11 @@ export function Stage({ onActiveChange }: StageProps) {
       // Stato di partenza. I valori che dipendono dal viewport sono funzioni:
       // `invalidateOnRefresh` le rivaluta a ogni refresh, così il resize non
       // lascia in giro pixel calcolati su un'altra finestra.
+      // Fuori dal suo momento lo Statement e' invisibile ma presente: senza
+      // `inert` il link alla pagina Studio resterebbe cliccabile e
+      // raggiungibile col tab anche a opacita' 0.
+      studio.inert = true;
+
       gsap.set(lines, { z: () => MOVE.statementZ * amplitude(), opacity: 0 });
       gsap.set(stanza, { yPercent: 100 });
       gsap.set(salaLeaf, { scale: MOVE.salaScaleIn });
@@ -155,6 +169,7 @@ export function Stage({ onActiveChange }: StageProps) {
             // quella piu' in basso nel foglio, non quella aggiunta dopo.
             const live = self.progress > SALA_LIVE.from && self.progress < SALA_LIVE.to;
             sala.style.pointerEvents = live ? 'auto' : 'none';
+            studio.inert = !(self.progress > STUDIO_LIVE.from && self.progress < STUDIO_LIVE.to);
           },
         },
       });

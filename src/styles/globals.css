@@ -358,6 +358,22 @@
   }
 }
 
+/* ---------- Stampa (pagina Studio) ---------------------------------------
+   L'unica pagina che ha senso stampare e' quella di testo: nero su bianco,
+   senza l'indice (che e' navigazione, non contenuto) e senza il chrome.
+   Sta fuori da `@layer` per la stessa ragione delle regole `.static`: deve
+   scavalcare le utility di Tailwind senza un `!important`.
+   ------------------------------------------------------------------------ */
+
+@media print {
+  .page-studio { background: #fff; color: #000; min-height: 0; }
+  .page-studio * { color: #000 !important; background: transparent !important; }
+  .page-studio nav[aria-label],
+  .page-studio > div:first-child { display: none; }
+  .page-studio a { text-decoration: none; }
+  .page-studio section { break-inside: avoid; }
+}
+
 /* ---------- Modalita' statica -------------------------------------------
    `prefers-reduced-motion`, oppure GSAP che non parte: niente camera, i set
    tornano in flusso normale, uno per schermata, luci spente.

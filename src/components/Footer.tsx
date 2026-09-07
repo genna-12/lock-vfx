@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CONTACT, PEOPLE } from '../data/people';
-import { openPrivacy } from '../lib/privacy';
+import { CONTACT } from '../data/people';
+import { CollectiveLine, PolicyLinks, VatLines } from './legal/LegalLines';
 
 /**
  * Il footer.
@@ -104,19 +104,8 @@ export function Footer() {
             partite IVA. La sostanza è fissata dal Legale. */}
         <div className="col-span-2 md:col-span-1">
           <span className="text-t1 font-medium text-ink">LockVFX</span>
-          <p className="mt-3 max-w-[42ch] text-t4 text-stone">
-            {t('footer.legal.collective', { a: PEOPLE[0].name, b: PEOPLE[1].name })}
-          </p>
-          <ul className="mt-4 flex flex-col gap-1.5 font-mono text-[12px] leading-[1.6] text-stone">
-            {PEOPLE.map((person) => (
-              <li key={person.email}>
-                {person.name} — P.IVA {person.vat} —{' '}
-                <a href={`mailto:${person.email}`} className="transition-colors duration-200 hover:text-ink">
-                  {person.email}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <CollectiveLine className="mt-3 max-w-[42ch] text-t4 text-stone" />
+          <VatLines className="mt-4" />
         </div>
 
         <div>
@@ -159,15 +148,7 @@ export function Footer() {
           dell'estetica, le due informative — che è quello che serve. */}
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 border-t border-dust/20 pt-8 sm:flex-row">
         <span className="text-t4 text-stone">© {year} LockVFX</span>
-        <span className="flex items-center gap-2 text-t4 text-stone">
-          <button type="button" onClick={openPrivacy} className="underline underline-offset-[3px] transition-colors duration-200 hover:text-ink">
-            {t('footer.legal.privacy')}
-          </button>
-          <span aria-hidden>·</span>
-          <button type="button" onClick={openPrivacy} className="underline underline-offset-[3px] transition-colors duration-200 hover:text-ink">
-            {t('footer.legal.cookie')}
-          </button>
-        </span>
+        <PolicyLinks className="text-t4 text-stone" />
       </div>
     </footer>
   );
