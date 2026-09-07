@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { assertTokensInSync, type SetId } from './brand/tokens';
+import { applyHead } from './lib/head';
 import { Loader } from './components/Loader';
 import { Wordmark } from './components/chrome/Wordmark';
 import { LangPill } from './components/chrome/LangPill';
@@ -28,10 +29,13 @@ export default function App() {
 
   useEffect(() => assertTokensInSync(), []);
   useEffect(() => {
-    document.documentElement.lang = lang;
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute('content', t('meta.description'));
+    applyHead({
+      title: t('meta.title'),
+      description: t('meta.description'),
+      path: '/',
+      lang,
+      imageAlt: t('meta.ogAlt'),
+    });
   }, [lang, t]);
 
   return (

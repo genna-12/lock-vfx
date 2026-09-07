@@ -6,11 +6,10 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/outfit-var.woff2" as="font" type="font/woff2" crossorigin />
-    <!-- Canonical: torna allo Step 9, insieme a `hreflang`, OG e meta, quando
-         il dominio è deciso. Va scritto assoluto (`https://…/studio/`): Vite
-         legge ogni `href` di `<link>` come un asset da mettere nel bundle, e
-         un percorso relativo che punta a una cartella fa fallire il build
-         con `EISDIR`. -->
+    <!-- Canonical: la scrive `src/lib/head.ts` quando `SITE_URL` è pieno, e
+         assoluta. Qui non può stare: Vite legge ogni `href` di `<link>` come
+         un asset da mettere nel bundle, e un percorso relativo che punta a
+         una cartella fa fallire il build con `EISDIR`. -->
     <title>LockVFX — Studio e servizi</title>
     <!-- Versione statica (crawler senza JS): StudioPage la riallinea alla
          lingua attiva. Questa e' l'unica pagina di testo del sito, ed e'
@@ -19,6 +18,24 @@
       name="description"
       content="LockVFX è il nome con cui due artisti VFX lavorano insieme: compositing, 3D e CGI, matte painting, simulazioni, finishing. Il metodo, i servizi, i contatti."
     />
+    <!-- Scheda social. Statica in italiano come la descrizione qui sopra;
+         `src/lib/head.ts` la riallinea alla lingua attiva, e ci aggiunge
+         `og:url` e l'indirizzo assoluto dell'immagine quando il dominio è
+         deciso. L'indirizzo relativo qui va bene: Vite legge come asset gli
+         `href` dei `<link>`, non il `content` dei `<meta>`. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="LockVFX" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:title" content="LockVFX — Studio e servizi" />
+    <meta property="og:description" content="LockVFX è il nome con cui due artisti VFX lavorano insieme: compositing, 3D e CGI, matte painting, simulazioni, finishing. Il metodo, i servizi, i contatti." />
+    <meta property="og:image" content="/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Il marchio LockVFX" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og.png" />
+    <meta name="twitter:image:alt" content="Il marchio LockVFX" />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#020202" />
   </head>

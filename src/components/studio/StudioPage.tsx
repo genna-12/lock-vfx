@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { applyHead } from '../../lib/head';
 import { PEOPLE } from '../../data/people';
 import { Wordmark } from '../chrome/Wordmark';
 import { LangPill } from '../chrome/LangPill';
@@ -49,11 +50,13 @@ export function StudioPage() {
   const [current, setCurrent] = useState<SectionId>('chi');
 
   useEffect(() => {
-    document.documentElement.lang = lang;
-    document.title = t('landing.meta.title');
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute('content', t('landing.meta.description'));
+    applyHead({
+      title: t('landing.meta.title'),
+      description: t('landing.meta.description'),
+      path: '/studio/',
+      lang,
+      imageAlt: t('meta.ogAlt'),
+    });
   }, [lang, t]);
 
   // La voce corrente dell'indice. `IntersectionObserver` e non lo scroll:
