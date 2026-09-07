@@ -248,7 +248,7 @@ export function Stanza() {
             {PEOPLE.map((person) => (
               <div key={person.email}>
                 <span className="font-medium">{person.name}</span>
-                <span className="mx-2 text-dust">—</span>
+                <span className="mx-2 text-stone">—</span>
                 <a
                   href={`mailto:${person.email}`}
                   className="text-stone transition-colors duration-[var(--f5)] hover:text-crimson"
@@ -257,7 +257,7 @@ export function Stanza() {
                 </a>
               </div>
             ))}
-            <div className="mt-1 text-t4 text-dust">
+            <div className="mt-1 text-t4 text-stone">
               {t('contact.city')} ·{' '}
               <a
                 href={`mailto:${CONTACT.email}`}
@@ -474,7 +474,7 @@ function Field({
 
   return (
     <label className={clsx('relative flex flex-col gap-[14px]', multiline && 'col-span-full')}>
-      <span className="u-cap text-dust">{label}</span>
+      <span className="u-cap text-stone">{label}</span>
       {multiline ? (
         <textarea
           {...shared}
@@ -505,8 +505,11 @@ function Field({
           onChange={(event) => onValue(name, event.currentTarget.value)}
         />
       )}
+      {/* Spento vuol dire assente: invisibile ma leggibile da uno screen
+          reader sarebbe un errore annunciato che non c'è. */}
       <span
         id={messageId}
+        aria-hidden={!invalid || undefined}
         className={clsx(
           'absolute top-full left-0 mt-2 text-t4 text-stone transition-[opacity,transform] duration-[var(--f5)] ease-[var(--ease-arrive)]',
           invalid ? 'translate-y-0 opacity-100' : '-translate-y-1 opacity-0'

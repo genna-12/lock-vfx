@@ -4,7 +4,7 @@ const LANGS = ['it', 'en'] as const;
 
 /**
  * Cambio lingua. Nessun bordo, nessuna pillola disegnata: due etichette e
- * una barra sottile fra le due. La lingua attiva è `ink`, l'altra `dust`.
+ * una barra sottile fra le due. La lingua attiva è `ink`, l'altra `stone`.
  */
 export function LangPill() {
   const { i18n } = useTranslation();
@@ -21,7 +21,7 @@ export function LangPill() {
             aria-current={current === lng ? 'true' : undefined}
             onClick={() => void i18n.changeLanguage(lng)}
             className={`u-cap transition-colors duration-200 ${
-              current === lng ? 'text-ink' : 'text-dust hover:text-stone'
+              current === lng ? 'text-ink' : 'text-stone hover:text-ink'
             }`}
           >
             {lng}

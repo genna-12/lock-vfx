@@ -44,11 +44,11 @@ export function PrivacyDialog() {
         if (event.target === ref.current) onClose();
       }}
     >
-      <h2 id={titleId} className="u-cap m-0 text-dust">
+      <h2 id={titleId} className="u-cap m-0 text-stone">
         {t('privacy.title')}
       </h2>
       <p className="mt-6 text-t3 text-stone">{t('privacy.short', { email: CONTACT.email })}</p>
-      <p className="mt-4 text-t3 text-dust">{t('privacy.body')}</p>
+      <p className="mt-4 text-t3 text-stone">{t('privacy.body')}</p>
       <button
         type="button"
         onClick={onClose}

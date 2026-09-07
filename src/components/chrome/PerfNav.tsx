@@ -75,7 +75,7 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
               >
                 <span
                   className={`u-cap hidden whitespace-nowrap transition-opacity duration-200 md:block ${
-                    isActive ? 'text-stone opacity-100' : 'text-dust opacity-0 group-hover:opacity-100'
+                    isActive ? 'text-stone opacity-100' : 'text-stone opacity-0 group-hover:opacity-100'
                   }`}
                 >
                   {t(`nav.${id}`)}
