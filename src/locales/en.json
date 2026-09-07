@@ -11,5 +11,14 @@
   },
   "meta": {
     "description": "LockVFX — visual effects for film, series and advertising: compositing, CGI, environments, cleanup and finishing. The name under which [Name] and [Name] work together."
+  },
+  "loader": {
+    "label": "Loading"
+  },
+  "reel": {
+    "h1": "LockVFX — visual effects for film, series and advertising",
+    "play": "Play reel",
+    "audioOn": "Turn sound on",
+    "audioOff": "Turn sound off"
   }
 }

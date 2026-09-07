@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 /**
  * Marchio LockVFX — PLACEHOLDER.
  *
@@ -19,6 +21,19 @@ type MarkProps = {
   className?: string;
   /** Testo accessibile. Se assente il marchio è decorativo (aria-hidden). */
   title?: string;
+  /**
+   * Di quanti px la staffa è sollevata rispetto al corpo. 0 = lucchetto
+   * chiuso. Il Loader la fa scendere col caricamento, la Stanza la tiene a 6
+   * e la chiude all'invio del form.
+   */
+  shackleOffset?: number;
+  /**
+   * Se presente, il marchio è disegnato a tratto di questo spessore in px
+   * reali (`vector-effect`), non a pieno. È così che lo vuole il Loader.
+   */
+  strokeWidth?: number;
+  /** Per animare la staffa dall'esterno (dasharray, scatto finale). */
+  shackleRef?: Ref<SVGPathElement>;
 };
 
 const SHACKLE =
@@ -42,7 +57,27 @@ function perf(x: number, y: number): string {
   return `M${x + 3},${y} h13 a3,3 0 0 1 3,3 v21 a3,3 0 0 1 -3,3 h-13 a3,3 0 0 1 -3,-3 v-21 a3,3 0 0 1 3,-3 z`;
 }
 
-export function Mark({ size = 24, className, title }: MarkProps) {
+export function Mark({
+  size = 24,
+  className,
+  title,
+  shackleOffset = 0,
+  strokeWidth,
+  shackleRef,
+}: MarkProps) {
+  const outlined = strokeWidth !== undefined;
+  // Il viewBox è alto 692 unità e sullo schermo è alto `size` px: per
+  // sollevare la staffa di N px reali servono N × 692 / size unità.
+  const lift = shackleOffset ? (shackleOffset * 692) / size : 0;
+  const paint = outlined
+    ? {
+        fill: 'none' as const,
+        stroke: 'currentColor',
+        strokeWidth,
+        vectorEffect: 'non-scaling-stroke' as const,
+      }
+    : { fill: 'currentColor' };
+
   return (
     <svg
       viewBox="0 0 434 692"
@@ -52,12 +87,18 @@ export function Mark({ size = 24, className, title }: MarkProps) {
       role={title ? 'img' : undefined}
       aria-hidden={title ? undefined : true}
       aria-label={title}
-      fill="currentColor"
       focusable="false"
+      overflow="visible"
     >
       {title ? <title>{title}</title> : null}
-      <path data-mark="shackle" d={SHACKLE} />
-      <path data-mark="body" d={BODY} fillRule="evenodd" />
+      <path
+        ref={shackleRef}
+        data-mark="shackle"
+        d={SHACKLE}
+        transform={lift ? `translate(0 ${-lift})` : undefined}
+        {...paint}
+      />
+      <path data-mark="body" d={BODY} fillRule="evenodd" {...paint} />
     </svg>
   );
 }

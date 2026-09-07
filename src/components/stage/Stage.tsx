@@ -6,6 +6,7 @@ import { CAMERA, COLORS, type SetId } from '../../brand/tokens';
 import { MOVE, SALA_LIVE, STAGE_VH, activeSetAt, amplitude } from '../../lib/camera';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
+import { Reel } from './Reel';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -181,9 +182,24 @@ export function Stage({ onActiveChange }: StageProps) {
 
     ScrollTrigger.refresh();
 
+    // Maniglia di sviluppo: serve per ispezionare la carrellata dalla console
+    // (e per le verifiche degli step). `import.meta.env.DEV` la fa sparire
+    // dal build di produzione insieme al ramo.
+    if (import.meta.env.DEV) {
+      (window as unknown as { __lock?: unknown }).__lock = {
+        ScrollTrigger,
+        ScrollSmoother,
+        smoother,
+        get timeline() {
+          return ScrollTrigger.getById('stage')?.animation;
+        },
+      };
+    }
+
     return () => {
       ctx.revert();
       smoother.kill();
+      if (import.meta.env.DEV) delete (window as unknown as { __lock?: unknown }).__lock;
     };
   }, [reduce, notify]);
 
@@ -194,11 +210,8 @@ export function Stage({ onActiveChange }: StageProps) {
       <div className="camera">
         <div className="world">
           <section id="reel" data-set="reel" className="set" aria-label="Showreel">
-            <div
-              data-leaf="reel"
-              className="absolute inset-0 grid place-items-center bg-obsidian ring-1 ring-dust/30 ring-inset"
-            >
-              <span className="u-cap text-stone">Reel</span>
+            <div data-leaf="reel" className="absolute inset-0">
+              <Reel />
               <div data-veil="reel" aria-hidden className="absolute inset-0 bg-void opacity-0" />
             </div>
           </section>
