@@ -17,7 +17,7 @@ import { STAGE_VH } from '../../lib/camera';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { SendError, THROTTLE_MS, remainingThrottle, sendContact } from '../../lib/emailjs';
 import { CONTACT, PEOPLE } from '../../data/people';
-import { MARK_VIEWBOX, Mark } from '../brand/Mark';
+import { MARK_VIEWBOX, Mark, SHACKLE_CLOSED } from '../brand/Mark';
 import { PrivacyDialog } from '../ui/PrivacyDialog';
 
 /**
@@ -39,9 +39,7 @@ import { PrivacyDialog } from '../ui/PrivacyDialog';
 
 /** HOLD 4: da 500vh alla fine dei 560. Fuori di qui la stanza è `inert`. */
 const HOLD_FROM = 500 / STAGE_VH;
-/** Di quanti px reali la staffa sta sollevata finché il form non è partito. */
-const SHACKLE_PX = 6;
-/** Mezzo fotogramma di rosso sulla staffa: si sente, non si legge. */
+/** Mezzo fotogramma di rosso sul marchio: si sente, non si legge. */
 const FLASH_MS = 42;
 /** Larghezza del marchio grande: `clamp(140px, 16vw, 240px)`, 96 su mobile. */
 const MARK = { min: 140, vw: 0.16, max: 240, mobile: 96 } as const;
@@ -83,6 +81,7 @@ export function Stanza() {
   const [markW, setMarkW] = useState(markWidth);
 
   const shackleRef = useRef<SVGPathElement>(null);
+  const markRef = useRef<HTMLSpanElement>(null);
   const hpRef = useRef<HTMLInputElement>(null);
   const consentRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -95,7 +94,6 @@ export function Stanza() {
   const locked = status === 'sending' || status === 'sent';
   const closed = status === 'sent';
   const markH = (markW * MARK_VIEWBOX.h) / MARK_VIEWBOX.w;
-  const lift = (SHACKLE_PX * MARK_VIEWBOX.h) / markH;
 
   /* ---- dentro la carrellata -------------------------------------------- */
   useEffect(() => {
@@ -115,34 +113,36 @@ export function Stanza() {
   }, []);
 
   /* ---- la staffa -------------------------------------------------------- */
-  // Stile inline e non una classe: la posizione della staffa dipende da
-  // quanto è grande il marchio a schermo (6 px reali sono unità diverse a
-  // 96 px e a 240 px di larghezza), e quel numero lo sa solo il JS.
+  // Stile inline e non una classe: dentro l'SVG un px CSS è un'unità di
+  // viewBox, quindi la discesa è esattamente i 25 del disegno a qualunque
+  // dimensione — e la transizione deve stare sull'elemento, non su una
+  // classe che React sostituirebbe insieme al resto.
   useLayoutEffect(() => {
     const el = shackleRef.current;
     if (!el) return;
     el.style.transition = reduced ? 'none' : `transform ${MOTION.f2}ms var(--ease-cut)`;
-    el.style.transform = closed ? 'none' : `translateY(${-lift}px)`;
+    el.style.transform = closed ? `translateY(${SHACKLE_CLOSED}px)` : 'none';
+    const root = markRef.current;
     if (!closed || reduced) {
-      el.style.stroke = '';
+      if (root) root.style.color = '';
       return;
     }
-    // Un solo fotogramma di rosso quando la staffa tocca il corpo. Con
-    // `setTimeout` e non con GSAP: se la scheda va in secondo piano il
-    // ticker si ferma e il rosso resterebbe acceso.
+    // Un solo fotogramma di rosso quando la staffa tocca il corpo e il
+    // marchio si riempie. Con `setTimeout` e non con GSAP: se la scheda va
+    // in secondo piano il ticker si ferma e il rosso resterebbe acceso.
     let off = 0;
     const on = window.setTimeout(() => {
-      el.style.stroke = 'var(--color-crimson)';
+      if (root) root.style.color = 'var(--color-crimson)';
       off = window.setTimeout(() => {
-        el.style.stroke = '';
+        if (root) root.style.color = '';
       }, FLASH_MS);
     }, MOTION.f2);
     return () => {
       window.clearTimeout(on);
       window.clearTimeout(off);
-      el.style.stroke = '';
+      if (root) root.style.color = '';
     };
-  }, [closed, lift, reduced]);
+  }, [closed, reduced]);
 
   /* ---- un invio al minuto ------------------------------------------------ */
   // Dopo l'invio il form resta compilato e fermo: chi ha scritto vede cosa ha
@@ -240,13 +240,11 @@ export function Stanza() {
         {/* Chi siamo. Il marchio prende la luce di taglio; sotto, i nomi veri:
             LockVFX è un nome collettivo, non una società, e si deve vedere. */}
         <div className="order-2 flex items-center gap-[22px] md:order-1 md:flex-col md:items-start md:gap-[28px]">
-          <Mark
-            size={markH}
-            strokeWidth={markW >= MARK.min ? 2 : 1.5}
-            shackleOffset={SHACKLE_PX}
-            shackleRef={shackleRef}
-            className="shrink-0 text-ink"
-          />
+          {/* Il colore sta sul contenitore: il fotogramma rosso della
+              chiusura è del marchio intero, non della sola staffa. */}
+          <span ref={markRef} className="shrink-0 text-ink">
+            <Mark size={markH} mode={closed ? 'solid' : 'outline'} shackleRef={shackleRef} />
+          </span>
           <div className="flex flex-col gap-[10px] text-[15px] md:text-[16px]">
             {PEOPLE.map((person) => (
               <div key={person.email}>

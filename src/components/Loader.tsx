@@ -11,15 +11,17 @@ import {
   whenFontsReady,
 } from '../lib/loadProgress';
 import { useReducedMotion } from '../lib/useReducedMotion';
-import { Mark } from './brand/Mark';
+import { Mark, SHACKLE_CLOSED } from './brand/Mark';
 
 /**
  * Il caricamento è il lucchetto che si chiude.
  *
- * Non è una barra travestita da logo: la staffa si disegna e scende in
- * proporzione al progresso vero (`loadProgress`), e al 100% fa gli ultimi
- * 3 px di scatto in `f2`, un fotogramma rosso, e stacco secco — nessuna
- * dissolvenza, perché in sala non si dissolve, si stacca.
+ * Non è una barra travestita da logo: il marchio è a contorno e aperto come
+ * nel logo ufficiale, e la staffa scende verso il corpo in proporzione al
+ * progresso vero (`loadProgress`). Al 100% fa l'ultimo tratto in `f2` e
+ * nello stesso istante il marchio si riempie con un fotogramma rosso, poi
+ * stacco secco — nessuna dissolvenza, perché in sala non si dissolve, si
+ * stacca. Chiuso e pieno sono la stessa cosa.
  *
  * Pavimento di 800 ms perché un lampo non si legge, tetto di 2 500 ms perché
  * oltre non è più un'attesa, è un muro: se una risorsa non arriva, si entra
@@ -27,17 +29,15 @@ import { Mark } from './brand/Mark';
  * già visto.
  */
 const SIZE = 132;
-/** Un px reale in unità del viewBox del marchio. */
-const U = 692 / SIZE;
-/** Staffa sollevata: 6 px a vuoto, 3 px a carico pieno, 0 = chiusa. */
-const LIFT_EMPTY = 6;
-const LIFT_FULL = 3;
 
 export function Loader({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const reduce = useReducedMotion();
   const [gone, setGone] = useState(false);
   const [percent, setPercent] = useState(0);
+  // Il riempimento è l'ultimo fotogramma del gesto, non uno stato del
+  // caricamento: nasce falso e diventa vero una volta sola, alla chiusura.
+  const [filled, setFilled] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLDivElement>(null);
@@ -72,27 +72,23 @@ export function Loader({ children }: { children: ReactNode }) {
       };
 
       if (short) {
-        // Marchio completo, 300 ms, stacco. Nessun disegno, nessuna discesa.
-        gsap.set(shackle, { strokeDashoffset: 0, y: 0 });
+        // Marchio completo — chiuso e pieno — 300 ms, stacco. Nessuna discesa.
+        gsap.set(shackle, { y: SHACKLE_CLOSED });
+        setFilled(true);
         setPercent(100);
         const id = window.setTimeout(cut, LOADER_TIMING.repeat);
         return () => window.clearTimeout(id);
       }
 
-      const length = shackle.getTotalLength();
-      gsap.set(shackle, {
-        strokeDasharray: length,
-        strokeDashoffset: length,
-        y: -LIFT_EMPTY * U,
-      });
+      gsap.set(shackle, { y: 0 });
 
       // La staffa insegue il progresso invece di saltarci sopra: i task sono
-      // cinque, a scatti si vedrebbero cinque scalini.
+      // cinque, a scatti si vedrebbero cinque scalini. `y` è in unità di
+      // viewBox, le stesse in cui il disegno misura l'apertura.
       const unsubscribe = loadProgress.subscribe((value) => {
         setPercent(Math.round(value * 100));
         gsap.to(shackle, {
-          strokeDashoffset: length * (1 - value),
-          y: -(LIFT_FULL + (LIFT_EMPTY - LIFT_FULL) * (1 - value)) * U,
+          y: SHACKLE_CLOSED * value,
           duration: MOTION.f8 / 1000,
           ease: EASE.arrive,
           overwrite: 'auto',
@@ -110,12 +106,14 @@ export function Loader({ children }: { children: ReactNode }) {
         // e lo stacco no — sono le due cose che DEVONO succedere, e in una
         // scheda in secondo piano il ticker è fermo. Vanno sui timer.
         gsap.to(shackle, {
-          strokeDashoffset: 0,
-          y: 0,
+          y: SHACKLE_CLOSED,
           duration: MOTION.f2 / 1000,
           ease: EASE.cut,
         });
         window.setTimeout(() => {
+          // Chiuso: nello stesso fotogramma il marchio si riempie e passa
+          // dal rosso. Poi lo stacco se lo porta via.
+          setFilled(true);
           if (markRef.current) markRef.current.style.color = 'var(--color-crimson)';
           window.setTimeout(cut, MOTION.f2);
         }, MOTION.f2);
@@ -156,7 +154,7 @@ export function Loader({ children }: { children: ReactNode }) {
           aria-valuenow={percent}
         >
           <div ref={markRef}>
-            <Mark size={SIZE} strokeWidth={1.5} shackleRef={shackleRef} />
+            <Mark size={SIZE} mode={filled ? 'solid' : 'outline'} shackleRef={shackleRef} />
           </div>
         </div>
       )}

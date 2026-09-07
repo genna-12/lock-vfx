@@ -1,91 +1,84 @@
 import type { Ref } from 'react';
 
 /**
- * Marchio LockVFX — PLACEHOLDER.
+ * Il marchio LockVFX, dal file ufficiale.
  *
- * Tracciato sul PNG in `src/assets/logo.png`: il lucchetto è un fotogramma
- * di pellicola (perforazioni sui due bordi, buco della serratura al centro,
- * due angoli opposti raccordati) e la staffa è aperta sul lato destro.
- * Geometria misurata sul PNG, non ridisegnata a occhio: corpo 434×415 con
- * raccordi r=200, finestra interna con bordo 62 e raccordi r=138,
- * perforazioni 19×27 al centro del bordo, staffa r=153/104 centrata sul corpo.
+ * I tre path sono quelli di `src/assets/brand/lockvfx-mark.svg`, copiati
+ * senza toccarli: staffa, corpo (con le perforazioni della pellicola) e
+ * serratura. Del file originale qui non entra il gradiente rosso — nel sito
+ * il rosso e' un segnale, non un colore di superficie: il marchio prende
+ * `currentColor` e lo decide chi lo usa. Il gradiente resta nella favicon e
+ * nell'immagine OG, dove il marchio e' solo.
  *
- * ⚠ Da sostituire con l'SVG definitivo di LockVFX. Serve un file con la
- * staffa come path separato dal corpo: qui è `data-mark="shackle"` ed è ciò
- * che il Loader anima e che la Stanza solleva all'invio del form.
+ * Nel logo ufficiale il lucchetto e' **aperto**: la gamba destra della
+ * staffa finisce 25 unita' sopra il corpo. `shackleOffset` misura quella
+ * distanza in unita' di viewBox — 0 = aperto com'e' nel logo, 25 = chiuso —
+ * cosi' chi anima (il Loader col progresso, la Stanza all'invio) lavora con
+ * il numero del disegno e non con una conversione in px.
+ *
+ * Due modi: `solid` (pieno, per il wordmark e la favicon) e `outline`
+ * (contorno di 1,5 px reali, per il Loader e la Stanza). Chiuso e pieno
+ * sono la stessa cosa: e' il gesto della fine del caricamento e dell'invio.
  */
 
+/**
+ * Riquadro stretto sul marchio dentro il 1920x1920 del file originale.
+ * Misurato con `getBBox()` sul disegno vero (743,6 / 611,7 / 433,8 / 690,9)
+ * e arrotondato all'unita' verso l'esterno: cosi' il marchio riempie la sua
+ * casella e chi lo usa ragiona sull'altezza, non sui margini del file.
+ */
+export const MARK_VIEWBOX = { x: 743, y: 611, w: 435, h: 692 } as const;
+
+/** Quanto scende la staffa per chiudersi, in unita' di viewBox. */
+export const SHACKLE_CLOSED = 25;
+
 type MarkProps = {
-  /** Altezza in px. La larghezza segue le proporzioni (0.627 × altezza). */
+  /** Altezza in px. La larghezza segue le proporzioni del riquadro. */
   size?: number;
-  className?: string;
-  /** Testo accessibile. Se assente il marchio è decorativo (aria-hidden). */
-  title?: string;
-  /**
-   * Di quanti px la staffa è sollevata rispetto al corpo. 0 = lucchetto
-   * chiuso. Il Loader la fa scendere col caricamento, la Stanza la tiene a 6
-   * e la chiude all'invio del form.
-   */
+  /** `solid` = pieno; `outline` = contorno di 1,5 px reali. */
+  mode?: 'solid' | 'outline';
+  /** 0 = aperto come nel logo, 25 = chiuso. Unita' di viewBox. */
   shackleOffset?: number;
-  /**
-   * Se presente, il marchio è disegnato a tratto di questo spessore in px
-   * reali (`vector-effect`), non a pieno. È così che lo vuole il Loader.
-   */
-  strokeWidth?: number;
-  /** Per animare la staffa dall'esterno (dasharray, scatto finale). */
+  className?: string;
+  /** Testo accessibile. Se assente il marchio e' decorativo (aria-hidden). */
+  title?: string;
+  /** Per animare la staffa dall'esterno (Loader, Stanza). */
   shackleRef?: Ref<SVGPathElement>;
 };
 
-/** Il viewBox del marchio: serve a chi converte px reali in unità (la Stanza). */
-export const MARK_VIEWBOX = { w: 434, h: 692 } as const;
+/** Contorno: 1,5 px reali a qualsiasi dimensione. */
+const STROKE = 1.5;
 
 const SHACKLE =
-  'M64,300 L64,153 A153,153 0 0 1 370,153 L370,252 L321,252 L321,153 ' +
-  'A104,104 0 0 0 113,153 L113,265 Q113,300 64,300 Z';
-
-const BODY = [
-  // sagoma esterna: angoli raccordati in alto a sinistra e in basso a destra
-  'M200,277 L434,277 L434,492 A200,200 0 0 1 234,692 L0,692 L0,477 A200,200 0 0 1 200,277 Z',
-  // finestra interna
-  'M201,339 L372,339 L372,493 A138,138 0 0 1 234,631 L63,631 L63,477 A138,138 0 0 1 201,339 Z',
-  // perforazioni: quattro in alto a destra, quattro in basso a sinistra
-  ...([339, 382.7, 426.3, 470] as const).map((y) => perf(394, y)),
-  ...([473, 516.7, 560.3, 604] as const).map((y) => perf(22, y)),
-  // buco della serratura
-  'M190,489 L175,568 L259,568 L244,489 A48.5,48.5 0 1 0 190,489 Z',
-].join(' ');
-
-/** Perforazione 19×27 con angoli da 3. */
-function perf(x: number, y: number): string {
-  return `M${x + 3},${y} h13 a3,3 0 0 1 3,3 v21 a3,3 0 0 1 -3,3 h-13 a3,3 0 0 1 -3,-3 v-21 a3,3 0 0 1 3,-3 z`;
-}
+  'M1114.06,765.27v98.2h-50.1v-98.2c0-57.05-46.41-103.47-103.46-103.47s-103.47,46.42-103.47,103.47v115.37c-6.26,2.76-12.35,5.83-18.25,9.19-11.36,6.47-22.02,14.05-31.85,22.55v-147.12c0-84.68,68.89-153.57,153.57-153.57s153.56,68.89,153.56,153.57Z';
+const BODY =
+  'M950.03,888.87c-37.04,0-71.83,9.81-101.92,26.96-15.33,8.74-29.44,19.39-42,31.62-38.54,37.52-62.51,89.93-62.51,147.84v207.28h227.38c113.82,0,206.42-92.61,206.42-206.43v-207.27h-227.37ZM783.62,1238.78c0,1.27-1.02,2.29-2.29,2.29h-12.78c-1.27,0-2.29-1.02-2.29-2.29v-20.74c0-1.26,1.02-2.29,2.29-2.29h12.78c1.27,0,2.29,1.03,2.29,2.29v20.74ZM783.62,1195.05c0,1.27-1.02,2.29-2.29,2.29h-12.78c-1.27,0-2.29-1.02-2.29-2.29v-20.74c0-1.26,1.02-2.29,2.29-2.29h12.78c1.27,0,2.29,1.03,2.29,2.29v20.74ZM783.62,1151.32c0,1.27-1.02,2.29-2.29,2.29h-12.78c-1.27,0-2.29-1.02-2.29-2.29v-20.74c0-1.26,1.02-2.29,2.29-2.29h12.78c1.27,0,2.29,1.03,2.29,2.29v20.74ZM783.62,1107.59c0,1.27-1.02,2.29-2.29,2.29h-12.78c-1.27,0-2.29-1.02-2.29-2.29v-20.74c0-1.26,1.02-2.29,2.29-2.29h12.78c1.27,0,2.29,1.03,2.29,2.29v20.74ZM1114.72,1096.09c0,79.95-65.04,144.98-144.98,144.98h-163.46v-145.73c0-25.4,6.58-49.28,18.08-70.07,9.37-16.87,22-31.7,37.04-43.62,24.72-19.58,55.95-31.28,89.86-31.28h163.46v145.72ZM1154.83,1104.59c0,1.26-1.03,2.29-2.29,2.29h-12.79c-1.26,0-2.28-1.03-2.28-2.29v-20.74c0-1.27,1.02-2.29,2.28-2.29h12.79c1.26,0,2.29,1.02,2.29,2.29v20.74ZM1154.83,1060.86c0,1.26-1.03,2.29-2.29,2.29h-12.79c-1.26,0-2.28-1.03-2.28-2.29v-20.74c0-1.27,1.02-2.29,2.28-2.29h12.79c1.26,0,2.29,1.02,2.29,2.29v20.74ZM1154.83,1017.13c0,1.26-1.03,2.29-2.29,2.29h-12.79c-1.26,0-2.28-1.03-2.28-2.29v-20.74c0-1.27,1.02-2.29,2.28-2.29h12.79c1.26,0,2.29,1.02,2.29,2.29v20.74ZM1154.83,973.4c0,1.26-1.03,2.29-2.29,2.29h-12.79c-1.26,0-2.28-1.03-2.28-2.29v-20.74c0-1.27,1.02-2.29,2.28-2.29h12.79c1.26,0,2.29,1.02,2.29,2.29v20.74Z';
+const KEYHOLE =
+  'M984.92,1103.05l18.32,75.93h-85.47l18.32-75.93c-14.46-8.41-24.17-24.07-24.17-42h0c0-26.84,21.75-48.59,48.58-48.59,13.42,0,25.57,5.44,34.36,14.23,8.79,8.79,14.23,20.93,14.23,34.35h0c0,17.94-9.71,33.6-24.17,42.01Z';
 
 export function Mark({
   size = 24,
+  mode = 'solid',
+  shackleOffset = 0,
   className,
   title,
-  shackleOffset = 0,
-  strokeWidth,
   shackleRef,
 }: MarkProps) {
-  const outlined = strokeWidth !== undefined;
-  // Il viewBox è alto 692 unità e sullo schermo è alto `size` px: per
-  // sollevare la staffa di N px reali servono N × 692 / size unità.
-  const lift = shackleOffset ? (shackleOffset * MARK_VIEWBOX.h) / size : 0;
-  const paint = outlined
-    ? {
-        fill: 'none' as const,
-        stroke: 'currentColor',
-        strokeWidth,
-        vectorEffect: 'non-scaling-stroke' as const,
-      }
-    : { fill: 'currentColor' };
+  const paint =
+    mode === 'outline'
+      ? {
+          fill: 'none' as const,
+          stroke: 'currentColor',
+          strokeWidth: STROKE,
+          vectorEffect: 'non-scaling-stroke' as const,
+        }
+      : { fill: 'currentColor' };
 
   return (
     <svg
-      viewBox={`0 0 ${MARK_VIEWBOX.w} ${MARK_VIEWBOX.h}`}
+      viewBox={`${MARK_VIEWBOX.x} ${MARK_VIEWBOX.y} ${MARK_VIEWBOX.w} ${MARK_VIEWBOX.h}`}
       height={size}
-      width={size * (MARK_VIEWBOX.w / MARK_VIEWBOX.h)}
+      width={(size * MARK_VIEWBOX.w) / MARK_VIEWBOX.h}
       className={className}
       role={title ? 'img' : undefined}
       aria-hidden={title ? undefined : true}
@@ -96,12 +89,14 @@ export function Mark({
       {title ? <title>{title}</title> : null}
       <path
         ref={shackleRef}
+        id="shackle"
         data-mark="shackle"
         d={SHACKLE}
-        transform={lift ? `translate(0 ${-lift})` : undefined}
+        transform={shackleOffset ? `translate(0 ${shackleOffset})` : undefined}
         {...paint}
       />
-      <path data-mark="body" d={BODY} fillRule="evenodd" {...paint} />
+      <path id="body" data-mark="body" d={BODY} {...paint} />
+      <path id="keyhole" data-mark="keyhole" d={KEYHOLE} {...paint} />
     </svg>
   );
 }
