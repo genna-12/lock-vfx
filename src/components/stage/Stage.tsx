@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
-import { CAMERA, COLORS, type SetId } from '../../brand/tokens';
+import { CAMERA, COLORS, STAGE_BG, type SetId } from '../../brand/tokens';
 import { MOVE, SALA_LIVE, STAGE_VH, T1, activeSetAt, amplitude } from '../../lib/camera';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
@@ -149,7 +149,10 @@ export function Stage({ onActiveChange }: StageProps) {
         }, 60)
         .to(reelVeil, { opacity: T1.veil.to, duration: T1.veil.duration }, T1.veil.at)
         .to(reelScreen, { opacity: 0, duration: 30 }, 120)
-        .to(root, { backgroundColor: COLORS.obsidian, duration: 90 }, 60)
+        // Il colore del fondo dello Studio e' una prova aperta: con
+        // `STAGE_BG = 'void'` questo tratto non cambia niente e lo spazio
+        // resta nero da cima a fondo.
+        .to(root, { backgroundColor: COLORS[STAGE_BG], duration: 90 }, 60)
         .to(lightSala, { opacity: 1, duration: 60, ease: 'power1.out' }, 80)
         .to(
           lines,

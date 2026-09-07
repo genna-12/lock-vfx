@@ -64,6 +64,16 @@ export const MOTION = {
   easeArrive: 'cubic-bezier(0.2, 0, 0, 1)',
 } as const;
 
+/**
+ * Fondo dei set illuminati. Oggi lo Studio si stacca sull'`obsidian` mentre
+ * la Sala e la Stanza restano sul nero del sito; LockVFX vuole vedere anche
+ * la versione tutta nera prima di decidere. L'interruttore serve a
+ * confrontarle senza rifare la timeline: `obsidian` e' com'e' adesso.
+ *
+ * ⚠ In attesa della scelta: le due prove sono in `materiale/prove/`.
+ */
+export const STAGE_BG: 'obsidian' | 'void' = 'obsidian';
+
 /** Camera della carrellata (vedi `momento-1-lo-spazio.md`). */
 export const CAMERA = {
   /** ScrollSmoother su desktop; su touch resta lo scroll nativo. */
