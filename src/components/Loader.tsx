@@ -11,7 +11,8 @@ import {
   whenFontsReady,
 } from '../lib/loadProgress';
 import { useReducedMotion } from '../lib/useReducedMotion';
-import { Mark, SHACKLE_CLOSED } from './brand/Mark';
+import { SHACKLE_CLOSED } from '../brand/mark';
+import { Mark } from './brand/Mark';
 
 /**
  * Il caricamento è il lucchetto che si chiude.

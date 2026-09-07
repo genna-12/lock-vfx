@@ -18,7 +18,8 @@ import { useReducedMotion } from '../../lib/useReducedMotion';
 import { SendError, THROTTLE_MS, remainingThrottle, sendContact } from '../../lib/emailjs';
 import { CONTACT, PEOPLE } from '../../data/people';
 import { openPrivacy } from '../../lib/privacy';
-import { MARK_VIEWBOX, Mark, SHACKLE_CLOSED } from '../brand/Mark';
+import { MARK_VIEWBOX, SHACKLE_CLOSED } from '../../brand/mark';
+import { Mark } from '../brand/Mark';
 
 /**
  * La stanza.

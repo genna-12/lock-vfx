@@ -1,4 +1,5 @@
 import type { Ref } from 'react';
+import { MARK_VIEWBOX } from '../../brand/mark';
 
 /**
  * Il marchio LockVFX, dal file ufficiale.
@@ -20,17 +21,6 @@ import type { Ref } from 'react';
  * (contorno di 1,5 px reali, per il Loader e la Stanza). Chiuso e pieno
  * sono la stessa cosa: e' il gesto della fine del caricamento e dell'invio.
  */
-
-/**
- * Riquadro stretto sul marchio dentro il 1920x1920 del file originale.
- * Misurato con `getBBox()` sul disegno vero (743,6 / 611,7 / 433,8 / 690,9)
- * e arrotondato all'unita' verso l'esterno: cosi' il marchio riempie la sua
- * casella e chi lo usa ragiona sull'altezza, non sui margini del file.
- */
-export const MARK_VIEWBOX = { x: 743, y: 611, w: 435, h: 692 } as const;
-
-/** Quanto scende la staffa per chiudersi, in unita' di viewBox. */
-export const SHACKLE_CLOSED = 25;
 
 type MarkProps = {
   /** Altezza in px. La larghezza segue le proporzioni del riquadro. */
