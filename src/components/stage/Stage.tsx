@@ -107,6 +107,51 @@ export function Stage({ onActiveChange }: StageProps) {
 
     let lastId: SetId | null = null;
 
+    /* ---- I magneti ---------------------------------------------------
+       `ScrollTrigger.snap` qui non si può usare: con ScrollSmoother lo
+       scroller è il wrapper, e il tween dello snap scrive su `st.scroll()`,
+       che con lo smoother non muove la pagina — misurato: gli si chiede
+       1709, finisce a 2 e si porta dietro tutto a zero. Il magnete quindi è
+       nostro, ma i numeri sono quelli di `momento-1`: 0,15 s di attesa,
+       0,4–0,9 s di corsa, `power2.inOut`, e dentro un HOLD non si muove
+       niente (lo decide `snapProgress`).
+
+       La durata cresce con la distanza: completare gli ultimi dieci vh di
+       una transizione e attraversarne novanta non sono lo stesso gesto. */
+    const magnet = { at: 0 };
+    let pull: gsap.core.Tween | undefined;
+    let settle: number | undefined;
+
+    const release = () => {
+      pull?.kill();
+      pull = undefined;
+    };
+
+    const attract = () => {
+      const st = ScrollTrigger.getById('stage');
+      if (!st || pull) return;
+      const target = snapProgress(st.progress, st.direction);
+      if (Math.abs(target - st.progress) < 0.001) return;
+      const to = st.start + target * (st.end - st.start);
+      magnet.at = smoother.scrollTop();
+      const far = Math.min(1, Math.abs(to - magnet.at) / (window.innerHeight * 1.5));
+      pull = gsap.to(magnet, {
+        at: to,
+        duration: SNAP.duration.min + far * (SNAP.duration.max - SNAP.duration.min),
+        ease: SNAP.ease,
+        onUpdate: () => smoother.scrollTop(magnet.at),
+        onComplete: () => {
+          pull = undefined;
+        },
+      });
+    };
+
+    // Chi tocca lo scroll ha sempre ragione: il magnete si stacca subito.
+    const interrupt = () => release();
+    window.addEventListener('wheel', interrupt, { passive: true });
+    window.addEventListener('touchstart', interrupt, { passive: true });
+    window.addEventListener('keydown', interrupt);
+
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(root);
       const [lightSala] = q('[data-light="sala"]');
@@ -146,18 +191,6 @@ export function Stage({ onActiveChange }: StageProps) {
           scrub: 0.6,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          // I magneti. `snapTo` è una funzione e non l'elenco delle quattro
-          // posizioni perché dentro un HOLD non si deve muovere niente:
-          // l'elenco tirerebbe al foro successivo anche chi si è fermato a
-          // leggere. La direzione la dà ScrollTrigger.
-          snap: {
-            snapTo: (value: number, self?: { direction: number }) =>
-              snapProgress(value, self?.direction ?? 1),
-            directional: true,
-            delay: SNAP.delay,
-            duration: SNAP.duration,
-            ease: SNAP.ease,
-          },
           onUpdate: (self) => {
             const id = activeSetAt(self.progress);
             if (id !== lastId) {
@@ -170,6 +203,9 @@ export function Stage({ onActiveChange }: StageProps) {
             const live = self.progress > SALA_LIVE.from && self.progress < SALA_LIVE.to;
             sala.style.pointerEvents = live ? 'auto' : 'none';
             studio.inert = !(self.progress > STUDIO_LIVE.from && self.progress < STUDIO_LIVE.to);
+            // Il magnete parte quando lo scroll si ferma, non mentre corre.
+            window.clearTimeout(settle);
+            if (!pull) settle = window.setTimeout(attract, SNAP.delay * 1000);
           },
         },
       });
@@ -248,6 +284,11 @@ export function Stage({ onActiveChange }: StageProps) {
     }
 
     return () => {
+      window.removeEventListener('wheel', interrupt);
+      window.removeEventListener('touchstart', interrupt);
+      window.removeEventListener('keydown', interrupt);
+      window.clearTimeout(settle);
+      release();
       ctx.revert();
       smoother.kill();
       if (import.meta.env.DEV) delete (window as unknown as { __lock?: unknown }).__lock;
