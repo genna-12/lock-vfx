@@ -51,6 +51,23 @@ export const MOVE = {
   salaScaleOut: 0.9,
 } as const;
 
+/**
+ * Tempi interni di T1 (Regola di T1 in `momento-1`, decisione della
+ * Direzione del 7/9): nessuna riga di testo sopra la fotografia. Il velo
+ * scurisce la reel PRIMA che arrivino le parole, e le righe partono a reel
+ * già velata. Il dolly back non cambia: si deve vedere per intero.
+ *
+ * Con questi numeri la prima riga supera 0,3 di opacità a ~110vh, quando il
+ * velo è al massimo da cinque vh — il vincolo («niente sopra 0,3 finché il
+ * velo non è ≥ 0,7», cioè da 97vh) è rispettato con margine.
+ */
+export const T1 = {
+  /** Velo della reel: 0 → 0,85 su 60–105. */
+  veil: { at: 60, duration: 45, to: 0.85 },
+  /** Righe dello statement: da 105, 30vh ciascuna, stagger 8vh. */
+  lines: { at: 105, duration: 30, stagger: 8 },
+} as const;
+
 const MOBILE_AMPLITUDE = 0.68;
 
 /** Fattore di ampiezza corrente. Valutato a ogni refresh di ScrollTrigger. */

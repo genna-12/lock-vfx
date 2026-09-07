@@ -29,5 +29,15 @@
       "b": "[Nome] · 3D/CGI",
       "c": "[Città]"
     }
+  },
+  "sala": {
+    "deck": "Seleziona un lavoro",
+    "full": "Guarda il video completo ↗",
+    "rotate": "Ruota per la sala",
+    "play": "Riproduci",
+    "pause": "Metti in pausa",
+    "audioOn": "Attiva l’audio",
+    "audioOff": "Disattiva l’audio",
+    "fullscreen": "Schermo intero"
   }
 }

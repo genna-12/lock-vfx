@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { CAMERA, COLORS, type SetId } from '../../brand/tokens';
-import { MOVE, SALA_LIVE, STAGE_VH, activeSetAt, amplitude } from '../../lib/camera';
+import { MOVE, SALA_LIVE, STAGE_VH, T1, activeSetAt, amplitude } from '../../lib/camera';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
 import { Reel } from './Reel';
 import { Statement } from './Statement';
+import { Sala } from './Sala';
+import { loadWorks } from '../../data/works';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -39,6 +41,9 @@ type StageProps = {
 };
 
 export function Stage({ onActiveChange }: StageProps) {
+  // La Sala riceve i lavori e non sa da dove vengono: oggi un array, domani
+  // un `works.json` pubblicato dalla dashboard.
+  const [works] = useState(loadWorks);
   const rootRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
@@ -141,11 +146,15 @@ export function Stage({ onActiveChange }: StageProps) {
           duration: 90,
           ease: CAMERA.t1,
         }, 60)
-        .to(reelVeil, { opacity: 0.85, duration: 60 }, 60)
+        .to(reelVeil, { opacity: T1.veil.to, duration: T1.veil.duration }, T1.veil.at)
         .to(reelScreen, { opacity: 0, duration: 30 }, 120)
         .to(root, { backgroundColor: COLORS.obsidian, duration: 90 }, 60)
         .to(lightSala, { opacity: 1, duration: 60, ease: 'power1.out' }, 80)
-        .to(lines, { z: 0, opacity: 1, duration: 60, stagger: 10, ease: 'power2.out' }, 90)
+        .to(
+          lines,
+          { z: 0, opacity: 1, duration: T1.lines.duration, stagger: T1.lines.stagger, ease: 'power2.out' },
+          T1.lines.at
+        )
 
         /* ---- T2 · PUSH IN (230 → 310) --------------------------------
            La camera avanza ATTRAVERSO lo statement ed entra nella sala.
@@ -236,11 +245,8 @@ export function Stage({ onActiveChange }: StageProps) {
         className="pointer-events-none absolute inset-0"
         aria-label="Lavori"
       >
-        <div
-          data-leaf="sala"
-          className="absolute inset-0 grid place-items-center bg-obsidian ring-1 ring-dust/30 ring-inset"
-        >
-          <span className="u-cap text-stone">Sala</span>
+        <div data-leaf="sala" className="absolute inset-0">
+          <Sala works={works} />
           <div data-veil="sala" aria-hidden className="absolute inset-0 bg-void" />
         </div>
       </section>
