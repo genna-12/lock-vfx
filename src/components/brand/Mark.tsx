@@ -36,6 +36,9 @@ type MarkProps = {
   shackleRef?: Ref<SVGPathElement>;
 };
 
+/** Il viewBox del marchio: serve a chi converte px reali in unità (la Stanza). */
+export const MARK_VIEWBOX = { w: 434, h: 692 } as const;
+
 const SHACKLE =
   'M64,300 L64,153 A153,153 0 0 1 370,153 L370,252 L321,252 L321,153 ' +
   'A104,104 0 0 0 113,153 L113,265 Q113,300 64,300 Z';
@@ -68,7 +71,7 @@ export function Mark({
   const outlined = strokeWidth !== undefined;
   // Il viewBox è alto 692 unità e sullo schermo è alto `size` px: per
   // sollevare la staffa di N px reali servono N × 692 / size unità.
-  const lift = shackleOffset ? (shackleOffset * 692) / size : 0;
+  const lift = shackleOffset ? (shackleOffset * MARK_VIEWBOX.h) / size : 0;
   const paint = outlined
     ? {
         fill: 'none' as const,
@@ -80,9 +83,9 @@ export function Mark({
 
   return (
     <svg
-      viewBox="0 0 434 692"
+      viewBox={`0 0 ${MARK_VIEWBOX.w} ${MARK_VIEWBOX.h}`}
       height={size}
-      width={size * (434 / 692)}
+      width={size * (MARK_VIEWBOX.w / MARK_VIEWBOX.h)}
       className={className}
       role={title ? 'img' : undefined}
       aria-hidden={title ? undefined : true}

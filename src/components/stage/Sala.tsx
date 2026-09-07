@@ -186,8 +186,24 @@ export function Sala({ works }: SalaProps) {
   /* ---- cambio lavoro: due fotogrammi di nero --------------------------- */
   const commit = useCallback(
     (next: number) => {
-      if (next === index) return;
       const black = blackRef.current;
+      if (next === index) {
+        // Con un solo lavoro pubblicato l'anello torna sullo stesso indice:
+        // `onEnded` ha gia' acceso il nero e nessuno lo spegnerebbe piu'.
+        // Qui il film riparte da capo dietro al nero, poi il nero se ne va.
+        if (black && black.style.opacity === '1') {
+          const video = videoRef.current;
+          if (video) {
+            video.currentTime = 0;
+            if (inHoldRef.current && WORKS_HAVE_VIDEO && !reducedRef.current) {
+              void video.play().catch(() => undefined);
+            }
+          }
+          if (fillRef.current) fillRef.current.style.width = '0%';
+          black.style.opacity = '0';
+        }
+        return;
+      }
       if (reduced || !black) {
         setIndex(next);
         return;

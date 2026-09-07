@@ -9,6 +9,7 @@ import { Lights } from './Lights';
 import { Reel } from './Reel';
 import { Statement } from './Statement';
 import { Sala } from './Sala';
+import { Stanza } from './Stanza';
 import { loadWorks } from '../../data/works';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
@@ -33,8 +34,8 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
  * prima di quelli del genitore — tenerli insieme qui è l'unico modo semplice
  * di garantire l'ordine.
  *
- * Contenuto: greybox. Reel, Statement, Sala e Stanza veri arrivano agli
- * step 3–6; qui si valida solo il movimento.
+ * I quattro set sono i componenti veri: la Stanza, ultima ad arrivare,
+ * entra da sotto in T3 e vive nell'HOLD 4.
  */
 type StageProps = {
   onActiveChange: (id: SetId) => void;
@@ -263,16 +264,14 @@ export function Stage({ onActiveChange }: StageProps) {
 
       {/* La Stanza non e' uno schermo: e' un ambiente. Niente fondo pieno,
           altrimenti coprirebbe la luce di taglio che deve batterle addosso
-          da sinistra (nel design vero e' il marchio grande a riceverla). */}
+          da sinistra: e' il marchio grande a riceverla. */}
       <section
         id="contact"
         data-set="contact"
-        className="u-pad absolute inset-0 grid place-items-center"
+        className="u-pad absolute inset-0"
         aria-label="Contatti"
       >
-        <div className="grid h-[62%] w-full max-w-[1180px] place-items-center ring-1 ring-dust/30 ring-inset">
-          <span className="u-cap text-stone">Stanza</span>
-        </div>
+        <Stanza />
       </section>
     </div>
   );

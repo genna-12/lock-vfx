@@ -39,5 +39,38 @@
     "audioOn": "Turn sound on",
     "audioOff": "Turn sound off",
     "fullscreen": "Full screen"
+  },
+  "contact": {
+    "title": "Let’s talk.",
+    "city": "[City]",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message"
+    },
+    "errors": {
+      "name": "What should we call you?",
+      "email": "We need an email to reply to.",
+      "message": "Two lines are enough: project, timing, what you need."
+    },
+    "consent": {
+      "before": "I have read the ",
+      "link": "privacy notice",
+      "after": " and understand my data will be used only to reply to me."
+    },
+    "send": "Send",
+    "sending": "Sending…",
+    "sent": "Sent",
+    "status": {
+      "sent": "Got it. We’ll get back to you within two working days.",
+      "failed": "It didn’t go through. Try again, or write to us directly:"
+    },
+    "honeypot": "Company"
+  },
+  "privacy": {
+    "title": "Privacy notice",
+    "short": "We use what you send us (name, email, message) only to reply. No newsletter, no sharing with third parties. We keep it for 24 months after our last exchange, then delete it. Your message is delivered to our inboxes through EmailJS. You can ask us to access or delete your data at any time at {{email}}. Full details in the privacy notice.",
+    "body": "The full privacy notice is being prepared and will be published here before the site goes live.",
+    "close": "Close"
   }
 }

@@ -39,5 +39,38 @@
     "audioOn": "Attiva l’audio",
     "audioOff": "Disattiva l’audio",
     "fullscreen": "Schermo intero"
+  },
+  "contact": {
+    "title": "Parliamone.",
+    "city": "[Città]",
+    "fields": {
+      "name": "Nome",
+      "email": "Email",
+      "message": "Messaggio"
+    },
+    "errors": {
+      "name": "Come possiamo chiamarti?",
+      "email": "Serve un’email a cui rispondere.",
+      "message": "Due righe bastano: progetto, tempi, cosa serve."
+    },
+    "consent": {
+      "before": "Ho letto l’",
+      "link": "informativa privacy",
+      "after": " e so che questi dati verranno usati solo per rispondermi."
+    },
+    "send": "Invia",
+    "sending": "Invio…",
+    "sent": "Inviato",
+    "status": {
+      "sent": "Ricevuto. Ti rispondiamo entro due giorni lavorativi.",
+      "failed": "Non è partito. Riprova, o scrivici direttamente:"
+    },
+    "honeypot": "Azienda"
+  },
+  "privacy": {
+    "title": "Informativa privacy",
+    "short": "I dati che ci lasci (nome, email, messaggio) li usiamo solo per risponderti. Non finiscono in nessuna newsletter e non li cediamo a nessuno. Li conserviamo per 24 mesi dall’ultimo scambio, poi li cancelliamo. L’email viene inoltrata alle nostre caselle tramite EmailJS. Puoi chiederci in qualsiasi momento di accedere ai tuoi dati o di cancellarli scrivendo a {{email}}. Dettagli nell’informativa completa.",
+    "body": "L’informativa completa è in preparazione e sarà pubblicata qui prima che il sito vada online.",
+    "close": "Chiudi"
   }
 }

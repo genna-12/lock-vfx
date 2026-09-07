@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Chiavi: in chiaro nel bundle, ma non nel repo. Il modello è `.env.example`.
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

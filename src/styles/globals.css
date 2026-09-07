@@ -303,6 +303,30 @@
     transform: none;
   }
 
+  /* ---- Il foglio dell'informativa -------------------------------------
+     Un `<dialog>` nativo: sta nel top layer, quindi le trasformazioni della
+     carrellata e l'`overflow: hidden` dello stage non lo toccano, `Esc` lo
+     chiude e il fuoco torna da solo sul link che l'ha aperto. Non è vetro:
+     è una superficie opaca appena staccata dal fondo. */
+  .sheet {
+    /* Il preflight di Tailwind azzera i margini di tutto, compreso l'`auto`
+       con cui il browser centra un dialog modale: senza questa riga il
+       foglio si incolla in alto a sinistra. */
+    margin: auto;
+    width: min(560px, calc(100vw - 2 * var(--pad)));
+    max-height: min(70svh, 640px);
+    overflow: auto;
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid var(--color-dust);
+    border-radius: var(--radius-frame);
+    background-color: var(--color-obsidian);
+    color: var(--color-stone);
+  }
+
+  .sheet::backdrop {
+    background-color: color-mix(in srgb, var(--color-void) 82%, transparent);
+  }
+
   /* Nascosto agli occhi, presente per screen reader e SEO. */
   .u-sr-only {
     position: absolute;
