@@ -20,5 +20,14 @@
     "play": "Play reel",
     "audioOn": "Turn sound on",
     "audioOff": "Turn sound off"
+  },
+  "statement": {
+    "phrase": "We give shape to the images a film imagines and cannot shoot.",
+    "paragraph": "LockVFX is the name under which [Name] and [Name] work together: compositing, CGI, environments, cleanup, simulation and finishing for film, series and advertising — with a network of studios and specialists that changes witheach project.",
+    "credits": {
+      "a": "[Name] · compositing",
+      "b": "[Name] · 3D/CGI",
+      "c": "[City]"
+    }
   }
 }

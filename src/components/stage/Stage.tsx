@@ -7,6 +7,7 @@ import { MOVE, SALA_LIVE, STAGE_VH, activeSetAt, amplitude } from '../../lib/cam
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
 import { Reel } from './Reel';
+import { Statement } from './Statement';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -222,11 +223,7 @@ export function Stage({ onActiveChange }: StageProps) {
             className="set pointer-events-none grid place-items-center"
             aria-label="Studio"
           >
-            <div data-statement className="u-pad flex w-full max-w-5xl flex-col gap-6 [transform-style:preserve-3d]">
-              <div data-line className="h-16 w-[70%] bg-stone/20 md:h-20" />
-              <div data-line className="h-10 w-[46%] bg-stone/20" />
-              <div data-line className="u-cap text-dust">Studio</div>
-            </div>
+            <Statement />
           </section>
         </div>
       </div>

@@ -47,7 +47,10 @@ export function Reel() {
   // Reduced motion o risparmio dati: il poster resta fermo e il video parte
   // solo se lo si chiede. Sono due utenti diversi con lo stesso bisogno.
   const [lightMode] = useState(() => prefersLightData());
-  const still = (reduce || lightMode) && !manualPlay;
+  // Senza showreel non c'e' niente da far partire: il poster e' gia' tutto
+  // quello che c'e', e un pulsante che non fa nulla e' peggio di nessun
+  // pulsante.
+  const still = HAS_VIDEO && (reduce || lightMode) && !manualPlay;
 
   /* ---- progresso di caricamento --------------------------------------- */
   useEffect(() => {
@@ -123,8 +126,10 @@ export function Reel() {
     setMuted(next);
   }, []);
 
+  // Niente `overflow` sul contenitore: sta dentro `.world` e appiattirebbe il
+  // preserve-3d (la regola è in globals.css). Il video lo taglia `object-cover`.
   return (
-    <div className="absolute inset-0 overflow-hidden bg-void">
+    <div className="absolute inset-0 bg-void">
       <h1 className="u-sr-only">{t('reel.h1')}</h1>
 
       <video

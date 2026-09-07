@@ -105,6 +105,7 @@ export function Loader({ children }: { children: ReactNode }) {
         if (closing) return;
         closing = true;
         gsap.ticker.remove(watch);
+        window.clearTimeout(ceiling);
         gsap
           .timeline({ onComplete: cut })
           // gli ultimi 3 px: il lucchetto si chiude
@@ -128,10 +129,14 @@ export function Loader({ children }: { children: ReactNode }) {
         }
       };
       gsap.ticker.add(watch);
+      // Il tetto non puo' vivere solo sul rAF: in una tab in secondo piano il
+      // ticker si ferma e il loader non chiuderebbe mai.
+      const ceiling = window.setTimeout(close, LOADER_TIMING.max);
 
       return () => {
         unsubscribe();
         gsap.ticker.remove(watch);
+        window.clearTimeout(ceiling);
       };
     }, overlay);
 
