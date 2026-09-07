@@ -12,7 +12,7 @@ export function Wordmark() {
       className="pointer-events-auto flex items-center gap-2.5 text-ink transition-opacity duration-200 hover:opacity-70"
     >
       <Mark size={18} />
-      <span className="text-[14px] font-medium tracking-[-0.01em] [font-stretch:100%]">LockVFX</span>
+      <span className="text-[14px] font-medium tracking-[-0.01em]">LockVFX</span>
     </a>
   );
 }

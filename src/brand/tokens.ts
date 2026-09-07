@@ -33,14 +33,22 @@ export const COLORS = {
 
 /** Una sola famiglia variabile, due registri di larghezza. */
 export const TYPE = {
-  display: "'Archivo', ui-sans-serif, system-ui, sans-serif",
-  text: "'Archivo', ui-sans-serif, system-ui, sans-serif",
+  display: "'Outfit', ui-sans-serif, system-ui, sans-serif",
+  text: "'Outfit', ui-sans-serif, system-ui, sans-serif",
   mono: "'Geist Mono', ui-monospace, 'SFMono-Regular', monospace",
-  /** Asse wdth: 75 = display condensato, 100 = testo. */
-  width: { display: 75, text: 100 },
-  /** Asse wght disponibile nel file variabile. */
-  weight: { regular: 400, medium: 500, semibold: 600 },
+  /**
+   * Asse wght del file variabile. Quattro pesi e basta: `air` e' riservato
+   * alla frase dello Statement, `display` e' il registro delle misure
+   * grandi, `text` il corpo, `medium` i nomi, le cap e i pulsanti.
+   */
+  weight: { air: 200, display: 300, text: 400, medium: 500 },
 } as const;
+
+/**
+ * Peso della frase dello Statement. La Direzione vuole vedere le due
+ * versioni prima di scegliere: 300 e' quella in pagina, 200 la prova.
+ */
+export const STATEMENT_WEIGHT: 200 | 300 = 300;
 
 /**
  * Durate espresse in fotogrammi a 24 fps: il vocabolario è quello del

@@ -12,15 +12,15 @@
 
 /* ---------- Font self-hosted ------------------------------------------- */
 
-/* Archivo variabile: un solo file per tutte le larghezze e i pesi che usiamo.
-   asse wdth 75–100 (75 = display condensato, 100 = testo)
-   asse wght 400–600
-   Sottoinsieme latino, ~40 KB. */
+/* Outfit variabile (richiesta di LockVFX del 7/9, licenza OFL): un solo file
+   per i quattro pesi che usiamo — 200 solo per la frase dello Statement, 300
+   display, 400 testo, 500 nomi/cap/pulsanti. Niente 600+.
+   Asse wght 200–500, default 400. Latino + latino esteso e le frecce, ~37 KB.
+   Self-hosted: nessuna chiamata a Google, quindi nessun terzo e nessun cookie. */
 @font-face {
-  font-family: 'Archivo';
-  src: url('/fonts/archivo-var.woff2') format('woff2');
-  font-weight: 400 600;
-  font-stretch: 75% 100%;
+  font-family: 'Outfit';
+  src: url('/fonts/outfit-var.woff2') format('woff2');
+  font-weight: 200 500;
   font-style: normal;
   font-display: swap;
 }
@@ -53,27 +53,32 @@
   --color-crimson: #e60b18;   /* unico accento: uno persistente + al massimo uno transitorio */
 
   /* Tipografia: una sola famiglia variabile, due registri di larghezza. */
-  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-  --font-text: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-text: 'Outfit', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', monospace;
 
-  /* Scala display (mobile → desktop). */
-  --text-d1: clamp(44px, 6.1vw, 88px);
-  --text-d1--line-height: 0.94;
-  --text-d2: clamp(40px, 4.44vw, 64px);
-  --text-d2--line-height: 0.96;
-  --text-d3: clamp(26px, 3.05vw, 44px);
+  /* Scala display (mobile → desktop). Ridotta del 14% rispetto ad Archivo:
+     Outfit non e' condensata, alla stessa misura occupa molto piu' spazio.
+     Interlinea 1,02 su tutta la scala; la crenatura stretta solo dove il
+     corpo supera i 40 px, sotto quella soglia toglierebbe aria alle parole. */
+  --text-d1: clamp(40px, 5.3vw, 76px);
+  --text-d1--line-height: 1.02;
+  --text-d1--letter-spacing: -0.02em;
+  --text-d2: clamp(36px, 3.9vw, 56px);
+  --text-d2--line-height: 1.02;
+  --text-d2--letter-spacing: -0.02em;
+  --text-d3: clamp(24px, 2.8vw, 40px);
   --text-d3--line-height: 1.02;
-  --text-d4: clamp(24px, 2.36vw, 34px);
-  --text-d4--line-height: 1.08;
+  --text-d4: clamp(21px, 2.1vw, 30px);
+  --text-d4--line-height: 1.02;
 
   /* Scala testo. */
   --text-t1: 19px;
   --text-t1--line-height: 1.5;
   --text-t2: 17px;
-  --text-t2--line-height: 1.55;
+  --text-t2--line-height: 1.5;
   --text-t3: 15px;
-  --text-t3--line-height: 1.55;
+  --text-t3--line-height: 1.5;
   --text-t4: 13px;
   --text-t4--line-height: 1.5;
 
@@ -128,7 +133,7 @@
     color: var(--color-ink);
     font-family: var(--font-text);
     font-size: var(--text-t2);
-    line-height: 1.55;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -151,18 +156,17 @@
   .u-cap {
     font-family: var(--font-text);
     font-size: var(--text-cap);
-    font-stretch: 100%;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     line-height: 1;
   }
 
-  /* Display: Archivo condensata. */
+  /* Display: Outfit leggera. Il peso e' 300 e non un grassetto: la frase
+     grande si impone con la misura, non con lo spessore. */
   .u-display {
     font-family: var(--font-display);
-    font-stretch: 75%;
-    font-weight: 600;
+    font-weight: 300;
   }
 
   /* Margine di pagina coerente. */

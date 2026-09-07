@@ -435,8 +435,10 @@ export function Sala({ works }: SalaProps) {
               : 'order-2 flex flex-col items-center gap-1'
           }
         >
+          {/* Con Outfit il titolo di un lavoro non e' piu' display: a 18 px il
+              peso 300 si sgrana sul video. E' un nome, e i nomi sono 500. */}
           <h2
-            className={`u-display text-ink ${
+            className={`font-medium text-ink ${
               portrait ? 'text-[18px]' : 'text-[clamp(17px,1.4vw,20px)]'
             }`}
           >

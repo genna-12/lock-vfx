@@ -272,7 +272,7 @@ export function Stanza() {
 
         {/* Parliamone. */}
         <div className="order-1 flex w-full max-w-[640px] flex-col gap-[26px] md:order-2 md:gap-[34px]">
-          <h2 className="u-display m-0 text-[clamp(44px,5vw,64px)] leading-[0.98] tracking-[-0.005em]">
+          <h2 className="u-display text-d2 m-0">
             {t('contact.title')}
           </h2>
 

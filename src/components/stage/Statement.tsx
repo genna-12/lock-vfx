@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { STATEMENT_WEIGHT } from '../../brand/tokens';
 
 /**
  * Il secondo set: chi è LockVFX, detto una volta sola.
@@ -26,7 +27,13 @@ export function Statement() {
       data-statement
       className="u-pad grid w-full max-w-[1180px] grid-cols-1 gap-y-10 [transform-style:preserve-3d] md:grid-cols-12 md:items-end md:gap-x-[clamp(32px,5vw,80px)]"
     >
-      <p data-line className="u-display text-d1 text-ink text-balance md:col-span-7">
+      {/* Il peso arriva dai token: la Direzione deve poter confrontare 300 e
+          200 senza che nessun altro testo del sito si muova. */}
+      <p
+        data-line
+        className="u-display text-d1 text-ink text-balance md:col-span-7"
+        style={{ fontWeight: STATEMENT_WEIGHT }}
+      >
         {t('statement.phrase')}
       </p>
 
