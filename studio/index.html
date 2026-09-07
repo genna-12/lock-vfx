@@ -6,7 +6,11 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/outfit-var.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="canonical" href="/studio/" />
+    <!-- Canonical: torna allo Step 9, insieme a `hreflang`, OG e meta, quando
+         il dominio è deciso. Va scritto assoluto (`https://…/studio/`): Vite
+         legge ogni `href` di `<link>` come un asset da mettere nel bundle, e
+         un percorso relativo che punta a una cartella fa fallire il build
+         con `EISDIR`. -->
     <title>LockVFX — Studio e servizi</title>
     <!-- Versione statica (crawler senza JS): StudioPage la riallinea alla
          lingua attiva. Questa e' l'unica pagina di testo del sito, ed e'
