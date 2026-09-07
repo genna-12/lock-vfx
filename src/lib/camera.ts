@@ -18,6 +18,47 @@ export const HOLDS: Record<SetId, number> = {
   contact: 530,
 };
 
+/**
+ * I magneti (richiesta di LockVFX, 7/9).
+ *
+ * La camera non si ferma mai a metà di un movimento: quando lo scroll si
+ * arresta dentro una transizione, la carrellata completa da sola il tratto
+ * verso l'HOLD successivo **nella direzione in cui si stava andando**.
+ * Dentro un HOLD invece lo scroll è libero: lì non c'è niente da
+ * completare, e uno scatto sarebbe solo un dispetto a chi sta leggendo.
+ *
+ * Sono i quattro tratti di riposo della tabella di `momento-1`, con la
+ * posizione a cui il magnete porta.
+ */
+export const HOLD_SPANS: ReadonlyArray<{ from: number; to: number; at: number }> = [
+  { from: 0, to: 60, at: HOLDS.reel },
+  { from: 150, to: 230, at: HOLDS.studio },
+  { from: 310, to: 420, at: HOLDS.work },
+  { from: 500, to: STAGE_VH, at: HOLDS.contact },
+];
+
+/** Tempi del magnete: `momento-1`, sezione Magneti. */
+export const SNAP = {
+  delay: 0.15,
+  duration: { min: 0.4, max: 0.9 },
+  ease: 'power2.inOut',
+} as const;
+
+/**
+ * Dove porta il magnete, in progress. `direction` è quella di
+ * ScrollTrigger: 1 se si stava scendendo, −1 se si stava risalendo.
+ * Restituire il valore ricevuto significa "non spostarti".
+ */
+export function snapProgress(progress: number, direction: number): number {
+  const vh = progress * STAGE_VH;
+  if (HOLD_SPANS.some((span) => vh >= span.from && vh <= span.to)) return progress;
+  const target =
+    direction >= 0
+      ? HOLD_SPANS.find((span) => span.from > vh)
+      : [...HOLD_SPANS].reverse().find((span) => span.to < vh);
+  return target ? target.at / STAGE_VH : progress;
+}
+
 /** Soglie di progress (0..1) fra un foro attivo e il successivo. */
 const NAV_STEPS = [0.17, 0.46, 0.82] as const;
 

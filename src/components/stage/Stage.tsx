@@ -3,7 +3,16 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { CAMERA, COLORS, STAGE_BG, type SetId } from '../../brand/tokens';
-import { MOVE, SALA_LIVE, STAGE_VH, T1, activeSetAt, amplitude } from '../../lib/camera';
+import {
+  MOVE,
+  SALA_LIVE,
+  SNAP,
+  STAGE_VH,
+  T1,
+  activeSetAt,
+  amplitude,
+  snapProgress,
+} from '../../lib/camera';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
 import { Reel } from './Reel';
@@ -13,6 +22,7 @@ import { Stanza } from './Stanza';
 import { loadWorks } from '../../data/works';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+
 
 /**
  * Lo spazio, e la camera che lo attraversa.
@@ -122,6 +132,18 @@ export function Stage({ onActiveChange }: StageProps) {
           scrub: 0.6,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          // I magneti. `snapTo` è una funzione e non l'elenco delle quattro
+          // posizioni perché dentro un HOLD non si deve muovere niente:
+          // l'elenco tirerebbe al foro successivo anche chi si è fermato a
+          // leggere. La direzione la dà ScrollTrigger.
+          snap: {
+            snapTo: (value: number, self?: { direction: number }) =>
+              snapProgress(value, self?.direction ?? 1),
+            directional: true,
+            delay: SNAP.delay,
+            duration: SNAP.duration,
+            ease: SNAP.ease,
+          },
           onUpdate: (self) => {
             const id = activeSetAt(self.progress);
             if (id !== lastId) {
