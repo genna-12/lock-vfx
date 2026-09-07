@@ -214,7 +214,13 @@
     position: relative;
     perspective: 1000px;
     perspective-origin: 50% 50%;
-    transform-style: preserve-3d;
+    /* NIENTE `transform-style: preserve-3d` qui: `perspective` da sola apre
+       già il contesto 3D per le card. Mettendo anche `preserve-3d`,
+       Chrome fa l'hit-testing sul piano appiattito della deck e le card
+       laterali diventano invisibili al puntatore — si vedono, ruotano, e non
+       si possono né cliccare né sfiorare. Misurato: con `preserve-3d` solo la
+       card centrale risponde (620–811 px), senza rispondono tutte e tre
+       (512–619 / 620–811 / 812–919). */
     touch-action: pan-y;
     cursor: grab;
     user-select: none;
@@ -230,7 +236,7 @@
     left: 50%;
     width: var(--card-w);
     margin-left: calc(var(--card-w) / -2);
-    transform-style: preserve-3d;
+    /* Sotto la card non c'è più profondità: i figli sono piatti. */
     transition: transform var(--f8) var(--ease-arrive);
   }
 

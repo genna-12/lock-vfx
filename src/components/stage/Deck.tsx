@@ -188,13 +188,10 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
     d.horizontal = null;
     d.moved = 0;
     d.samples = [{ x: event.clientX, t: performance.now() }];
-    try {
-      // Il browser può rifiutare la cattura (puntatore già sparito, o un
-      // ambiente di prova): il trascinamento deve partire lo stesso.
-      deckRef.current?.setPointerCapture(event.pointerId);
-    } catch {
-      /* niente cattura: si va avanti con gli eventi normali */
-    }
+    // La cattura del puntatore NON si prende qui: finché il gesto non è
+    // dichiarato un trascinamento, dev'essere un click normale. Con la
+    // cattura attiva il browser recapita il `click` all'elemento che
+    // cattura — la deck — e la card non lo vede mai.
   };
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -211,6 +208,13 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
       if (d.horizontal) {
         deckRef.current?.classList.add('is-dragging');
         onDrag(true);
+        try {
+          // Ora sì: da qui in poi è un trascinamento, e il puntatore può
+          // uscire dalla deck senza che il gesto si spezzi.
+          deckRef.current?.setPointerCapture(event.pointerId);
+        } catch {
+          /* il browser ha rifiutato: si va avanti con gli eventi normali */
+        }
       }
     }
     if (d.horizontal !== true) return;
