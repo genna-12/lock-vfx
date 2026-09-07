@@ -31,3 +31,7 @@ dist-ssr
 # Various
 reference/
 materiale/
+
+# Materiale di lavoro, non del sito: appunti delle chat e vecchi snapshot.
+Claude outputs/
+_to_delete/
