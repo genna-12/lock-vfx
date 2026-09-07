@@ -1,0 +1,5 @@
+# LockVFX — il sito è tutto indicizzabile: la pagina /studio/ esiste anche
+# per essere letta dai motori. La riga `Sitemap:` arriva allo Step 9, con il
+# dominio (una sitemap con un URL relativo non serve a niente).
+User-agent: *
+Allow: /
