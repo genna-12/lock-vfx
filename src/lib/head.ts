@@ -7,11 +7,18 @@
  *
  * L'indirizzo del sito non è ancora deciso, e finché è vuoto il sito **non**
  * dichiara `canonical` né `og:url`: un canonical sbagliato è peggio di
- * nessun canonical. Quando il dominio arriva si riempie soltanto la riga qui
- * sotto — senza barra finale — e con essa si accendono da sole la canonical
- * di tutte e due le pagine, `og:url` e l'indirizzo assoluto dell'immagine OG.
- * L'unica cosa che resta da fare a mano è la riga `Sitemap:` in
- * `public/robots.txt`.
+ * nessun canonical. Quando il dominio arriva non si tocca più il codice: si
+ * riempie `VITE_SITE_URL` fra le variabili del progetto (Cloudflare Pages) e
+ * con essa si accendono da sole la canonical di tutte e due le pagine,
+ * `og:url` e l'indirizzo assoluto dell'immagine OG. L'unica cosa che resta
+ * da fare a mano è la riga `Sitemap:` in `public/robots.txt`.
+ *
+ * `VITE_PREVIEW=1` marca la versione che i ragazzi guardano prima del
+ * lancio: le due pagine dichiarano `noindex, nofollow`. La meta è la seconda
+ * linea, non la prima — quella vera è l'intestazione `X-Robots-Tag` che il
+ * build scrive in `dist/_headers` (vedi `vite.config.ts`), perché la legge
+ * anche chi non esegue il JavaScript. Le due si accendono e si spengono
+ * insieme, dalla stessa variabile.
  *
  * `hreflang` no: vuole un indirizzo diverso per lingua, e qui la lingua si
  * sceglie nel browser e resta nel `localStorage`. Le due pagine sono un
@@ -21,7 +28,10 @@
  * Perché a mano e non con una libreria: sono cinque tag su due pagine
  * statiche, e un `<head>` non è uno stato di React.
  */
-export const SITE_URL = '';
+export const SITE_URL = String(import.meta.env.VITE_SITE_URL ?? '').replace(/\/+$/, '');
+
+/** Anteprima per i ragazzi: fuori dai motori di ricerca. */
+const IS_PREVIEW = String(import.meta.env.VITE_PREVIEW ?? '') === '1';
 
 /** L'immagine delle schede social: il marchio su fondo pieno, 1200×630. */
 const OG_IMAGE = '/og.png';
@@ -48,6 +58,8 @@ function meta(key: 'name' | 'property', value: string): HTMLMetaElement {
 }
 
 export function applyHead({ title, description, path, lang, imageAlt }: HeadInfo): void {
+  if (IS_PREVIEW) meta('name', 'robots').content = 'noindex, nofollow';
+
   document.documentElement.lang = lang;
   document.title = title;
   meta('name', 'description').content = description;
