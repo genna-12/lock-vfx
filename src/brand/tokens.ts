@@ -74,6 +74,23 @@ export const MOTION = {
  */
 export const STAGE_BG: 'obsidian' | 'void' = 'obsidian';
 
+/**
+ * La parola "LockVFX" accanto al marchio, nel chrome.
+ *
+ * Decisione della Direzione dell'8/9 sera: nella **home** non ci va, ne' su
+ * telefono ne' su desktop — restano il marchio, la lingua e la nav, e il
+ * resto e' lo schermo del video. Nelle altre pagine (Studio) la parola
+ * resta: li' non c'e' un video che dica il nome.
+ *
+ * Era nato come variante (`rifinitura-spec.md` §7.3) ed e' diventato il
+ * default di tutte e due le versioni (`mobile-semplice-spec.md` §7).
+ *
+ * Va detto una volta: finche' lo showreel vero non c'e', la home non dice
+ * il proprio nome da nessuna parte visibile — restano il `<title>`, l'`h1`
+ * nascosto e i dati strutturati. E' una scommessa sul segno.
+ */
+export const WORDMARK_TEXT: 'always' | 'not-home' = 'not-home';
+
 /** Camera della carrellata (vedi `momento-1-lo-spazio.md`). */
 export const CAMERA = {
   /** ScrollSmoother su desktop; su touch resta lo scroll nativo. */
