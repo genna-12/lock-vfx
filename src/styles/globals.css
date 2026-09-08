@@ -507,3 +507,29 @@
 .snap #site-footer {
   scroll-snap-align: start;
 }
+
+/* L'unico movimento rimasto sul telefono: ogni sezione entra una volta
+   sola, con una dissolvenza corta e dodici pixel di salita. Ad accenderla e'
+   l'`IntersectionObserver` dello Stage a soglia 0,55 (`data-seen`); con
+   `prefers-reduced-motion` la transizione globale la riduce a un istante, e
+   resta un cambio secco. */
+.snap .stage [data-set] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity var(--f8) linear,
+    transform var(--f8) var(--ease-arrive);
+}
+
+.snap .stage [data-set][data-seen='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Le luci restano, ma qui sono ferme e a schermo: si accendono con la
+   sezione che devono illuminare, sulla stessa soglia. */
+.snap .stage [data-light] {
+  display: block;
+  position: fixed;
+  transition: opacity var(--f8) linear;
+}

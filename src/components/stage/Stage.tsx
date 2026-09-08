@@ -135,8 +135,43 @@ export function Stage({ onActiveChange }: StageProps) {
       // conseguenza (video, HUD, `inert`).
       setStageStatic(true);
       notify('reel');
+
+      /* ---- le transizioni, quando non c'è la camera -------------------
+         Una sola dissolvenza corta all'ingresso di ogni sezione, e la luce
+         che le tocca. La soglia è 0,55: più della metà della sezione a
+         schermo vuol dire "è questa che si sta guardando", ed è la stessa
+         che fa seguire il foro attivo della nav. Niente scrub, niente
+         parallasse: il movimento sul telefono è quello del dito. */
+      const sets = Array.from(root.querySelectorAll<HTMLElement>('[data-set]'));
+      const luci = {
+        sala: root.querySelector<HTMLElement>('[data-light="sala"]'),
+        taglio: root.querySelector<HTMLElement>('[data-light="taglio"]'),
+      };
+      const acceso = (id: SetId) => {
+        if (luci.sala) luci.sala.style.opacity = id === 'studio' ? '1' : '0';
+        if (luci.taglio) luci.taglio.style.opacity = id === 'contact' ? '1' : '0';
+      };
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            // Vista una volta, vista per sempre: la dissolvenza è un
+            // ingresso, non un effetto che si ripete a ogni passaggio.
+            el.dataset.seen = 'true';
+            const id = el.id as SetId;
+            notify(id);
+            acceso(id);
+          }
+        },
+        { threshold: 0.55 }
+      );
+      for (const set of sets) io.observe(set);
+
       return () => {
         spegniSonda();
+        io.disconnect();
+        for (const light of Object.values(luci)) light?.style.removeProperty('opacity');
         html.classList.remove('static');
         html.classList.remove('snap');
       };
