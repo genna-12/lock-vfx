@@ -59,6 +59,20 @@ export function mountProbe(fonti: Fonti): () => void {
     return Math.round(righello.getBoundingClientRect().height);
   };
 
+  /** Quale sezione ha il bordo alto piu' vicino a quello della finestra. */
+  const sezioneAllineata = (): string => {
+    let vicina = '—';
+    let scarto = Infinity;
+    for (const set of document.querySelectorAll<HTMLElement>('[data-set]')) {
+      const d = Math.abs(set.getBoundingClientRect().top);
+      if (d < scarto) {
+        scarto = d;
+        vicina = `${set.id} (${Math.round(set.getBoundingClientRect().top)})`;
+      }
+    }
+    return vicina;
+  };
+
   const storia: string[] = [];
   const t0 = performance.now();
   const alto = (sel: string): string => {
@@ -70,6 +84,14 @@ export function mountProbe(fonti: Fonti): () => void {
     box.textContent = [
       `finestra  ${window.innerWidth}×${window.innerHeight}`,
       `svh ${unita('svh')}  lvh ${unita('lvh')}  dvh ${unita('dvh')}`,
+      // Le due righe che dicono se il telefono sta facendo quello che deve:
+      // di quanto `lvh` (l'altezza delle sezioni) supera la finestra vera —
+      // cioe' quanta sezione sta dietro le barre — e su quale sezione si e'
+      // fermato lo snap.
+      `lvh − finestra  ${unita('lvh') - window.innerHeight}   snap ${
+        getComputedStyle(document.documentElement).scrollSnapType
+      }`,
+      `fermo su  ${sezioneAllineata()}`,
       `palco ${alto('.stage')}  set1 ${alto('[data-set]')}  --stage-h ${
         getComputedStyle(document.documentElement).getPropertyValue('--stage-h').trim() || '—'
       }`,
