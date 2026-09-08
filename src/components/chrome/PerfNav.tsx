@@ -57,7 +57,7 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
       aria-hidden={onFooter || undefined}
       inert={onFooter || undefined}
       style={{ transitionDuration: 'var(--f5)' }}
-      className={`fixed right-[var(--pad)] bottom-[var(--pad)] z-30 transition-opacity md:bottom-auto md:top-1/2 md:-translate-y-1/2 ${
+      className={`fixed right-[var(--pad)] bottom-[max(var(--pad),env(safe-area-inset-bottom,0px))] z-30 transition-opacity md:bottom-auto md:top-1/2 md:-translate-y-1/2 ${
         onFooter ? 'pointer-events-none opacity-0' : 'pointer-events-auto opacity-100'
       }`}
     >

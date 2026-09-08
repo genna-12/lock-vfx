@@ -69,7 +69,10 @@ export function Footer() {
   return (
     <footer
       id="site-footer"
-      className="u-pad relative w-full bg-void pb-20 md:pb-28"
+      // Il `pb` porta con sé `env(safe-area-inset-bottom)`: con
+      // `viewport-fit=cover` la pagina arriva sotto la barra di casa
+      // dell'iPhone, e il footer è l'ultima cosa che c'è.
+      className="u-pad relative w-full bg-void pb-[calc(5rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(7rem+env(safe-area-inset-bottom,0px))]"
       style={{ paddingTop: 'max(calc(var(--pad) * 2), 5rem)' }}
     >
       {/* L'invito. Un pannello fermo: il raggio grande è l'unica forma
