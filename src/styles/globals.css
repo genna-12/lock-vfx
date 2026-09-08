@@ -433,20 +433,14 @@
   visibility: visible;
 }
 
-/* Telefono coricato: e' una pagina che scorre, non una carrellata, e deve
-   sembrarlo. Le due sezioni di testo prendono l'altezza del loro contenuto
-   con un respiro sopra e sotto, invece di promettere uno schermo intero che
-   riempirebbero per meta'. Reel e Sala no: il loro contenuto e' un video in
-   posizione assoluta, non hanno un'altezza propria (misurato: con
-   `min-height: auto` diventano alte 0) e a schermo pieno stanno bene — in
-   orizzontale un video e' esattamente quel che si vuole guardare. */
-@media (max-height: 500px) and (orientation: landscape) {
-  .static .stage [data-set="studio"],
-  .static .stage [data-set="contact"] {
-    min-height: auto;
-    padding-block: clamp(48px, 14vh, 88px);
-  }
-}
+/* `min-height` e non `height`: una sezione riempie sempre lo schermo, e se il
+   suo contenuto e' piu' alto si allunga e scorre — nell'orizzontale del
+   telefono la Stanza e' alta 625 px su 390 di finestra e va bene cosi'.
+   Provata e scartata l'altezza-da-contenuto pura (`min-height: auto`) per le
+   due sezioni di testo: Reel e Sala hanno il contenuto in posizione assoluta
+   e diventano alte **zero**, e lo Statement scende a 376 px su una finestra
+   di 390 — cioe' ricrea esattamente la striscia della sezione dopo che
+   questo lotto deve togliere. */
 .static .stanza-fit { overflow: visible; }
 .static .stage [data-set="work"] { pointer-events: auto; }
 
