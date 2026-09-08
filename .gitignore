@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Chiavi: in chiaro nel bundle, ma non nel repo. Il modello è `.env.example`.
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +27,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Various
+reference/
+materiale/
+
+# Materiale di lavoro, non del sito: appunti delle chat e vecchi snapshot.
+Claude outputs/
+_to_delete/

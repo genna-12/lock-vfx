@@ -1,39 +1,70 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './utils/i18n';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { assertTokensInSync, type SetId } from './brand/tokens';
+import { applyHead } from './lib/head';
+import { Loader } from './components/Loader';
+import { Wordmark } from './components/chrome/Wordmark';
+import { LangPill } from './components/chrome/LangPill';
+import { PerfNav } from './components/chrome/PerfNav';
+import { Stage } from './components/stage/Stage';
+import { Footer } from './components/Footer';
+import { PrivacyDialog } from './components/ui/PrivacyDialog';
 
-import { AmbientBackground } from './components/layout/AmbientBackground';
-import { LockVfxNavbar } from './components/layout/InstagramGlassNavbar';
-import { HeaderOverlay } from './components/layout/HeaderOverlay';
+/**
+ * Struttura della pagina.
+ *
+ * Il chrome (marchio, lingua, nav) sta FUORI da `#smooth-wrapper`: gli
+ * elementi `fixed` dentro il wrapper di ScrollSmoother vengono trascinati
+ * dal transform e smettono di essere fissi. Lo smoother vero viene montato
+ * allo step 2; qui esistono già i due nodi che gli servono.
+ */
+export default function App() {
+  const { i18n, t } = useTranslation();
+  const lang = i18n.resolvedLanguage ?? 'it';
 
-import { HomePage } from './pages/HomePage';
-//import { PortfolioPage } from './pages/PortfolioPage';
-//import { AboutPage } from './pages/AboutPage';
-//import { ContactPage } from './pages/ContactPage';
+  // Quale HOLD e' inquadrato: lo Stage lo comunica solo quando cambia, quindi
+  // qui si rirenderizza tre volte in tutta la carrellata, non a ogni frame.
+  const [active, setActive] = useState<SetId>('reel');
+  const handleActiveChange = useCallback((id: SetId) => setActive(id), []);
 
-export const App: React.FC = () => {
+  useEffect(() => assertTokensInSync(), []);
+  useEffect(() => {
+    applyHead({
+      title: t('meta.title'),
+      description: t('meta.description'),
+      path: import.meta.env.BASE_URL,
+      lang,
+      imageAlt: t('meta.ogAlt'),
+    });
+  }, [lang, t]);
+
   return (
-    <Router>
-      <div className="min-h-screen bg-[#08090C] text-zinc-100 font-sans relative antialiased selection:bg-[#D3121B] selection:text-white overflow-x-hidden">
-        {/* Sfondo dinamico morbido */}
-        <AmbientBackground />
+    <Loader>
+      <a
+        href="#top"
+        className="u-sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 focus-visible:bg-obsidian focus-visible:px-4 focus-visible:py-2"
+      >
+        {t('a11y.skip')}
+      </a>
 
-        {/* Overlay Navbar Glassmorphic */}
-        <LockVfxNavbar />
-        <HeaderOverlay />
+      <header className="u-pad pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between py-[var(--pad)]">
+        <Wordmark />
+        <LangPill />
+      </header>
+      <PerfNav active={active} />
 
-        {/* Contenuto Principale: 100% larghezza reale, NESSUN padding laterale */}
-        <main className="relative z-10 w-full min-h-screen">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            {/* <Route path="/portfolio" element={<PortfolioPage />} /> */}
-            {/* <Route path="/about" element={<AboutPage />} /> */}
-            {/* <Route path="/contact" element={<ContactPage />} /> */}
-          </Routes>
-        </main>
+      <div id="smooth-wrapper">
+        <div id="smooth-content">
+          <main id="top">
+            <Stage onActiveChange={handleActiveChange} />
+          </main>
+          <Footer />
+        </div>
       </div>
-    </Router>
-  );
-};
 
-export default App;
+      {/* Fuori dallo smooth wrapper e fuori dallo stage: è modale, e la sua
+          posizione non deve dipendere dalle trasformazioni della camera. */}
+      <PrivacyDialog />
+    </Loader>
+  );
+}

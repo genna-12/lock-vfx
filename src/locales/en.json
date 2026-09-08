@@ -1,20 +1,185 @@
 {
   "nav": {
-    "home": "Home",
-    "portfolio": "Portfolio",
-    "about": "About",
-    "contact": "Contact",
-    "getInTouch": "Get in Touch"
+    "label": "Sections",
+    "reel": "Reel",
+    "studio": "Studio",
+    "work": "Work",
+    "contact": "Contact"
   },
-  "hero": {
-    "badge": "VISUAL EFFECTS STUDIO",
-    "title": "We Craft Cinematic Reality",
-    "subtitle": "High-end visual effects, compositing, and 3D environments for feature films and commercial projects.",
-    "ctaWork": "Explore Works",
-    "ctaContact": "Start a Project"
+  "a11y": {
+    "skip": "Skip to content"
+  },
+  "meta": {
+    "title": "LockVFX — visual effects for film, series and advertising",
+    "ogAlt": "The LockVFX mark",
+    "description": "LockVFX — visual effects for film, series and advertising: compositing, CGI, environments, cleanup and finishing. The name under which [Name] and [Name] work together."
+  },
+  "loader": {
+    "label": "Loading"
+  },
+  "reel": {
+    "h1": "LockVFX — visual effects for film, series and advertising",
+    "play": "Play reel",
+    "audioOn": "Turn sound on",
+    "audioOff": "Turn sound off"
+  },
+  "statement": {
+    "phrase": "We give shape to the images a film imagines and cannot shoot.",
+    "paragraph": "LockVFX is the name under which [Name] and [Name] work together: compositing, CGI, environments, cleanup, simulation and finishing for film, series and advertising — with a network of studios and specialists that changes with each project.",
+    "credits": {
+      "a": "[Name] · compositing",
+      "b": "[Name] · 3D/CGI",
+      "c": "[City]"
+    },
+    "cta": "What we do →"
+  },
+  "sala": {
+    "deck": "Choose a work",
+    "full": "Watch the full video ↗",
+    "rotate": "Rotate for the screening room",
+    "play": "Play",
+    "pause": "Pause",
+    "audioOn": "Turn sound on",
+    "audioOff": "Turn sound off",
+    "fullscreen": "Full screen"
+  },
+  "contact": {
+    "title": "Let’s talk.",
+    "city": "[City]",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message"
+    },
+    "errors": {
+      "name": "What should we call you?",
+      "email": "We need an email to reply to.",
+      "message": "Two lines are enough: project, timing, what you need."
+    },
+    "consent": {
+      "before": "I have read the ",
+      "link": "privacy notice",
+      "after": " and understand my data will be used only to reply to me."
+    },
+    "send": "Send",
+    "sending": "Sending…",
+    "sent": "Sent",
+    "status": {
+      "sent": "Got it. We’ll get back to you within two working days.",
+      "failed": "It didn’t go through. Try again, or write to us directly:"
+    },
+    "honeypot": "Company"
+  },
+  "privacy": {
+    "title": "Privacy notice",
+    "short": "We use what you send us (name, email, message) only to reply. No newsletter, no sharing with third parties. We keep it for 24 months after our last exchange, then delete it. Your message is delivered to our inboxes through EmailJS. You can ask us to access or delete your data at any time at {{email}}. Full details in the privacy notice.",
+    "body": "The full privacy notice is being prepared and will be published here before the site goes live.",
+    "close": "Close"
   },
   "footer": {
-    "rights": "All rights reserved.",
-    "tagline": "Precision VFX Architecture."
+    "cta": {
+      "kicker": "Got a project in mind?",
+      "title": "Let’s talk at",
+      "button": "Write to us"
+    },
+    "columns": {
+      "studio": {
+        "title": "Studio"
+      },
+      "contact": {
+        "title": "Contact",
+        "write": "Write to us"
+      },
+      "social": {
+        "title": "Follow us"
+      }
+    },
+    "social": {
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "email": "Email"
+    },
+    "legal": {
+      "collective": "LockVFX is the collective name under which {{a}} and {{b}} present their work. It is not a company: each of them works with their own VAT number and in their own name.",
+      "privacy": "Privacy policy",
+      "cookie": "Cookie policy"
+    }
+  },
+  "landing": {
+    "back": "Back to the site",
+    "nav": {
+      "label": "On this page",
+      "chi": "About",
+      "servizi": "What we do",
+      "come": "How we work",
+      "persone": "The people",
+      "contatti": "Contact"
+    },
+    "chi": {
+      "h1": "Visual effects for film, series and advertising.",
+      "lead": "LockVFX is the shared name [Name 1] and [Name 2] work under: from a single shot cleanup to a sequence built from scratch, held to the same standard.",
+      "paragraph": "[...]"
+    },
+    "servizi": {
+      "h2": "What we do",
+      "intro": "A full service, or just the piece missing from your pipeline.",
+      "compositing": {
+        "title": "Compositing",
+        "body": "Element integration, keying and roto, 2D/3D tracking, shot-by-shot grading."
+      },
+      "cgi": {
+        "title": "3D and CGI",
+        "body": "Modeling, look development, lighting and rendering of assets and environments integrated into the plate."
+      },
+      "matte": {
+        "title": "Matte painting and environments",
+        "body": "Set extensions, skies, landscapes and cities: the ones that don’t exist, or do but not quite like that."
+      },
+      "cleanup": {
+        "title": "Cleanup and removals",
+        "body": "Wires, rigs, logos, reflections, anything that shouldn’t be in frame: gone without a trace."
+      },
+      "sim": {
+        "title": "Simulations",
+        "body": "Fire, smoke, water, destruction, particles and cloth, scaled to the shot."
+      },
+      "finishing": {
+        "title": "Finishing",
+        "body": "Conform, quality control, delivery in the formats post and distributors need."
+      }
+    },
+    "come": {
+      "h2": "How we work",
+      "step1": {
+        "title": "Brief and breakdown",
+        "body": "We read the script or the cut, count the shots, and say what post needs and what shooting can save."
+      },
+      "step2": {
+        "title": "On set, if needed",
+        "body": "VFX supervision, references, HDRIs, measurements: whatever makes post shorter."
+      },
+      "step3": {
+        "title": "Post and revisions",
+        "body": "Numbered versions, notes in one place, timelines agreed before we start."
+      },
+      "step4": {
+        "title": "Delivery",
+        "body": "In post’s formats, with separate passes if you need them."
+      }
+    },
+    "persone": {
+      "h2": "The people",
+      "placeholder": "[Role · city · two lines on what they do and for how long]",
+      "transparency": "Two freelancers with separate VAT numbers, working together and with others: LockVFX isn’t a company."
+    },
+    "contatti": {
+      "h2": "Let’s talk.",
+      "paragraph": "A project, a sequence, a doubt about what’s possible: get in touch.",
+      "cta": "Get in touch →"
+    },
+    "meta": {
+      "title": "LockVFX — Studio and services",
+      "description": "LockVFX is the name two VFX artists work under: compositing, 3D and CGI, matte painting, simulations, finishing. The method, the services, the contacts."
+    }
   }
 }

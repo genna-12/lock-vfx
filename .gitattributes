@@ -1,0 +1,9 @@
+# Il repo vive su Windows ma i blob restano LF: senza questo, ogni checkout
+# fa apparire tutti i file come modificati (solo per il fine riga).
+* text=auto eol=lf
+
+*.woff2 binary
+*.png   binary
+*.webp  binary
+*.glb   binary
+*.ico   binary

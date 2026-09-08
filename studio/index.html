@@ -6,23 +6,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/outfit-var.woff2" as="font" type="font/woff2" crossorigin />
-    <!-- Il poster della reel è l'LCP della home, e senza questa riga il
-         browser lo scopre solo dopo aver eseguito il JS: un secondo e mezzo
-         di attesa per un file che è già sul server. Vale solo qui: la pagina
-         Studio non ha immagini sopra la piega. -->
-    <link
-      rel="preload"
-      href="/images/showreel-poster.webp"
-      as="image"
-      type="image/webp"
-      fetchpriority="high"
-    />
-    <title>LockVFX — effetti visivi per cinema, serie e pubblicità</title>
-    <!-- Versione statica (crawler senza JS): App.tsx la riallinea alla lingua
-         attiva. I due [Nome] sono segnaposto: mancano i nomi dei ragazzi. -->
+    <!-- Canonical: la scrive `src/lib/head.ts` quando `SITE_URL` è pieno, e
+         assoluta. Qui non può stare: Vite legge ogni `href` di `<link>` come
+         un asset da mettere nel bundle, e un percorso relativo che punta a
+         una cartella fa fallire il build con `EISDIR`. -->
+    <title>LockVFX — Studio e servizi</title>
+    <!-- Versione statica (crawler senza JS): StudioPage la riallinea alla
+         lingua attiva. Questa e' l'unica pagina di testo del sito, ed e'
+         quella che i motori leggeranno davvero: resta indicizzata. -->
     <meta
       name="description"
-      content="LockVFX — effetti visivi per cinema, serie e pubblicità: compositing, CGI, environment, cleanup e finishing. Il nome con cui [Nome] e [Nome] lavorano insieme."
+      content="LockVFX è il nome con cui due artisti VFX lavorano insieme: compositing, 3D e CGI, matte painting, simulazioni, finishing. Il metodo, i servizi, i contatti."
     />
     <!-- Scheda social. Statica in italiano come la descrizione qui sopra;
          `src/lib/head.ts` la riallinea alla lingua attiva, e ci aggiunge
@@ -32,8 +26,8 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="LockVFX" />
     <meta property="og:locale" content="it_IT" />
-    <meta property="og:title" content="LockVFX — effetti visivi per cinema, serie e pubblicità" />
-    <meta property="og:description" content="LockVFX — effetti visivi per cinema, serie e pubblicità: compositing, CGI, environment, cleanup e finishing. Il nome con cui [Nome] e [Nome] lavorano insieme." />
+    <meta property="og:title" content="LockVFX — Studio e servizi" />
+    <meta property="og:description" content="LockVFX è il nome con cui due artisti VFX lavorano insieme: compositing, 3D e CGI, matte painting, simulazioni, finishing. Il metodo, i servizi, i contatti." />
     <meta property="og:image" content="/og.png" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
@@ -47,6 +41,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/studio.tsx"></script>
   </body>
 </html>

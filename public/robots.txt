@@ -1,0 +1,10 @@
+# LockVFX — il sito è tutto indicizzabile: la pagina /studio/ esiste anche
+# per essere letta dai motori.
+#
+# La riga `Sitemap:` resta spenta finché il dominio non è deciso: una
+# sitemap con un indirizzo relativo non serve a niente. Quando il dominio
+# arriva si riempie `SITE_URL` in `src/lib/head.ts` e si scrive qui, a mano:
+#   Sitemap: https://…/sitemap.xml
+# Due pagine sole: la sitemap può essere un file statico in `public/`.
+User-agent: *
+Allow: /

@@ -1,75 +1,37 @@
-# React + TypeScript + Vite
+# LockVFX — sito
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite, Tailwind v4, GSAP/ScrollTrigger, i18next. Due
+pagine statiche e nessun router: la home (`index.html`, la carrellata) e
+`/studio/` (`studio/index.html`, solo testo). `npm run dev` per lavorarci,
+`npm run build` per il `dist/`, `npm run serve:dist` per guardarlo come lo
+vedrà il browser — **non** `vite preview` (Console Ninja falsa le misure).
 
-Currently, two official plugins are available:
+## Anteprima e produzione
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Il sito non sa dove abita: glielo dicono tre variabili, tutte facoltative,
+tutte con un default che funziona (`.env.example` le elenca tutte).
 
-## React Compiler
+- `VITE_SITE_URL` — l'indirizzo del sito, **senza barra finale**. Finché è
+  vuoto il sito non dichiara `canonical` né `og:url`: un canonical
+  sbagliato è peggio di nessun canonical. Quando il dominio c'è si riempie
+  questa, e con essa si accendono da sole la canonical di tutte e due le
+  pagine, `og:url` e l'indirizzo assoluto dell'immagine OG. Resta da fare a
+  mano solo la riga `Sitemap:` in `public/robots.txt`.
+- `VITE_PREVIEW=1` — è l'anteprima che guardano i ragazzi, non il sito
+  vero: le due pagine dichiarano `noindex, nofollow` e il build scrive
+  `dist/_headers` con `X-Robots-Tag` (lo legge Cloudflare Pages, e lo legge
+  anche chi non esegue il JavaScript). Si spengono insieme togliendo la
+  variabile: non c'è nessun file da ricordarsi di cancellare al lancio.
+- `VITE_BASE` — la sottocartella, se il sito non sta alla radice del
+  dominio (GitHub Pages: `/lock-vfx/`). Con un dominio proprio non serve.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+L'anteprima è su **Cloudflare Pages**, branch `v2`: ogni push ridistribuisce
+da solo. La procedura completa — creazione del progetto, variabili, password
+facoltativa, R2 per i video, cosa cambiare il giorno del lancio — sta in
+`deploy-e-anteprima.md` nel Project, che è l'unico posto in cui è scritta
+per intero: queste righe la riassumono, non la sostituiscono.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+Le chiavi (`VITE_EMAILJS_*`) non stanno nel repo: in locale in `.env.local`,
+su Cloudflare fra le variabili del progetto. Senza chiavi il form dei
+contatti fallisce dicendolo e offre il `mailto:` — che per un'anteprima è il
+comportamento giusto.

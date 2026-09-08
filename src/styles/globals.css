@@ -1,20 +1,410 @@
 @import "tailwindcss";
 
-@layer utilities {
-  .transform-gpu {
-    transform: translateZ(0);
+/* =========================================================================
+   LockVFX — foglio di stile radice.
+   I valori qui dentro sono gli stessi di `src/brand/tokens.ts`: quel file è
+   la fonte di verità per il lato JS (GSAP, timeline, camera), questo blocco
+   `@theme` è la stessa tavola esposta a Tailwind e al CSS. Se cambi un
+   valore, cambialo in tutti e due i posti — in dev un controllo automatico
+   (vedi tokens.ts) avvisa in console se i due si disallineano.
+   Nessun componente deve contenere un hex.
+   ========================================================================= */
+
+/* ---------- Font self-hosted ------------------------------------------- */
+
+/* Outfit variabile (richiesta di LockVFX del 7/9, licenza OFL): un solo file
+   per i quattro pesi che usiamo — 200 solo per la frase dello Statement, 300
+   display, 400 testo, 500 nomi/cap/pulsanti. Niente 600+.
+   Asse wght 200–500, default 400. Latino + latino esteso e le frecce, ~37 KB.
+   Self-hosted: nessuna chiamata a Google, quindi nessun terzo e nessun cookie. */
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/outfit-var.woff2') format('woff2');
+  font-weight: 200 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Geist Mono: solo per la riga legale del footer (P.IVA), mai nella UI. */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/geist-mono-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/geist-mono-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Tavola dei token (Tailwind v4) ------------------------------ */
+
+@theme {
+  /* Colori con un ruolo, non solo un valore. */
+  --color-void: #020202;      /* fondo primario: il nero prima del girato */
+  --color-obsidian: #0b0b0e;  /* superfici e volumi appena staccati dal fondo */
+  --color-ink: #f2efea;       /* testo primario, neutro caldo */
+  --color-stone: #b9b2a8;     /* testo secondario */
+  --color-dust: #6e685f;      /* etichette, bordi, tutto ciò che è quasi muto */
+  --color-crimson: #e60b18;   /* unico accento: uno persistente + al massimo uno transitorio */
+
+  /* Tipografia: una sola famiglia variabile, due registri di larghezza. */
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-text: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Scala display (mobile → desktop). Ridotta del 14% rispetto ad Archivo:
+     Outfit non e' condensata, alla stessa misura occupa molto piu' spazio.
+     Interlinea 1,02 su tutta la scala; la crenatura stretta solo dove il
+     corpo supera i 40 px, sotto quella soglia toglierebbe aria alle parole. */
+  --text-d1: clamp(40px, 5.3vw, 76px);
+  --text-d1--line-height: 1.02;
+  --text-d1--letter-spacing: -0.02em;
+  --text-d2: clamp(36px, 3.9vw, 56px);
+  --text-d2--line-height: 1.02;
+  --text-d2--letter-spacing: -0.02em;
+  --text-d3: clamp(24px, 2.8vw, 40px);
+  --text-d3--line-height: 1.02;
+  --text-d4: clamp(21px, 2.1vw, 30px);
+  --text-d4--line-height: 1.02;
+
+  /* Scala testo. */
+  --text-t1: 19px;
+  --text-t1--line-height: 1.5;
+  --text-t2: 17px;
+  --text-t2--line-height: 1.5;
+  --text-t3: 15px;
+  --text-t3--line-height: 1.5;
+  --text-t4: 13px;
+  --text-t4--line-height: 1.5;
+
+  /* Etichette maiuscole (nav, lingua, form). */
+  --text-cap: clamp(12px, 0.9vw, 13px);
+  --text-cap--line-height: 1;
+  --text-cap--letter-spacing: 0.14em;
+
+  /* Solo due raggi in tutto il sito. */
+  --radius-frame: 2px;
+  --radius-card: 6px;
+
+  /* Curve. */
+  --ease-cut: linear;
+  --ease-arrive: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ---------- Token non-Tailwind (motion, spazio, luci) ------------------- */
+
+:root {
+  /* Durate in fotogrammi a 24 fps: il vocabolario del montaggio. */
+  --cut: 0ms;
+  --f2: 83ms;
+  --f5: 208ms;
+  --f8: 333ms;
+  --f12: 500ms;
+
+  /* Camera. */
+  --smooth: 1.2s;
+
+  /* Luci: opacità di layer, mai filtri. */
+  --light-sala: rgb(255 246 232 / 0.1);
+  --light-taglio: rgb(255 236 214 / 0.15);
+
+  /* Ritmo. */
+  --pad: clamp(20px, 3.4vw, 48px);
+  --gap-section: clamp(96px, 12vh, 160px);
+}
+
+/* ---------- Base --------------------------------------------------------- */
+
+@layer base {
+  html {
+    background-color: var(--color-void);
+    /* NIENTE overflow-x qui: su un antenato rompe position:sticky (bug noto
+       del progetto precedente). Tagliare l'overflow sulla singola sezione. */
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: var(--text-t2);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-crimson);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-crimson);
+    outline-offset: 3px;
   }
 }
 
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
+/* ---------- Componenti minimi ------------------------------------------- */
+
+@layer components {
+  /* Etichetta maiuscola: l'unico trattamento "tecnico" ammesso nella UI. */
+  .u-cap {
+    font-family: var(--font-text);
+    font-size: var(--text-cap);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
   }
-  100% {
-    transform: translateX(-100%);
+
+  /* Display: Outfit leggera. Il peso e' 300 e non un grassetto: la frase
+     grande si impone con la misura, non con lo spessore. */
+  .u-display {
+    font-family: var(--font-display);
+    font-weight: 300;
+  }
+
+  /* Margine di pagina coerente. */
+  .u-pad {
+    padding-inline: var(--pad);
+  }
+
+  /* ---- Lo spazio ----------------------------------------------------
+     Tre gusci: `.stage` e' il palco pinnato, `.camera` mette la
+     prospettiva, `.world` e' il volume dove vivono i set con profondita'.
+
+     DENTRO `.world` non entrano mai: `will-change`, un `opacity` < 1 su un
+     contenitore, un `overflow` diverso da `visible`. Ognuna delle tre
+     appiattisce il `preserve-3d` e la profondita' sparisce senza errori in
+     console. L'opacita' si anima sulle foglie ([data-leaf], [data-line]),
+     mai sui wrapper. */
+  .stage {
+    position: relative;
+    height: 100svh;
+    overflow: hidden;
+    background-color: var(--color-void);
+  }
+
+  .camera {
+    position: absolute;
+    inset: 0;
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+  }
+
+  .world {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .set {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  /* ---- La deck della Sala --------------------------------------------
+     Coverflow ad anello in CSS 3D: nessun WebGL per tre rettangoli.
+     Il posizionamento (transform, z-index, opacità, saturazione) lo scrive
+     il JS sulla `.deck-card`; il lift dell'hover sta sulla `.deck-face`, un
+     livello più sotto, così non litiga con la matrice 3D del genitore. */
+  .deck {
+    position: relative;
+    perspective: 1000px;
+    perspective-origin: 50% 50%;
+    /* NIENTE `transform-style: preserve-3d` qui: `perspective` da sola apre
+       già il contesto 3D per le card. Mettendo anche `preserve-3d`,
+       Chrome fa l'hit-testing sul piano appiattito della deck e le card
+       laterali diventano invisibili al puntatore — si vedono, ruotano, e non
+       si possono né cliccare né sfiorare. Misurato: con `preserve-3d` solo la
+       card centrale risponde (620–811 px), senza rispondono tutte e tre
+       (512–619 / 620–811 / 812–919). */
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .deck.is-dragging {
+    cursor: grabbing;
+  }
+
+  .deck-card {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--card-w);
+    margin-left: calc(var(--card-w) / -2);
+    /* Sotto la card non c'è più profondità: i figli sono piatti. */
+    transition: transform var(--f8) var(--ease-arrive);
+  }
+
+  .deck-face {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background-color: var(--color-obsidian);
+    box-shadow:
+      0 14px 36px rgb(0 0 0 / 0.7),
+      inset 0 0 0 1px rgb(242 239 234 / 0.08);
+    opacity: var(--card-op, 1);
+    filter: saturate(var(--card-sat, 1));
+    cursor: pointer;
+    transition:
+      transform var(--f5) var(--ease-arrive),
+      opacity var(--f5) linear,
+      filter var(--f5) linear;
+  }
+
+  .deck-face img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .deck-title {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    translate: -50% 0;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity var(--f5) linear;
+    pointer-events: none;
+  }
+
+  /* Hover solo sulle laterali: la centrale è già dov'è. */
+  .deck-card:not(.is-center):hover .deck-face {
+    opacity: 1;
+    filter: saturate(1);
+    transform: translateY(-10px);
+  }
+  .deck-card:not(.is-center):hover .deck-title {
+    opacity: 1;
+  }
+
+  /* Durante il drag e l'inerzia le card seguono la mano: nessuna transizione.
+     In reduced motion vale sempre, e il lift non c'è. */
+  .deck.is-dragging .deck-card,
+  .deck.is-dragging .deck-face,
+  .deck.is-flat .deck-card,
+  .deck.is-flat .deck-face,
+  .deck.is-flat .deck-title {
+    transition: none;
+  }
+  .deck.is-flat .deck-card:hover .deck-face {
+    transform: none;
+  }
+
+  /* ---- Il foglio dell'informativa -------------------------------------
+     Un `<dialog>` nativo: sta nel top layer, quindi le trasformazioni della
+     carrellata e l'`overflow: hidden` dello stage non lo toccano, `Esc` lo
+     chiude e il fuoco torna da solo sul link che l'ha aperto. Non è vetro:
+     è una superficie opaca appena staccata dal fondo. */
+  .sheet {
+    /* Il preflight di Tailwind azzera i margini di tutto, compreso l'`auto`
+       con cui il browser centra un dialog modale: senza questa riga il
+       foglio si incolla in alto a sinistra. */
+    margin: auto;
+    width: min(560px, calc(100vw - 2 * var(--pad)));
+    max-height: min(70svh, 640px);
+    overflow: auto;
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid var(--color-dust);
+    border-radius: var(--radius-frame);
+    background-color: var(--color-obsidian);
+    color: var(--color-stone);
+  }
+
+  .sheet::backdrop {
+    background-color: color-mix(in srgb, var(--color-void) 82%, transparent);
+  }
+
+  /* Nascosto agli occhi, presente per screen reader e SEO. */
+  .u-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 }
 
-.animate-marquee {
-  animation: marquee linear infinite;
+/* ---------- Reduced motion ---------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
+
+/* ---------- Stampa (pagina Studio) ---------------------------------------
+   L'unica pagina che ha senso stampare e' quella di testo: nero su bianco,
+   senza l'indice (che e' navigazione, non contenuto) e senza il chrome.
+   Sta fuori da `@layer` per la stessa ragione delle regole `.static`: deve
+   scavalcare le utility di Tailwind senza un `!important`.
+   ------------------------------------------------------------------------ */
+
+@media print {
+  .page-studio { background: #fff; color: #000; min-height: 0; }
+  .page-studio * { color: #000 !important; background: transparent !important; }
+  .page-studio nav[aria-label],
+  .page-studio > div:first-child { display: none; }
+  .page-studio a { text-decoration: none; }
+  .page-studio section { break-inside: avoid; }
+}
+
+/* ---------- Modalita' statica -------------------------------------------
+   `prefers-reduced-motion`, oppure GSAP che non parte: niente camera, i set
+   tornano in flusso normale, uno per schermata, luci spente.
+
+   Queste regole stanno FUORI da `@layer` di proposito: il CSS non stratificato
+   vince su quello stratificato, e devono poter scavalcare le utility di
+   Tailwind (`absolute`, `inset-0`, `opacity-0`) senza un solo `!important`.
+   Le proprieta' inline che scrive GSAP non sono un problema: in questa
+   modalita' GSAP non gira, e se l'utente cambia impostazione a pagina aperta
+   il `ctx.revert()` dello Stage le rimuove prima che queste entrino in gioco.
+   ------------------------------------------------------------------------ */
+
+.static .stage { height: auto; overflow: visible; }
+.static .camera { position: static; perspective: none; }
+.static .world { position: static; transform-style: flat; }
+
+.static .stage [data-set] {
+  position: relative;
+  inset: auto;
+  min-height: 100svh;
+  transform: none;
+  opacity: 1;
+}
+.static .stage [data-set="work"] { pointer-events: auto; }
+
+.static .stage [data-leaf],
+.static .stage [data-statement],
+.static .stage [data-line] {
+  transform: none;
+  opacity: 1;
+}
+
+.static .stage [data-veil] { opacity: 0; }
+.static .stage [data-light] { display: none; }
