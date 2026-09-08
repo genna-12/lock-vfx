@@ -468,3 +468,42 @@
 
 .static .stage [data-veil] { opacity: 0; }
 .static .stage [data-light] { display: none; }
+
+/* ---------- Il telefono: quattro sezioni e lo snap del browser ----------
+   `mobile-semplice-spec.md` §2. La classe `snap` sta sull'`html` insieme a
+   `static`: la pagina del telefono e' la pagina statica piu' due cose, lo
+   snap e le dissolvenze d'ingresso.
+
+   `100lvh` e non `svh` ne' `dvh`: e' l'altezza dello schermo con le barre
+   ritirate, cioe' lo schermo intero che la Direzione ha chiesto. Quando le
+   barre sono aperte la striscia bassa della sezione ci finisce dietro, e per
+   questo sotto ogni contenuto ci sono 72 px di respiro piu' la safe area:
+   li' sotto non va mai niente di leggibile ne' di toccabile.
+
+   Lo snap lo fa il browser, con la sua inerzia e la sua curva: una passata
+   di dito = una sezione, in su e in giu'. Nessuna seconda mano sulla barra —
+   che e' tutto il punto di questo lotto.
+   ------------------------------------------------------------------------ */
+
+.snap {
+  scroll-snap-type: y mandatory;
+}
+
+/* Con un campo a fuoco lo snap si spegne: la tastiera accorcia la finestra,
+   la sezione resta alta come lo schermo intero e lo snap incastrerebbe chi
+   sta scrivendo. */
+.snap:has(:focus) {
+  scroll-snap-type: none;
+}
+
+.snap .stage [data-set] {
+  height: 100lvh;
+  scroll-snap-align: start;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Il footer e' l'ultima fermata: senza un punto di aggancio suo, con
+   `mandatory` non ci si arriva piu'. */
+.snap #site-footer {
+  scroll-snap-align: start;
+}
