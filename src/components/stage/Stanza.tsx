@@ -42,15 +42,12 @@ import { Mark } from '../brand/Mark';
 const HOLD_FROM = 500 / STAGE_VH;
 /** Mezzo fotogramma di rosso sul marchio: si sente, non si legge. */
 const FLASH_MS = 42;
-/** Larghezza del marchio grande: `clamp(140px, 16vw, 240px)`, 44 su mobile.
- *  Il budget dell'8/9 dà 64 px alla **riga** del marchio, e qui il numero è
- *  una larghezza: il lucchetto è alto una volta e sei. A 44 la riga la
- *  decidono i nomi (80 px) e il marchio non costa niente in altezza, mentre
- *  ogni pixel che non prende lo prendono i nomi, che a 390 di larghezza sono
- *  al limite dell'a capo. Conta che stia sullo schermo insieme al pulsante — la
- *  staffa che si chiude all'invio è la firma della Stanza e va vista mentre
- *  si chiude — non che sia grande. */
-const MARK = { min: 140, vw: 0.16, max: 240, mobile: 44 } as const;
+/** Larghezza del marchio grande: `clamp(140px, 16vw, 240px)`, 96 su mobile.
+ *  Sul telefono il marchio non sta più sotto il pulsante: sotto il pulsante
+ *  non c'è più niente, e la Stanza sta in una schermata
+ *  (`mobile-semplice-spec.md` §4). Il lucchetto torna nel momento in cui
+ *  significa qualcosa — l'invio riuscito — e lì può essere grande. */
+const MARK = { min: 140, vw: 0.16, max: 240, mobile: 96 } as const;
 /** La textarea cresce col contenuto: 6 righe su desktop, 3 dove lo schermo è corto. */
 const ROWS = { max: 6, maxCompact: 3 } as const;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -150,12 +147,23 @@ export function Stanza() {
     const el = shackleRef.current;
     if (!el) return;
     el.style.transition = reduced ? 'none' : `transform ${MOTION.f2}ms var(--ease-cut)`;
-    el.style.transform = closed ? `translateY(${SHACKLE_CLOSED}px)` : 'none';
     const root = markRef.current;
     if (!closed || reduced) {
+      el.style.transform = closed ? `translateY(${SHACKLE_CLOSED}px)` : 'none';
       if (root) root.style.color = '';
       return;
     }
+    // La staffa parte dall'alto e **poi** scende: sul telefono il marchio
+    // compare solo adesso — prima era `display: none` — e una transizione su
+    // un elemento appena apparso non parte, perché il browser non ha mai
+    // dipinto il valore di partenza. Due fotogrammi di attesa e lo scatto si
+    // vede anche lì, che è il punto: la staffa che si chiude è la conferma.
+    el.style.transform = 'none';
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transform = `translateY(${SHACKLE_CLOSED}px)`;
+      });
+    });
     // Un solo fotogramma di rosso quando la staffa tocca il corpo e il
     // marchio si riempie. Con `setTimeout` e non con GSAP: se la scheda va
     // in secondo piano il ticker si ferma e il rosso resterebbe acceso.
@@ -167,6 +175,7 @@ export function Stanza() {
       }, FLASH_MS);
     }, MOTION.f2);
     return () => {
+      cancelAnimationFrame(frame);
       window.clearTimeout(on);
       window.clearTimeout(off);
       if (root) root.style.color = '';
@@ -275,14 +284,26 @@ export function Stanza() {
         className="stanza-fit grid h-full w-full content-start gap-y-[20px] pt-[72px] pb-[max(24px,env(safe-area-inset-bottom,0px))] md:grid-cols-[5fr_7fr] md:content-center md:items-center md:gap-x-[clamp(32px,5vw,96px)] md:gap-y-[34px] md:py-[calc(var(--pad)+56px)]"
       >
         {/* Chi siamo. Il marchio prende la luce di taglio; sotto, i nomi veri:
-            LockVFX è un nome collettivo, non una società, e si deve vedere. */}
-        <div className="order-2 flex items-center gap-[16px] md:order-1 md:flex-col md:items-start md:gap-[28px]">
+            LockVFX è un nome collettivo, non una società, e si deve vedere.
+
+            Sul telefono questo blocco non c'è: sotto il pulsante non deve
+            esserci niente, così la Stanza sta in una schermata e lo scroll
+            interno — con tutti i suoi guai — non ha più ragione di esistere.
+            Torna, e solo il marchio, quando il messaggio è partito: è lì che
+            la staffa che si chiude significa qualcosa. I nomi e le P. IVA
+            stanno dove devono per legge, nel blocco legale del footer. */}
+        <div
+          className={clsx(
+            'order-2 items-center gap-[16px] md:order-1 md:flex md:flex-col md:items-start md:gap-[28px]',
+            closed ? 'flex' : 'hidden'
+          )}
+        >
           {/* Il colore sta sul contenitore: il fotogramma rosso della
               chiusura è del marchio intero, non della sola staffa. */}
           <span ref={markRef} className="shrink-0 text-ink">
             <Mark size={markH} mode={closed ? 'solid' : 'outline'} shackleRef={shackleRef} />
           </span>
-          <div className="flex flex-col gap-[7px] text-[14px] md:gap-[10px] md:text-[16px]">
+          <div className="hidden flex-col gap-[7px] text-[14px] md:flex md:gap-[10px] md:text-[16px]">
             {PEOPLE.map((person) => (
               <div key={person.email}>
                 <span className="font-medium">{person.name}</span>
@@ -313,6 +334,16 @@ export function Stanza() {
             {t('contact.title')}
           </h2>
 
+          {/* A invio riuscito il form lascia il posto alla conferma: il
+              marchio che si chiude (nella colonna qui accanto, che sul
+              telefono compare adesso) e una riga sola. Era la firma della
+              Stanza e stava sotto il pulsante *per essere vista all'invio*:
+              qui si vede meglio, ed è l'unica cosa a schermo. */}
+          {closed ? (
+            <p aria-live="polite" className="m-0 max-w-[40ch] text-[16px] text-stone">
+              {t('contact.status.sent')}
+            </p>
+          ) : (
           <form
             noValidate
             onSubmit={onSubmit}
@@ -429,22 +460,18 @@ export function Stanza() {
               <button
                 type="submit"
                 disabled={locked}
+                // Lo stato `sent` qui non arriva più: quando il messaggio è
+                // partito il form non c'è, c'è la conferma.
                 className={clsx(
-                  'u-cap h-[44px] min-w-[150px] px-[26px] transition-colors duration-[var(--f5)] md:h-[46px]',
-                  status === 'sent'
-                    ? 'bg-transparent text-ink ring-1 ring-stone/40 ring-inset'
-                    : 'bg-ink text-void hover:bg-white',
+                  'u-cap h-[44px] min-w-[150px] bg-ink px-[26px] text-void transition-colors duration-[var(--f5)] hover:bg-white md:h-[46px]',
                   status === 'sending' && 'cursor-default opacity-60'
                 )}
               >
-                {status === 'sending'
-                  ? t('contact.sending')
-                  : status === 'sent'
-                    ? t('contact.sent')
-                    : t('contact.send')}
+                {status === 'sending' ? t('contact.sending') : t('contact.send')}
               </button>
             </div>
           </form>
+          )}
         </div>
       </div>
     </>
