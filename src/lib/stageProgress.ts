@@ -43,6 +43,20 @@ function subscribe(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
+/**
+ * `true` quando non c'è nessuna carrellata: `prefers-reduced-motion`, o il
+ * telefono coricato. Non è un dettaglio di rendering — in quella modalità i
+ * set non sono più riquadri a schermo intero ma sezioni di una pagina che
+ * scorre, e si disegnano in un altro modo (`rifinitura-spec.md` §6.4.3).
+ */
+export function useStageStatic(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => isStatic,
+    () => false
+  );
+}
+
 /** `true` quando la camera è dentro la finestra (estremi esclusi). */
 export function useStageWindow(from: number, to: number): boolean {
   return useSyncExternalStore(

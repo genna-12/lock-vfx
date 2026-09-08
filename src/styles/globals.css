@@ -409,31 +409,39 @@
 .static .camera { position: static; perspective: none; }
 .static .world { position: static; transform-style: flat; }
 
-/* `dvh` e non `svh`: qui lo scroll e' nativo e le barre del browser si
-   ritirano, quindi la finestra vera e' quella grande e una sezione alta
-   `100svh` resta 46 px piu' corta dello schermo — sul telefono si vede
-   sempre un pezzo della sezione dopo. `dvh` segue le barre e una sezione
-   riempie sempre esattamente lo schermo, che e' l'unica promessa che questa
-   modalita' deve mantenere. (Nella carrellata `svh` resta giusto: li' lo
-   scroll passa da `normalizeScroll` e le barre non si muovono.) */
+/* Niente altezze di finestra qui dentro: in questa modalita' una sezione e'
+   alta **quanto il suo contenuto**, e la pagina scorre come una pagina
+   (`rifinitura-spec.md` §6.4.3). Prima erano `100svh`, poi `100dvh`: sezioni
+   che promettevano lo schermo intero e lo mantenevano solo a volte. Adesso
+   non lo promettono, e il problema non c'e' piu'.
+
+   Perche' funzioni, le foglie devono uscire dalla posizione assoluta: se ci
+   restano, il set non ha niente che gli dia altezza e diventa alto **zero**
+   (misurato nel Lotto 1 bis). Reel e Sala, infatti, senza carrellata si
+   disegnano in un altro modo — un riquadro e del testo in flusso, non uno
+   schermo pieno (vedi il loro `flat`). */
 .static .stage [data-set] {
   position: relative;
   inset: auto;
-  min-height: 100dvh;
+  min-height: 0;
+  padding-block: clamp(56px, 9vh, 112px);
   transform: none;
   opacity: 1;
   visibility: visible;
 }
 
-/* `min-height` e non `height`: una sezione riempie sempre lo schermo, e se il
-   suo contenuto e' piu' alto si allunga e scorre — nell'orizzontale del
-   telefono la Stanza e' alta 625 px su 390 di finestra e va bene cosi'.
-   Provata e scartata l'altezza-da-contenuto pura (`min-height: auto`) per le
-   due sezioni di testo: Reel e Sala hanno il contenuto in posizione assoluta
-   e diventano alte **zero**, e lo Statement scende a 376 px su una finestra
-   di 390 — cioe' ricrea esattamente la striscia della sezione dopo che
-   questo lotto deve togliere. */
-.static .stanza-fit { overflow: visible; }
+/* La prima sezione passa sotto il marchio e la lingua, che restano fissi. */
+.static .stage [data-set='reel'] {
+  padding-top: calc(clamp(56px, 9vh, 112px) + 56px);
+}
+
+.static .stage [data-leaf] {
+  position: relative;
+  inset: auto;
+}
+
+/* Il respiro verticale ce l'ha gia' il set. */
+.static .stanza-fit { overflow: visible; padding-block: 0; }
 .static .stage [data-set="work"] { pointer-events: auto; }
 
 .static .stage [data-leaf],

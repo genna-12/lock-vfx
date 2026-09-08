@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
-import { useStageWindow } from '../../lib/stageProgress';
+import { useStageStatic, useStageWindow } from '../../lib/stageProgress';
 import { loadProgress, whenImageReady, whenReelReady } from '../../lib/loadProgress';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 
@@ -60,6 +60,9 @@ export function Reel() {
   // La reel è in scena fino a quando la camera non l'ha lasciata indietro.
   // La progress la dà lo Stage: qui non si crea un secondo trigger.
   const inScene = useStageWindow(-1, PAUSE_AFTER);
+  // Senza carrellata la reel non è più uno schermo a piena pagina: è la
+  // prima sezione di una pagina che scorre.
+  const flat = useStageStatic();
 
   /* ---- progresso di caricamento --------------------------------------- */
   useEffect(() => {
@@ -125,6 +128,33 @@ export function Reel() {
     video.muted = next;
     setMuted(next);
   }, []);
+
+  /* ---- la pagina, quando non c'è la carrellata -------------------------
+     Una fotografia in un riquadro e la frase sotto: niente posizioni
+     assolute (in flusso il set prende l'altezza del suo contenuto, che è
+     tutto il senso della modalità statica), niente HUD, niente linea del
+     tempo nostra — se il video c'è, comandano i controlli del browser. */
+  if (flat) {
+    return (
+      <div className="u-pad mx-auto flex w-full max-w-[1180px] flex-col gap-7">
+        <div className="aspect-video w-full overflow-hidden rounded-frame bg-void">
+          <video
+            ref={videoRef}
+            className="h-full w-full object-cover"
+            poster={POSTER}
+            controls={HAS_VIDEO}
+            muted
+            playsInline
+            preload="metadata"
+            aria-label={t('reel.h1')}
+          >
+            {HAS_VIDEO ? SOURCES.map((s) => <source key={s.src} src={s.src} type={s.type} />) : null}
+          </video>
+        </div>
+        <h1 className="u-display text-d2 m-0 max-w-[20ch] text-ink">{t('reel.h1')}</h1>
+      </div>
+    );
+  }
 
   // Niente `overflow` sul contenitore: sta dentro `.world` e appiattirebbe il
   // preserve-3d (la regola è in globals.css). Il video lo taglia `object-cover`.
