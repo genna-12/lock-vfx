@@ -89,6 +89,7 @@ export function Stanza() {
   const inHold = useStageWindow(HOLD_FROM, 1.01);
   const [markW, setMarkW] = useState(markWidth);
 
+  const fitRef = useRef<HTMLDivElement>(null);
   const shackleRef = useRef<SVGPathElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
   const hpRef = useRef<HTMLInputElement>(null);
@@ -108,6 +109,36 @@ export function Stanza() {
     const onResize = () => setMarkW(markWidth());
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  /* ---- scorre, o no ----------------------------------------------------
+     L'invariante di questa sezione, che vale sempre e da qualunque punto:
+     **un dito che sale deve poter riportare alla Sala.**
+
+     Dopo la stretta del Lotto 1 bis la Stanza sta in 640 px e non ha niente
+     da scorrere. Ma la regola che l'accendeva era una media query
+     (`max-height: 640px`, e il fuoco su un campo), quindi su uno schermo
+     corto diventava un contenitore che scorre **a vuoto**: con venti pixel
+     di corsa e `overscroll-behavior: contain` si prendeva il gesto e non lo
+     passava alla pagina — dai contatti non si tornava più indietro
+     (riprodotto a 390×620: una passata di dito, la progress non si muove di
+     un vh).
+
+     Quindi: non una media query ma una **misura**, e nessun `contain`. Il
+     contenitore esiste solo se c'è davvero qualcosa che sborda, e quando
+     arriva in cima la catena verso la pagina resta aperta. */
+  const [scrolls, setScrolls] = useState(false);
+  useLayoutEffect(() => {
+    const el = fitRef.current;
+    if (!el) return;
+    const measure = () => setScrolls(el.scrollHeight - el.clientHeight > 1);
+    measure();
+    // Il riquadro cambia col viewport, il contenuto quando il messaggio
+    // cresce: si guardano tutti e due.
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    for (const child of el.children) ro.observe(child);
+    return () => ro.disconnect();
   }, []);
 
   /* ---- la staffa -------------------------------------------------------- */
@@ -237,8 +268,10 @@ export function Stanza() {
           la sezione precedente. Allineata in alto sborda solo in basso, dove
           `.stanza-fit` la fa scorrere dentro il set quando è il suo turno. */}
       <div
+        ref={fitRef}
         inert={!live}
         data-live={live ? 'true' : 'false'}
+        data-scrolls={scrolls ? 'true' : 'false'}
         className="stanza-fit grid h-full w-full content-start gap-y-[20px] pt-[72px] pb-[max(24px,env(safe-area-inset-bottom,0px))] md:grid-cols-[5fr_7fr] md:content-center md:items-center md:gap-x-[clamp(32px,5vw,96px)] md:gap-y-[34px] md:py-[calc(var(--pad)+56px)]"
       >
         {/* Chi siamo. Il marchio prende la luce di taglio; sotto, i nomi veri:
