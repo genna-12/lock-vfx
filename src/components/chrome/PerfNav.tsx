@@ -4,6 +4,7 @@ import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SETS, type SetId } from '../../brand/tokens';
 import { holdScroll } from '../../lib/camera';
+import { useCoarsePointer } from '../../lib/useReducedMotion';
 
 /**
  * Navigazione = quattro perforazioni di pellicola, una per HOLD.
@@ -27,6 +28,10 @@ type PerfNavProps = {
 export function PerfNav({ active = 'reel' }: PerfNavProps) {
   const { t } = useTranslation();
   const [onFooter, setOnFooter] = useState(false);
+  // Sul telefono la nav va in basso al centro: sul bordo destro finisce
+  // addosso ai comandi del video ed è dove passa il pollice tutto il tempo
+  // (`mobile-semplice-spec.md` §2 e §3).
+  const coarse = useCoarsePointer();
 
   useEffect(() => {
     const footer = document.getElementById('site-footer');
@@ -46,9 +51,18 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
   function goToHold(event: MouseEvent<HTMLAnchorElement>, id: SetId) {
     const stage = ScrollTrigger.getById('stage');
     const smoother = ScrollSmoother.get();
-    if (!stage || !smoother) return;
+    if (stage && smoother) {
+      event.preventDefault();
+      smoother.scrollTo(holdScroll(stage, id), true);
+      return;
+    }
+    // Senza carrellata le sezioni sono quattro blocchi veri, uno sotto
+    // l'altro: ci si va con lo scroll del browser, che è anche quello che
+    // conosce lo snap.
+    const target = document.getElementById(id);
+    if (!target) return;
     event.preventDefault();
-    smoother.scrollTo(holdScroll(stage, id), true);
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   return (
@@ -57,16 +71,18 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
       aria-hidden={onFooter || undefined}
       inert={onFooter || undefined}
       style={{ transitionDuration: 'var(--f5)' }}
-      className={`fixed right-[var(--pad)] bottom-[max(var(--pad),env(safe-area-inset-bottom,0px))] z-30 transition-opacity md:bottom-auto md:top-1/2 md:-translate-y-1/2 ${
-        onFooter ? 'pointer-events-none opacity-0' : 'pointer-events-auto opacity-100'
-      }`}
+      className={`fixed z-30 transition-opacity ${
+        coarse
+          ? 'inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+16px)] flex justify-center'
+          : 'right-[var(--pad)] bottom-[max(var(--pad),env(safe-area-inset-bottom,0px))] md:bottom-auto md:top-1/2 md:-translate-y-1/2'
+      } ${onFooter ? 'pointer-events-none opacity-0' : 'pointer-events-auto opacity-100'}`}
     >
       {/* Su mobile i 44px di target si toccano: lo spazio ce lo mette già il target. */}
-      <ul className="flex flex-col gap-0 md:gap-4">
+      <ul className={coarse ? 'flex flex-row gap-0' : 'flex flex-col gap-0 md:gap-4'}>
         {SETS.map((id) => {
           const isActive = id === active;
           return (
-            <li key={id} className="flex justify-end">
+            <li key={id} className={coarse ? 'flex justify-center' : 'flex justify-end'}>
               <a
                 href={`#${id}`}
                 onClick={(event) => goToHold(event, id)}
@@ -76,10 +92,14 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                 // da leggere. E' la stessa parola che si vede da desktop, non
                 // una seconda etichetta.
                 aria-label={t(`nav.${id}`)}
-                className="group flex min-h-11 min-w-11 items-center justify-end gap-3 md:min-h-0 md:min-w-0"
+                className={`group flex min-h-11 min-w-11 items-center gap-3 ${
+                  coarse ? 'justify-center' : 'justify-end md:min-h-0 md:min-w-0'
+                }`}
               >
                 <span
-                  className={`u-cap hidden whitespace-nowrap transition-opacity duration-200 md:block ${
+                  className={`u-cap whitespace-nowrap transition-opacity duration-200 ${
+                    coarse ? 'hidden' : 'hidden md:block'
+                  } ${
                     isActive ? 'text-stone opacity-100' : 'text-stone opacity-0 group-hover:opacity-100'
                   }`}
                 >
