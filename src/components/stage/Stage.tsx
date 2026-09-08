@@ -186,14 +186,39 @@ export function Stage({ onActiveChange }: StageProps) {
       });
     };
 
-    /* Il magnete parte da `scrollEnd`, cioè da quando lo scroll si è
-       fermato **davvero**. Prima partiva da un timer di 0,15 s riarmato a
-       ogni aggiornamento: su desktop è la stessa cosa, ma su touch quel
-       timer scadeva *dentro* l'inerzia, quando lo scroll era tutt'altro che
-       finito. I 0,15 s della spec restano, ma contati da lì. */
+    /* Quando parte il magnete.
+
+       Servono due condizioni, e ci vogliono tutte e due. `scrollEnd` dice
+       che l'input è finito — il dito, la rotella —, ed è quello che mancava
+       su touch: prima il magnete partiva da un timer di 0,15 s riarmato a
+       ogni aggiornamento, e quel timer scadeva *dentro* l'inerzia del
+       browser, con due mani sulla stessa barra.
+
+       Ma `scrollEnd` da solo non basta su desktop: lì lo smoother continua
+       a muovere la camera per un altro secondo dopo che la barra si è
+       fermata, e un magnete che parte in quel mentre legge una progress
+       vecchia e tira verso l'HOLD sbagliato (misurato: fermandosi a 460vh
+       non partiva affatto, perché a `scrollEnd` la camera era ancora a
+       365). Quindi dopo `scrollEnd` si aspetta che si fermi anche la
+       camera: si guarda la progress ogni 0,15 s finché due letture di fila
+       non sono uguali. */
+    /** Un vh su 560: sotto questa soglia la camera è ferma per gli occhi. */
+    const STILL = 1 / STAGE_VH;
+    let seen = -1;
+    const settled = () => {
+      const st = ScrollTrigger.getById('stage');
+      if (!st) return;
+      if (Math.abs(st.progress - seen) > STILL) {
+        seen = st.progress;
+        wait = gsap.delayedCall(SNAP.delay, settled);
+        return;
+      }
+      attract();
+    };
     const onScrollEnd = () => {
       wait?.kill();
-      wait = gsap.delayedCall(SNAP.delay, attract);
+      seen = -1;
+      wait = gsap.delayedCall(SNAP.delay, settled);
     };
     ScrollTrigger.addEventListener('scrollEnd', onScrollEnd);
 
