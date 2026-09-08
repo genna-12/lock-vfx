@@ -444,11 +444,6 @@
   visibility: visible;
 }
 
-/* La prima sezione passa sotto il marchio e la lingua, che restano fissi. */
-.static .stage [data-set='reel'] {
-  padding-top: calc(clamp(56px, 9vh, 112px) + 56px);
-}
-
 .static .stage [data-leaf] {
   position: relative;
   inset: auto;
@@ -532,4 +527,16 @@
   display: block;
   position: fixed;
   transition: opacity var(--f8) linear;
+}
+
+/* ---------- La prima schermata (§2.1) -----------------------------------
+   L'unica sezione che non prende l'altezza dal suo contenuto: una schermata
+   piena, sempre, anche in reduced motion su desktop. E senza padding —
+   l'immagine arriva ai quattro bordi, e sopra non c'e' scritto niente.
+   Sta dopo le regole di `.snap` di proposito: a parita' di specificita'
+   vince l'ultima, e questa deve valere in tutte e due le modalita'.
+   ------------------------------------------------------------------------ */
+.static .stage [data-set='reel'] {
+  min-height: 100lvh;
+  padding: 0;
 }

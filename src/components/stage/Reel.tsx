@@ -129,30 +129,41 @@ export function Reel() {
     setMuted(next);
   }, []);
 
-  /* ---- la pagina, quando non c'è la carrellata -------------------------
-     Una fotografia in un riquadro e la frase sotto: niente posizioni
-     assolute (in flusso il set prende l'altezza del suo contenuto, che è
-     tutto il senso della modalità statica), niente HUD, niente linea del
-     tempo nostra — se il video c'è, comandano i controlli del browser. */
+  /* ---- la prima schermata, quando non c'è la carrellata ----------------
+     Pieno schermo e nient'altro (`mobile-semplice-spec.md` §2.1). Non un
+     riquadro con la frase sotto: l'immagine riempie la sezione, e sopra non
+     c'è **nessun testo**. A schermo restano tre cose sole — il marchio in
+     alto a sinistra, la lingua in alto a destra, la nav in basso.
+
+     L'`h1` resta, invisibile: è l'unico posto in cui la pagina dice cosa fa,
+     e lo dice ai motori e agli screen reader, non agli occhi. Niente
+     controlli del browser sopra il video, che sarebbero l'unica cosa scritta
+     sullo schermo; il video, se c'è, parte da solo — muto, in loop — e sta
+     fermo se è stato chiesto meno movimento.
+
+     È l'unica sezione la cui altezza non viene dal contenuto: una schermata
+     piena, sempre. */
   if (flat) {
     return (
-      <div className="u-pad mx-auto flex w-full max-w-[1180px] flex-col gap-7">
-        <div className="aspect-video w-full overflow-hidden rounded-frame bg-void">
+      <>
+        <h1 className="u-sr-only">{t('reel.h1')}</h1>
+        <div className="relative h-[100lvh] w-full overflow-hidden bg-void">
           <video
             ref={videoRef}
-            className="h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
             poster={POSTER}
-            controls={HAS_VIDEO}
+            autoPlay={HAS_VIDEO && !reduce}
             muted
+            loop
             playsInline
             preload="metadata"
-            aria-label={t('reel.h1')}
+            tabIndex={-1}
+            aria-hidden
           >
             {HAS_VIDEO ? SOURCES.map((s) => <source key={s.src} src={s.src} type={s.type} />) : null}
           </video>
         </div>
-        <h1 className="u-display text-d2 m-0 max-w-[20ch] text-ink">{t('reel.h1')}</h1>
-      </div>
+      </>
     );
   }
 
