@@ -36,8 +36,14 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
   useEffect(() => {
     const footer = document.getElementById('site-footer');
     if (!footer || typeof IntersectionObserver === 'undefined') return;
+    // `rootMargin` in negativo sul fondo: il footer deve essere entrato per
+    // ottanta pixel, non essere semplicemente arrivato al bordo. Senza,
+    // sul telefono — dove i contatti finiscono esattamente dove comincia il
+    // footer — la nav spariva già nei contatti, e da lì non si poteva più
+    // navigare. Su desktop non cambia niente di visibile.
     const io = new IntersectionObserver(([entry]) => setOnFooter(entry.isIntersecting), {
       threshold: 0,
+      rootMargin: '0px 0px -80px 0px',
     });
     io.observe(footer);
     return () => io.disconnect();
