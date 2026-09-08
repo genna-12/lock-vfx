@@ -14,7 +14,7 @@ import {
   snapProgress,
 } from '../../lib/camera';
 import { publishProgress, setStageStatic } from '../../lib/stageProgress';
-import { useReducedMotion } from '../../lib/useReducedMotion';
+import { useReducedMotion, useShortLandscape } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
 import { Reel } from './Reel';
 import { Statement } from './Statement';
@@ -65,7 +65,12 @@ export function Stage({ onActiveChange }: StageProps) {
   // un `works.json` pubblicato dalla dashboard.
   const [works] = useState(loadWorks);
   const rootRef = useRef<HTMLDivElement>(null);
+  // Due strade portano allo stesso posto: chi ha chiesto meno movimento, e
+  // il telefono coricato, dove la carrellata non ci starebbe. Due chiamate
+  // separate e poi l'or: `a() || b()` salterebbe il secondo hook.
   const reduce = useReducedMotion();
+  const landscape = useShortLandscape();
+  const flat = reduce || landscape;
 
   // La timeline si costruisce una volta sola: se `onActiveChange` finisse
   // nelle dipendenze, un render del genitore smonterebbe e rimonterebbe pin,
@@ -82,11 +87,11 @@ export function Stage({ onActiveChange }: StageProps) {
 
     const html = document.documentElement;
 
-    // Reduced motion: nessuna camera, nessuno smoother. I set tornano in
+    // Flusso statico: nessuna camera, nessuno smoother. I set tornano in
     // flusso normale (le regole `.static` in globals.css) e la nav resta una
-    // lista di ancore. Il listener di useReducedMotion rifà questo effetto se
-    // l'utente cambia impostazione a pagina aperta.
-    if (reduce) {
+    // lista di ancore. I listener dei due media query rifanno questo effetto
+    // se l'utente cambia impostazione o gira il telefono a pagina aperta.
+    if (flat) {
       html.classList.add('static');
       // Niente carrellata: i set sono tutti in scena e si comportano di
       // conseguenza (video, HUD, `inert`).
@@ -349,7 +354,7 @@ export function Stage({ onActiveChange }: StageProps) {
       if (normalized) ScrollTrigger.normalizeScroll(false);
       if (import.meta.env.DEV) delete (window as unknown as { __lock?: unknown }).__lock;
     };
-  }, [reduce, notify]);
+  }, [flat, notify]);
 
   return (
     <div ref={rootRef} className="stage">
