@@ -40,11 +40,19 @@ export const HOLD_SPANS: ReadonlyArray<{ from: number; to: number; at: number }>
 /** Tempi del magnete: `momento-1`, sezione Magneti. */
 export const SNAP = {
   /**
-   * Interruttore del magnete su touch. Se sul telefono il magnete continua
-   * a litigare con lo scroll, si spegne di qui e resta solo su desktop
-   * (`rifinitura-spec.md` §6.1, ultima riga).
+   * Il magnete su touch: **spento**.
+   *
+   * L'uscita era gia' decisa dalla Direzione al primo giro
+   * (`rifinitura-spec.md` §6.1 punto 1, ultima riga) e adesso serve: sul
+   * telefono lo scroll veloce verso l'alto va su e giu' finche' non arriva
+   * alla sezione dopo — il magnete riparte mentre la corsa e' ancora in
+   * corso e tira all'indietro. Su desktop invece funziona ed e' misurato
+   * (una corsa sola, 0,65 s), quindi resta li'.
+   *
+   * L'interruttore esiste per questo: quando la sonda (`?probe=1`) dira'
+   * chi litiga con chi, si riaccende con un `true` e non con un lotto.
    */
-  touch: true,
+  touch: false,
   /** Attesa dopo che lo scroll si e' fermato **davvero** (`scrollEnd`). */
   delay: 0.15,
   /**
