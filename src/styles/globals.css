@@ -405,13 +405,35 @@
 .static .camera { position: static; perspective: none; }
 .static .world { position: static; transform-style: flat; }
 
+/* `dvh` e non `svh`: qui lo scroll e' nativo e le barre del browser si
+   ritirano, quindi la finestra vera e' quella grande e una sezione alta
+   `100svh` resta 46 px piu' corta dello schermo — sul telefono si vede
+   sempre un pezzo della sezione dopo. `dvh` segue le barre e una sezione
+   riempie sempre esattamente lo schermo, che e' l'unica promessa che questa
+   modalita' deve mantenere. (Nella carrellata `svh` resta giusto: li' lo
+   scroll passa da `normalizeScroll` e le barre non si muovono.) */
 .static .stage [data-set] {
   position: relative;
   inset: auto;
-  min-height: 100svh;
+  min-height: 100dvh;
   transform: none;
   opacity: 1;
   visibility: visible;
+}
+
+/* Telefono coricato: e' una pagina che scorre, non una carrellata, e deve
+   sembrarlo. Le due sezioni di testo prendono l'altezza del loro contenuto
+   con un respiro sopra e sotto, invece di promettere uno schermo intero che
+   riempirebbero per meta'. Reel e Sala no: il loro contenuto e' un video in
+   posizione assoluta, non hanno un'altezza propria (misurato: con
+   `min-height: auto` diventano alte 0) e a schermo pieno stanno bene — in
+   orizzontale un video e' esattamente quel che si vuole guardare. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .static .stage [data-set="studio"],
+  .static .stage [data-set="contact"] {
+    min-height: auto;
+    padding-block: clamp(48px, 14vh, 88px);
+  }
 }
 .static .stanza-fit { overflow: visible; }
 .static .stage [data-set="work"] { pointer-events: auto; }
