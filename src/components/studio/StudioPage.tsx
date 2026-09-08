@@ -53,7 +53,7 @@ export function StudioPage() {
     applyHead({
       title: t('landing.meta.title'),
       description: t('landing.meta.description'),
-      path: '/studio/',
+      path: `${import.meta.env.BASE_URL}studio/`,
       lang,
       imageAlt: t('meta.ogAlt'),
     });
@@ -84,10 +84,10 @@ export function StudioPage() {
     <div className="page-studio min-h-svh bg-void text-ink">
       {/* Chrome: il marchio riporta alla home, e lo dice anche a parole. */}
       <div className="u-pad sticky top-0 z-10 flex items-center justify-between bg-linear-to-b from-void from-70% to-transparent py-[26px]">
-        <Wordmark href="/" />
+        <Wordmark href={import.meta.env.BASE_URL} />
         <div className="flex items-center gap-7">
           <a
-            href="/"
+            href={import.meta.env.BASE_URL}
             className="text-[14px] text-stone transition-colors duration-[var(--f5)] hover:text-ink"
           >
             ← {t('landing.back')}
@@ -202,7 +202,7 @@ export function StudioPage() {
             </p>
             {/* Il form è uno solo, e sta nella Stanza: di qui ci si va. */}
             <a
-              href="/#contact"
+              href={`${import.meta.env.BASE_URL}#contact`}
               className="u-cap group inline-flex h-[46px] items-center gap-2.5 bg-ink px-[26px] text-void transition-colors duration-[var(--f5)] hover:bg-white"
             >
               {ctaLabel}

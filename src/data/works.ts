@@ -32,8 +32,15 @@ export type Work = {
  */
 export const WORKS_HAVE_VIDEO = (import.meta.env.VITE_WORKS ?? 'none') !== 'none';
 
+/**
+ * Il sito deve poter vivere anche in una sottocartella (`VITE_BASE`), quindi
+ * i percorsi non partono più dalla radice ma da `import.meta.env.BASE_URL`,
+ * che finisce sempre con una barra e vale `/` quando il sito sta al suo posto.
+ */
+const BASE = import.meta.env.BASE_URL;
+
 /** Unico poster disponibile finché non arrivano quelli dei lavori. */
-const PLACEHOLDER_POSTER = '/images/showreel-poster.webp';
+const PLACEHOLDER_POSTER = `${BASE}images/showreel-poster.webp`;
 
 const PLACEHOLDERS: Work[] = [
   {
@@ -43,7 +50,7 @@ const PLACEHOLDERS: Work[] = [
     client: 'Produzione',
     disciplines: ['Environment', 'Compositing'],
     poster: PLACEHOLDER_POSTER,
-    video: { mp4: '/video/works/lavoro-01.mp4', webm: '/video/works/lavoro-01.webm' },
+    video: { mp4: `${BASE}video/works/lavoro-01.mp4`, webm: `${BASE}video/works/lavoro-01.webm` },
     fullUrl: 'https://vimeo.com/',
     rights: 'cleared',
     order: 1,
@@ -55,7 +62,7 @@ const PLACEHOLDERS: Work[] = [
     client: 'Cliente',
     disciplines: ['CG integration', 'Cleanup'],
     poster: PLACEHOLDER_POSTER,
-    video: { mp4: '/video/works/lavoro-02.mp4', webm: '/video/works/lavoro-02.webm' },
+    video: { mp4: `${BASE}video/works/lavoro-02.mp4`, webm: `${BASE}video/works/lavoro-02.webm` },
     rights: 'cleared',
     order: 2,
   },
@@ -66,7 +73,7 @@ const PLACEHOLDERS: Work[] = [
     client: 'Produzione',
     disciplines: ['FX / simulazioni', 'Finishing'],
     poster: PLACEHOLDER_POSTER,
-    video: { mp4: '/video/works/lavoro-03.mp4', webm: '/video/works/lavoro-03.webm' },
+    video: { mp4: `${BASE}video/works/lavoro-03.mp4`, webm: `${BASE}video/works/lavoro-03.webm` },
     fullUrl: 'https://vimeo.com/',
     rights: 'cleared',
     order: 3,

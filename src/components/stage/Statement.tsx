@@ -63,7 +63,7 @@ export function Statement() {
               ritorno il loader dura 300 ms. È cliccabile solo quando lo
               Studio è il set inquadrato (lo Stage toglie `inert`). */}
           <a
-            href="/studio/"
+            href={`${import.meta.env.BASE_URL}studio/`}
             className="group pointer-events-auto inline-flex items-center gap-2 self-start text-[15px] font-medium text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
           >
             {label}

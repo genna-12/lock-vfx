@@ -17,10 +17,17 @@ import { useReducedMotion } from '../../lib/useReducedMotion';
  * (default `none`), altrimenti resta il poster fermo e nessun 404. Quando il
  * video arriva bastano i due file in `public/video` e `VITE_REEL=on`.
  */
-const POSTER = '/images/showreel-poster.webp';
+/**
+ * Il sito deve poter vivere anche in una sottocartella (`VITE_BASE`), quindi
+ * i percorsi non partono più dalla radice ma da `import.meta.env.BASE_URL`,
+ * che finisce sempre con una barra e vale `/` quando il sito sta al suo posto.
+ */
+const BASE = import.meta.env.BASE_URL;
+
+const POSTER = `${BASE}images/showreel-poster.webp`;
 const SOURCES = [
-  { src: '/video/reel.webm', type: 'video/webm' },
-  { src: '/video/reel.mp4', type: 'video/mp4' },
+  { src: `${BASE}video/reel.webm`, type: 'video/webm' },
+  { src: `${BASE}video/reel.mp4`, type: 'video/mp4' },
 ];
 const HAS_VIDEO = (import.meta.env.VITE_REEL ?? 'none') !== 'none';
 

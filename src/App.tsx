@@ -32,7 +32,7 @@ export default function App() {
     applyHead({
       title: t('meta.title'),
       description: t('meta.description'),
-      path: '/',
+      path: import.meta.env.BASE_URL,
       lang,
       imageAlt: t('meta.ogAlt'),
     });

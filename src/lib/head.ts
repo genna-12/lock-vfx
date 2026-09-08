@@ -34,12 +34,12 @@ export const SITE_URL = String(import.meta.env.VITE_SITE_URL ?? '').replace(/\/+
 const IS_PREVIEW = String(import.meta.env.VITE_PREVIEW ?? '') === '1';
 
 /** L'immagine delle schede social: il marchio su fondo pieno, 1200×630. */
-const OG_IMAGE = '/og.png';
+const OG_IMAGE = `${import.meta.env.BASE_URL}og.png`;
 
 type HeadInfo = {
   title: string;
   description: string;
-  /** Percorso della pagina dalla radice, con la barra finale: `/`, `/studio/`. */
+  /** Percorso della pagina dal `base`, con la barra finale: `/`, `/studio/`. */
   path: string;
   /** Lingua attiva, due lettere. */
   lang: string;
