@@ -71,6 +71,11 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                 href={`#${id}`}
                 onClick={(event) => goToHold(event, id)}
                 aria-current={isActive ? 'true' : undefined}
+                // Sotto i 768 px l'etichetta e' `display: none` e il foro e'
+                // `aria-hidden`: senza questo il link non avrebbe nessun nome
+                // da leggere. E' la stessa parola che si vede da desktop, non
+                // una seconda etichetta.
+                aria-label={t(`nav.${id}`)}
                 className="group flex min-h-11 min-w-11 items-center justify-end gap-3 md:min-h-0 md:min-w-0"
               >
                 <span
