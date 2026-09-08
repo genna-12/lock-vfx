@@ -19,6 +19,13 @@ const REDUCE = '(prefers-reduced-motion: reduce)';
  */
 const SHORT_LANDSCAPE = '(max-height: 500px) and (orientation: landscape)';
 
+/**
+ * Telefono o tablet: puntatore grosso e niente hover. Non un portatile col
+ * touch, che ha tutti e due. Da qui in poi è la condizione che decide se il
+ * sito fa la carrellata o la pagina semplice (`mobile-semplice-spec.md` §0).
+ */
+const COARSE = '(hover: none) and (pointer: coarse)';
+
 function useMedia(query: string): boolean {
   const [matches, setMatches] = useState(
     () => typeof window !== 'undefined' && window.matchMedia(query).matches
@@ -42,4 +49,9 @@ export function useReducedMotion(): boolean {
 /** `true` su un telefono coricato: stessa modalità statica di reduced motion. */
 export function useShortLandscape(): boolean {
   return useMedia(SHORT_LANDSCAPE);
+}
+
+/** `true` su telefono e tablet: lì non c'è carrellata. */
+export function useCoarsePointer(): boolean {
+  return useMedia(COARSE);
 }

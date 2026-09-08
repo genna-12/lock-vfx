@@ -14,7 +14,7 @@ import {
   snapProgress,
 } from '../../lib/camera';
 import { publishProgress, setStageStatic } from '../../lib/stageProgress';
-import { useReducedMotion, useShortLandscape } from '../../lib/useReducedMotion';
+import { useCoarsePointer, useReducedMotion, useShortLandscape } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
 import { Reel } from './Reel';
 import { Statement } from './Statement';
@@ -65,12 +65,23 @@ export function Stage({ onActiveChange }: StageProps) {
   // un `works.json` pubblicato dalla dashboard.
   const [works] = useState(loadWorks);
   const rootRef = useRef<HTMLDivElement>(null);
-  // Due strade portano allo stesso posto: chi ha chiesto meno movimento, e
-  // il telefono coricato, dove la carrellata non ci starebbe. Due chiamate
-  // separate e poi l'or: `a() || b()` salterebbe il secondo hook.
+  /* Tre strade portano allo stesso posto: chi ha chiesto meno movimento, lo
+     schermo troppo basso, e — da questo lotto — **il telefono**.
+
+     Su un telefono la carrellata non ci sta, e non per come è scritta: le tre
+     cose chieste dalla Direzione (schermo intero dietro le barre di Safari,
+     niente glitch in salita, niente conflitti di scroll) sono incompatibili
+     con un pin a scrub su touch, una per una
+     (`mobile-semplice-spec.md` §1). Quindi lì si monta la pagina semplice:
+     quattro sezioni in flusso, snap del browser, nessuna seconda mano sulla
+     barra di scorrimento. Il desktop non cambia di una riga.
+
+     Tre chiamate separate e poi l'or: `a() || b()` salterebbe gli hook dopo
+     il primo `true`. */
   const reduce = useReducedMotion();
   const landscape = useShortLandscape();
-  const flat = reduce || landscape;
+  const coarse = useCoarsePointer();
+  const flat = reduce || landscape || coarse;
 
   // La timeline si costruisce una volta sola: se `onActiveChange` finisse
   // nelle dipendenze, un render del genitore smonterebbe e rimonterebbe pin,
@@ -117,6 +128,9 @@ export function Stage({ onActiveChange }: StageProps) {
     // se l'utente cambia impostazione o gira il telefono a pagina aperta.
     if (flat) {
       html.classList.add('static');
+      // La pagina semplice del telefono è la pagina statica **più** lo snap
+      // e le dissolvenze d'ingresso: una classe in più, non un altro albero.
+      if (coarse) html.classList.add('snap');
       // Niente carrellata: i set sono tutti in scena e si comportano di
       // conseguenza (video, HUD, `inert`).
       setStageStatic(true);
@@ -124,6 +138,7 @@ export function Stage({ onActiveChange }: StageProps) {
       return () => {
         spegniSonda();
         html.classList.remove('static');
+        html.classList.remove('snap');
       };
     }
     html.classList.remove('static');
@@ -439,7 +454,7 @@ export function Stage({ onActiveChange }: StageProps) {
       if (normalized) ScrollTrigger.normalizeScroll(false);
       if (import.meta.env.DEV) delete (window as unknown as { __lock?: unknown }).__lock;
     };
-  }, [flat, notify]);
+  }, [coarse, flat, notify]);
 
   return (
     <div ref={rootRef} className="stage">
