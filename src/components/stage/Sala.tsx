@@ -33,8 +33,6 @@ const AWAKE_MS = 2500;
 const FRAME_MS = 83;
 /** Dodici fotogrammi di nero alla fine di un video. */
 const END_BLACK_MS = 500;
-const HINT_MS = 2400;
-const HINT_KEY = 'lockvfx:rotate-hint';
 
 export function Sala({ works }: SalaProps) {
   const { t } = useTranslation();
@@ -62,7 +60,6 @@ export function Sala({ works }: SalaProps) {
   const [playing, setPlaying] = useState(false);
   const [portrait, setPortrait] = useState(false);
   const [compact, setCompact] = useState(false);
-  const [hint, setHint] = useState(false);
 
   const work = works[index];
 
@@ -130,25 +127,6 @@ export function Sala({ works }: SalaProps) {
     if (!WORKS_HAVE_VIDEO || reduced || !video) return;
     void video.play().catch(() => undefined);
   }, [inHold, reduced]);
-
-  /* ---- suggerimento di rotazione, una volta per sessione --------------- */
-  useEffect(() => {
-    if (!inHold || !portrait) return;
-    try {
-      if (sessionStorage.getItem(HINT_KEY) === '1') return;
-      sessionStorage.setItem(HINT_KEY, '1');
-    } catch {
-      /* storage bloccato: il suggerimento si rivedrà, pazienza */
-    }
-    // Un respiro prima di parlare: il suggerimento arriva quando la sala è
-    // già a schermo, non insieme allo stacco.
-    const on = window.setTimeout(() => setHint(true), 400);
-    const off = window.setTimeout(() => setHint(false), 400 + HINT_MS);
-    return () => {
-      window.clearTimeout(on);
-      window.clearTimeout(off);
-    };
-  }, [inHold, portrait]);
 
   /* ---- linea del tempo ------------------------------------------------ */
   useEffect(() => {
@@ -244,26 +222,75 @@ export function Sala({ works }: SalaProps) {
     wake();
   }, [wake]);
 
+  /**
+   * Schermo intero.
+   *
+   * Su un telefono è quello del **telefono**: il player nativo ruota da
+   * solo, ha i suoi comandi, la sua barra e uno schermo intero vero — e su
+   * iOS è anche l'unico possibile, perché lì lo schermo intero si concede
+   * al `<video>` e mai a un `div`. Prima chiedevamo il pieno schermo al
+   * contenitore e poi provavamo a bloccare l'orientamento: su iPhone non ha
+   * mai funzionato, e chiedere di girare il telefono per dare in cambio una
+   * pagina che non torna è la peggiore delle due cose (`rifinitura-spec.md`
+   * §6.4).
+   *
+   * Su desktop resta il pieno schermo del contenitore: lì il riquadro con
+   * l'HUD del sito è meglio del player di sistema.
+   */
   const toggleFullscreen = useCallback(() => {
+    const video = videoRef.current;
     const root = rootRef.current;
+    const touch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+    if (touch) {
+      if (!video) return;
+      const native = video as HTMLVideoElement & {
+        webkitEnterFullscreen?: () => void;
+        webkitSupportsFullscreen?: boolean;
+      };
+      // I comandi sono del telefono, e solo lì dentro: al ritorno la sala
+      // torna a essere la sala.
+      video.controls = true;
+      if (video.requestFullscreen) {
+        void video.requestFullscreen().catch(() => {
+          video.controls = false;
+        });
+      } else if (native.webkitSupportsFullscreen && native.webkitEnterFullscreen) {
+        native.webkitEnterFullscreen();
+      } else {
+        video.controls = false;
+      }
+      wake();
+      return;
+    }
+
     if (!root) return;
     if (document.fullscreenElement) {
       void document.exitFullscreen().catch(() => undefined);
       return;
     }
-    void root
-      .requestFullscreen()
-      .then(async () => {
-        // Dove si può, il telefono si gira da solo: è una sala, non una
-        // pagina.
-        const orientation = screen.orientation as ScreenOrientation & {
-          lock?: (o: string) => Promise<void>;
-        };
-        await orientation.lock?.('landscape').catch(() => undefined);
-      })
-      .catch(() => undefined);
+    void root.requestFullscreen().catch(() => undefined);
     wake();
   }, [wake]);
+
+  /* ---- ritorno dal player nativo --------------------------------------
+     `webkitendfullscreen` è l'unico segnale che dà iOS quando si esce dal
+     suo player; altrove basta `fullscreenchange`. In tutti e due i casi i
+     comandi nativi si spengono: fuori dal player comandano la linea del
+     tempo e l'HUD. */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const off = () => {
+      if (!document.fullscreenElement) video.controls = false;
+    };
+    video.addEventListener('webkitendfullscreen', off);
+    document.addEventListener('fullscreenchange', off);
+    return () => {
+      video.removeEventListener('webkitendfullscreen', off);
+      document.removeEventListener('fullscreenchange', off);
+    };
+  }, []);
 
   /* ---- tastiera -------------------------------------------------------- */
   useEffect(() => {
@@ -374,17 +401,6 @@ export function Sala({ works }: SalaProps) {
           </div>
         </div>
 
-        {hint ? (
-          <div className="pointer-events-none absolute inset-0 grid place-items-center">
-            <span className="u-cap flex flex-col items-center gap-2 rounded-frame bg-void/70 px-4 py-3 text-ink">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <rect x="7" y="2" width="10" height="20" rx="2" />
-                <path d="M3 15a9 9 0 0 0 3 4M21 9a9 9 0 0 0-3-4" />
-              </svg>
-              {t('sala.rotate')}
-            </span>
-          </div>
-        ) : null}
       </div>
 
       {/* Il velo che rende leggibile l'HUD. Solo quando l'HUD c'è. */}
