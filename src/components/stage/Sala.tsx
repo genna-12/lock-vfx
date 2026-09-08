@@ -379,6 +379,36 @@ export function Sala({ works }: SalaProps) {
               {t('sala.play')}
             </span>
           </button>
+
+          {/* I comandi stanno **dentro il riquadro, in alto a destra**, e non
+              sul bordo dello schermo: là sotto passa il pollice e c'è la nav,
+              e sul telefono non si riuscivano a premere. Regole di
+              `mobile-semplice-spec.md` §3: 44×44 di area sensibile, 12 px fra
+              l'uno e l'altro, lontani dalla nav e dai bordi. */}
+          <div className="absolute top-3 right-3 z-10 flex gap-3">
+            <button
+              type="button"
+              onClick={toggleAudio}
+              aria-label={t(muted ? 'sala.audioOn' : 'sala.audioOff')}
+              aria-pressed={!muted}
+              className="grid h-11 w-11 place-items-center rounded-frame bg-void/60 text-ink/80 transition-colors duration-200 hover:text-ink"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M4 9v6h3.5L13 19V5L7.5 9H4z" />
+                {muted ? <path d="M17 9.5l4 5m0-5l-4 5" /> : <path d="M16.5 8.8a4.2 4.2 0 0 1 0 6.4M19 6.5a7.5 7.5 0 0 1 0 11" />}
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              aria-label={t('sala.fullscreen')}
+              className="grid h-11 w-11 place-items-center rounded-frame bg-void/60 text-ink/80 transition-colors duration-200 hover:text-ink"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
