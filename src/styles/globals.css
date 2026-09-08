@@ -183,9 +183,23 @@
      appiattisce il `preserve-3d` e la profondita' sparisce senza errori in
      console. L'opacita' si anima sulle foglie ([data-leaf], [data-line]),
      mai sui wrapper. */
+  /* L'altezza del palco non la decide il CSS.
+
+     Tre lotti l'hanno chiesta a tre unita' diverse e nessuna ha retto tre
+     configurazioni di barre: `svh` e' l'altezza con tutte le barre aperte
+     (troppo corta appena si ritirano), `lvh` quella con tutte chiuse
+     (sborda), `dvh` respira mentre si scorre. Sull'iPhone del 1 ter il
+     palco finiva 115 pt sopra il fondo dello schermo, con una striscia nera
+     sotto ogni sezione.
+
+     Adesso la scrive lo Stage in `--stage-h` da `window.innerHeight`, che e'
+     l'unico numero che su iOS corrisponde sempre a quello che si vede.
+     `100svh` resta come rete per il primo fotogramma, prima che il JS parta:
+     e' la piu' corta delle tre, e una striscia nera per un istante e' meglio
+     di un salto. */
   .stage {
     position: relative;
-    height: 100svh;
+    height: var(--stage-h, 100svh);
     overflow: hidden;
     background-color: var(--color-void);
   }

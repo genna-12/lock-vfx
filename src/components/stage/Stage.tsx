@@ -134,6 +134,30 @@ export function Stage({ onActiveChange }: StageProps) {
     // 560vh.
     ScrollTrigger.config({ ignoreMobileResize: true });
 
+    /* ---- quanto è alto il palco ---------------------------------------
+       Lo dice `window.innerHeight`, non il CSS: su iOS è l'unico numero che
+       corrisponde sempre a quello che si vede, mentre `svh` è l'altezza con
+       tutte le barre aperte, `lvh` quella con tutte chiuse e `dvh` cambia
+       mentre si scorre. Tre lotti, tre unità, tre volte sbagliato.
+
+       Si riscrive quando lo schermo cambia davvero — una rotazione, il
+       ritorno da un player a pieno schermo — e **non** a ogni `resize`: con
+       `normalizeScroll` le barre non si muovono, e `ignoreMobileResize` è lì
+       apposta perché un pin da 560vh non si rifaccia a ogni pixel. */
+    const misuraPalco = () => {
+      html.style.setProperty('--stage-h', `${window.innerHeight}px`);
+    };
+    const rimisura = () => {
+      misuraPalco();
+      ScrollTrigger.refresh();
+    };
+    misuraPalco();
+    window.addEventListener('orientationchange', rimisura);
+    document.addEventListener('fullscreenchange', rimisura);
+    // iOS non manda `fullscreenchange` per il player nativo: manda questo, sul
+    // `<video>`, e non risale — quindi si ascolta in cattura.
+    document.addEventListener('webkitendfullscreen', rimisura, true);
+
     /* ---- Lo scroll del telefono --------------------------------------
        Due cose rendevano la carrellata inservibile su un telefono vero, e
        nessuna delle due si vede nel pannello a 390×844.
@@ -401,6 +425,10 @@ export function Stage({ onActiveChange }: StageProps) {
 
     return () => {
       spegniSonda();
+      window.removeEventListener('orientationchange', rimisura);
+      document.removeEventListener('fullscreenchange', rimisura);
+      document.removeEventListener('webkitendfullscreen', rimisura, true);
+      html.style.removeProperty('--stage-h');
       window.removeEventListener('wheel', interrupt);
       window.removeEventListener('touchstart', interrupt);
       window.removeEventListener('keydown', interrupt);
