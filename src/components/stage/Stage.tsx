@@ -179,11 +179,19 @@ export function Stage({ onActiveChange }: StageProps) {
       // raggiungibile col tab anche a opacita' 0.
       studio.inert = true;
 
-      gsap.set(lines, { z: () => MOVE.statementZ * amplitude(), opacity: 0 });
-      gsap.set(stanza, { yPercent: 100 });
+      // `autoAlpha` e non `opacity`: a opacità 0 un set resta nel layout, si
+      // fa toccare e — se il suo contenuto è più alto dello schermo — sborda
+      // dal proprio riquadro e si vede lo stesso. Sul telefono era così che
+      // "Parliamone." compariva in fondo a ogni sezione. `autoAlpha` porta
+      // con sé `visibility: hidden`, che toglie il set da tutto e non
+      // appiattisce il 3D come farebbe un `display: none`.
+      gsap.set(lines, { z: () => MOVE.statementZ * amplitude(), autoAlpha: 0 });
+      // La stanza non ha opacità: è solo tradotta sotto il bordo. Finché non
+      // comincia a salire (T3) resta nascosta anche lei.
+      gsap.set(stanza, { yPercent: 100, visibility: 'hidden' });
       gsap.set(salaLeaf, { scale: MOVE.salaScaleIn });
       gsap.set(salaVeil, { opacity: 1 });
-      gsap.set(sala, { opacity: 0 });
+      gsap.set(sala, { autoAlpha: 0 });
 
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
@@ -229,7 +237,7 @@ export function Stage({ onActiveChange }: StageProps) {
           ease: CAMERA.t1,
         }, 60)
         .to(reelVeil, { opacity: T1.veil.to, duration: T1.veil.duration }, T1.veil.at)
-        .to(reelScreen, { opacity: 0, duration: 30 }, 120)
+        .to(reelScreen, { autoAlpha: 0, duration: 30 }, 120)
         // Il colore del fondo dello Studio e' una prova aperta: con
         // `STAGE_BG = 'void'` questo tratto non cambia niente e lo spazio
         // resta nero da cima a fondo.
@@ -237,7 +245,7 @@ export function Stage({ onActiveChange }: StageProps) {
         .to(lightSala, { opacity: 1, duration: 60, ease: 'power1.out' }, 80)
         .to(
           lines,
-          { z: 0, opacity: 1, duration: T1.lines.duration, stagger: T1.lines.stagger, ease: 'power2.out' },
+          { z: 0, autoAlpha: 1, duration: T1.lines.duration, stagger: T1.lines.stagger, ease: 'power2.out' },
           T1.lines.at
         )
 
@@ -250,10 +258,10 @@ export function Stage({ onActiveChange }: StageProps) {
           duration: 80,
           ease: CAMERA.t2In,
         }, 230)
-        .to(lines, { opacity: 0, duration: 50, ease: 'power1.in' }, 250)
+        .to(lines, { autoAlpha: 0, duration: 50, ease: 'power1.in' }, 250)
         .to(lightSala, { opacity: 0, duration: 50 }, 240)
         .to(root, { backgroundColor: COLORS.void, duration: 60 }, 240)
-        .to(sala, { opacity: 1, duration: 30 }, 260)
+        .to(sala, { autoAlpha: 1, duration: 30 }, 260)
         .to(salaLeaf, { scale: 1, duration: 70, ease: CAMERA.t2Out }, 250)
         .to(salaVeil, { opacity: 0, duration: 60, ease: 'power1.out' }, 260)
 
@@ -267,7 +275,8 @@ export function Stage({ onActiveChange }: StageProps) {
           ease: CAMERA.t3,
         }, 420)
         .to(salaVeil, { opacity: 0.7, duration: 50 }, 420)
-        .to(sala, { opacity: 0, duration: 30 }, 465)
+        .to(sala, { autoAlpha: 0, duration: 30 }, 465)
+        .set(stanza, { visibility: 'visible' }, 420)
         .to(stanza, { yPercent: 0, duration: 80, ease: CAMERA.t3 }, 420)
         .to(lightTaglio, { opacity: 1, duration: 60, ease: 'power1.out' }, 450)
 

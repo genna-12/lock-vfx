@@ -209,6 +209,21 @@
     transform-style: preserve-3d;
   }
 
+  /* La stanza sul telefono: il suo contenuto non entra in 100svh (861 px
+     contro i 660 di un iPhone con la barra aperta), e la carrellata non può
+     allungare il palco. Quando è il suo turno la stanza scorre **dentro** il
+     proprio set; fuori dal turno è tagliata, così non si affaccia mai sulla
+     sezione prima. Da 768 in su non serve: ci sta. */
+  @media (max-width: 767px) {
+    .stanza-fit {
+      overflow: hidden;
+    }
+    .stanza-fit[data-live='true'] {
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+    }
+  }
+
   /* ---- La deck della Sala --------------------------------------------
      Coverflow ad anello in CSS 3D: nessun WebGL per tre rettangoli.
      Il posizionamento (transform, z-index, opacità, saturazione) lo scrive
@@ -396,7 +411,9 @@
   min-height: 100svh;
   transform: none;
   opacity: 1;
+  visibility: visible;
 }
+.static .stanza-fit { overflow: visible; }
 .static .stage [data-set="work"] { pointer-events: auto; }
 
 .static .stage [data-leaf],
@@ -404,6 +421,7 @@
 .static .stage [data-line] {
   transform: none;
   opacity: 1;
+  visibility: visible;
 }
 
 .static .stage [data-veil] { opacity: 0; }

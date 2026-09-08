@@ -224,9 +224,15 @@ export function Stanza() {
 
   return (
     <>
+      {/* `content-start` su mobile e `content-center` da 768 in su: al
+          telefono la stanza è più alta dello schermo, e un contenuto
+          centrato che sborda esce **anche dal lato di sopra**, cioè dentro
+          la sezione precedente. Allineata in alto sborda solo in basso, dove
+          `.stanza-fit` la fa scorrere dentro il set quando è il suo turno. */}
       <div
         inert={!live}
-        className="grid h-full w-full content-center gap-y-[34px] pt-[86px] pb-[68px] md:grid-cols-[5fr_7fr] md:items-center md:gap-x-[clamp(32px,5vw,96px)] md:py-[calc(var(--pad)+56px)]"
+        data-live={live ? 'true' : 'false'}
+        className="stanza-fit grid h-full w-full content-start gap-y-[34px] pt-[86px] pb-[68px] md:grid-cols-[5fr_7fr] md:content-center md:items-center md:gap-x-[clamp(32px,5vw,96px)] md:py-[calc(var(--pad)+56px)]"
       >
         {/* Chi siamo. Il marchio prende la luce di taglio; sotto, i nomi veri:
             LockVFX è un nome collettivo, non una società, e si deve vedere. */}
