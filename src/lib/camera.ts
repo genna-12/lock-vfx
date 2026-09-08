@@ -47,6 +47,12 @@ export const SNAP = {
   touch: true,
   /** Attesa dopo che lo scroll si e' fermato **davvero** (`scrollEnd`). */
   delay: 0.15,
+  /**
+   * Ogni quanto si ricontrolla se anche la camera si e' fermata. Corto: e'
+   * un controllo, non un'attesa — l'attesa e' `delay`, e a farla due volte
+   * il magnete attaccava mezzo secondo tardi.
+   */
+  check: 0.04,
   duration: { min: 0.4, max: 0.9 },
   ease: 'power2.inOut',
 } as const;

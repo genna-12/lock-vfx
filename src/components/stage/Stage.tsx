@@ -202,15 +202,19 @@ export function Stage({ onActiveChange }: StageProps) {
        365). Quindi dopo `scrollEnd` si aspetta che si fermi anche la
        camera: si guarda la progress ogni 0,15 s finché due letture di fila
        non sono uguali. */
-    /** Un vh su 560: sotto questa soglia la camera è ferma per gli occhi. */
-    const STILL = 1 / STAGE_VH;
+    /** Meno di un vh e mezzo fra un controllo e l'altro (≈ 37 vh al
+     *  secondo): la camera sta finendo di posarsi, e il magnete può
+     *  prendere il suo posto senza strappi — il tratto che sceglie è già
+     *  quello giusto. Più fine di così si aspetta mezzo secondo di coda
+     *  esponenziale dello smoother per niente. */
+    const STILL = 1.5 / STAGE_VH;
     let seen = -1;
     const settled = () => {
       const st = ScrollTrigger.getById('stage');
       if (!st) return;
       if (Math.abs(st.progress - seen) > STILL) {
         seen = st.progress;
-        wait = gsap.delayedCall(SNAP.delay, settled);
+        wait = gsap.delayedCall(SNAP.check, settled);
         return;
       }
       attract();
