@@ -39,6 +39,13 @@ export const HOLD_SPANS: ReadonlyArray<{ from: number; to: number; at: number }>
 
 /** Tempi del magnete: `momento-1`, sezione Magneti. */
 export const SNAP = {
+  /**
+   * Interruttore del magnete su touch. Se sul telefono il magnete continua
+   * a litigare con lo scroll, si spegne di qui e resta solo su desktop
+   * (`rifinitura-spec.md` §6.1, ultima riga).
+   */
+  touch: true,
+  /** Attesa dopo che lo scroll si e' fermato **davvero** (`scrollEnd`). */
   delay: 0.15,
   duration: { min: 0.4, max: 0.9 },
   ease: 'power2.inOut',

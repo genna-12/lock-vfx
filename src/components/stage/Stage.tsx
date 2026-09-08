@@ -102,6 +102,33 @@ export function Stage({ onActiveChange }: StageProps) {
     // 560vh.
     ScrollTrigger.config({ ignoreMobileResize: true });
 
+    /* ---- Lo scroll del telefono --------------------------------------
+       Due cose rendevano la carrellata inservibile su un telefono vero, e
+       nessuna delle due si vede nel pannello a 390×844.
+
+       L'inerzia nativa: dopo che il dito si è alzato il browser continua a
+       scorrere per centinaia di ms, e in quel mentre il magnete scriveva la
+       sua posizione — due mani sulla stessa barra, la pagina che scatta su
+       e giù finché non arriva alla sezione dopo.
+
+       La barra degli indirizzi che si ritira: la finestra si allunga sotto
+       un palco alto `100svh` e in fondo resta scoperta una striscia, che si
+       legge come una sezione tagliata.
+
+       `normalizeScroll` toglie tutte e due: lo scroll passa in JavaScript,
+       l'inerzia la governa GSAP e la barra non si muove più. È quello che
+       GSAP prescrive per i pin con scrub su iOS. La deck resta fuori
+       (`ignore`): lì il dito trascina le card, e sotto il dito la pagina
+       deve continuare a scorrere come prima. */
+    const normalized =
+      ScrollTrigger.isTouch === 1
+        ? ScrollTrigger.normalizeScroll({
+            type: 'touch',
+            allowNestedScroll: true,
+            ignore: '.deck',
+          })
+        : undefined;
+
     // `smoothTouch` resta 0 (default): su touch lo scroll è quello nativo.
     const smoother = ScrollSmoother.create({
       wrapper: '#smooth-wrapper',
@@ -125,14 +152,17 @@ export function Stage({ onActiveChange }: StageProps) {
        una transizione e attraversarne novanta non sono lo stesso gesto. */
     const magnet = { at: 0 };
     let pull: gsap.core.Tween | undefined;
-    let settle: number | undefined;
+    let wait: gsap.core.Tween | undefined;
 
     const release = () => {
+      wait?.kill();
+      wait = undefined;
       pull?.kill();
       pull = undefined;
     };
 
     const attract = () => {
+      if (!SNAP.touch && ScrollTrigger.isTouch === 1) return;
       const st = ScrollTrigger.getById('stage');
       if (!st || pull) return;
       const target = snapProgress(st.progress, st.direction);
@@ -150,6 +180,17 @@ export function Stage({ onActiveChange }: StageProps) {
         },
       });
     };
+
+    /* Il magnete parte da `scrollEnd`, cioè da quando lo scroll si è
+       fermato **davvero**. Prima partiva da un timer di 0,15 s riarmato a
+       ogni aggiornamento: su desktop è la stessa cosa, ma su touch quel
+       timer scadeva *dentro* l'inerzia, quando lo scroll era tutt'altro che
+       finito. I 0,15 s della spec restano, ma contati da lì. */
+    const onScrollEnd = () => {
+      wait?.kill();
+      wait = gsap.delayedCall(SNAP.delay, attract);
+    };
+    ScrollTrigger.addEventListener('scrollEnd', onScrollEnd);
 
     // Chi tocca lo scroll ha sempre ragione: il magnete si stacca subito.
     const interrupt = () => release();
@@ -219,9 +260,6 @@ export function Stage({ onActiveChange }: StageProps) {
             const live = self.progress > SALA_LIVE.from && self.progress < SALA_LIVE.to;
             sala.style.pointerEvents = live ? 'auto' : 'none';
             studio.inert = !(self.progress > STUDIO_LIVE.from && self.progress < STUDIO_LIVE.to);
-            // Il magnete parte quando lo scroll si ferma, non mentre corre.
-            window.clearTimeout(settle);
-            if (!pull) settle = window.setTimeout(attract, SNAP.delay * 1000);
           },
         },
       });
@@ -304,10 +342,11 @@ export function Stage({ onActiveChange }: StageProps) {
       window.removeEventListener('wheel', interrupt);
       window.removeEventListener('touchstart', interrupt);
       window.removeEventListener('keydown', interrupt);
-      window.clearTimeout(settle);
+      ScrollTrigger.removeEventListener('scrollEnd', onScrollEnd);
       release();
       ctx.revert();
       smoother.kill();
+      if (normalized) ScrollTrigger.normalizeScroll(false);
       if (import.meta.env.DEV) delete (window as unknown as { __lock?: unknown }).__lock;
     };
   }, [reduce, notify]);
