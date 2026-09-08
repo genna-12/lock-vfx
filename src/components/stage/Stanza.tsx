@@ -42,10 +42,17 @@ import { Mark } from '../brand/Mark';
 const HOLD_FROM = 500 / STAGE_VH;
 /** Mezzo fotogramma di rosso sul marchio: si sente, non si legge. */
 const FLASH_MS = 42;
-/** Larghezza del marchio grande: `clamp(140px, 16vw, 240px)`, 96 su mobile. */
-const MARK = { min: 140, vw: 0.16, max: 240, mobile: 96 } as const;
-/** La textarea cresce col contenuto: 6 righe su desktop, 4 dove lo schermo è corto. */
-const ROWS = { start: 2, max: 6, maxCompact: 4 } as const;
+/** Larghezza del marchio grande: `clamp(140px, 16vw, 240px)`, 44 su mobile.
+ *  Il budget dell'8/9 dà 64 px alla **riga** del marchio, e qui il numero è
+ *  una larghezza: il lucchetto è alto una volta e sei. A 44 la riga la
+ *  decidono i nomi (80 px) e il marchio non costa niente in altezza, mentre
+ *  ogni pixel che non prende lo prendono i nomi, che a 390 di larghezza sono
+ *  al limite dell'a capo. Conta che stia sullo schermo insieme al pulsante — la
+ *  staffa che si chiude all'invio è la firma della Stanza e va vista mentre
+ *  si chiude — non che sia grande. */
+const MARK = { min: 140, vw: 0.16, max: 240, mobile: 44 } as const;
+/** La textarea cresce col contenuto: 6 righe su desktop, 3 dove lo schermo è corto. */
+const ROWS = { max: 6, maxCompact: 3 } as const;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MOBILE = '(max-width: 767px)';
 
@@ -232,17 +239,17 @@ export function Stanza() {
       <div
         inert={!live}
         data-live={live ? 'true' : 'false'}
-        className="stanza-fit grid h-full w-full content-start gap-y-[34px] pt-[86px] pb-[68px] md:grid-cols-[5fr_7fr] md:content-center md:items-center md:gap-x-[clamp(32px,5vw,96px)] md:py-[calc(var(--pad)+56px)]"
+        className="stanza-fit grid h-full w-full content-start gap-y-[20px] pt-[72px] pb-[max(24px,env(safe-area-inset-bottom,0px))] md:grid-cols-[5fr_7fr] md:content-center md:items-center md:gap-x-[clamp(32px,5vw,96px)] md:gap-y-[34px] md:py-[calc(var(--pad)+56px)]"
       >
         {/* Chi siamo. Il marchio prende la luce di taglio; sotto, i nomi veri:
             LockVFX è un nome collettivo, non una società, e si deve vedere. */}
-        <div className="order-2 flex items-center gap-[22px] md:order-1 md:flex-col md:items-start md:gap-[28px]">
+        <div className="order-2 flex items-center gap-[16px] md:order-1 md:flex-col md:items-start md:gap-[28px]">
           {/* Il colore sta sul contenitore: il fotogramma rosso della
               chiusura è del marchio intero, non della sola staffa. */}
           <span ref={markRef} className="shrink-0 text-ink">
             <Mark size={markH} mode={closed ? 'solid' : 'outline'} shackleRef={shackleRef} />
           </span>
-          <div className="flex flex-col gap-[10px] text-[15px] md:text-[16px]">
+          <div className="flex flex-col gap-[7px] text-[14px] md:gap-[10px] md:text-[16px]">
             {PEOPLE.map((person) => (
               <div key={person.email}>
                 <span className="font-medium">{person.name}</span>
@@ -268,7 +275,7 @@ export function Stanza() {
         </div>
 
         {/* Parliamone. */}
-        <div className="order-1 flex w-full max-w-[640px] flex-col gap-[26px] md:order-2 md:gap-[34px]">
+        <div className="order-1 flex w-full max-w-[640px] flex-col gap-[16px] md:order-2 md:gap-[34px]">
           <h2 className="u-display text-d2 m-0">
             {t('contact.title')}
           </h2>
@@ -276,7 +283,7 @@ export function Stanza() {
           <form
             noValidate
             onSubmit={onSubmit}
-            className="grid grid-cols-1 gap-[30px] md:grid-cols-2 md:gap-x-8 md:gap-y-[44px]"
+            className="grid grid-cols-1 gap-[22px] md:grid-cols-2 md:gap-x-8 md:gap-y-[44px]"
           >
             <Field
               id={`${uid}-name`}
@@ -332,7 +339,7 @@ export function Stanza() {
 
             <label
               className={clsx(
-                'col-span-full flex items-start gap-3 text-[14px] leading-[1.5] text-stone',
+                'col-span-full flex items-start gap-3 text-[13px] leading-[1.45] text-stone md:text-[14px] md:leading-[1.5]',
                 !locked && 'cursor-pointer'
               )}
             >
@@ -365,11 +372,11 @@ export function Stanza() {
               </span>
             </label>
 
-            <div className="col-span-full flex min-h-12 flex-col-reverse items-stretch gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+            <div className="col-span-full flex min-h-11 flex-col-reverse items-stretch gap-3 md:min-h-12 md:flex-row md:items-center md:gap-6 md:justify-between">
               <p
                 aria-live="polite"
                 className={clsx(
-                  'm-0 text-[14px] text-stone transition-opacity duration-[var(--f5)]',
+                  'm-0 text-[13px] text-stone transition-opacity duration-[var(--f5)] md:text-[14px]',
                   statusText ? 'opacity-100' : 'opacity-0'
                 )}
               >
@@ -390,7 +397,7 @@ export function Stanza() {
                 type="submit"
                 disabled={locked}
                 className={clsx(
-                  'u-cap h-[46px] min-w-[150px] px-[26px] transition-colors duration-[var(--f5)]',
+                  'u-cap h-[44px] min-w-[150px] px-[26px] transition-colors duration-[var(--f5)] md:h-[46px]',
                   status === 'sent'
                     ? 'bg-transparent text-ink ring-1 ring-stone/40 ring-inset'
                     : 'bg-ink text-void hover:bg-white',
@@ -477,8 +484,12 @@ function Field({
         <textarea
           {...shared}
           ref={inputRef as RefObject<HTMLTextAreaElement | null>}
-          rows={ROWS.start}
-          className={clsx(control, 'min-h-16 resize-none')}
+          rows={1}
+          // Una riga sola sul telefono, due da 768 in su; al focus si apre
+          // alla seconda. È l'unico modo di stare in 660 px senza togliere
+          // niente: il campo si allarga quando serve, cioè quando ci si
+          // scrive dentro.
+          className={clsx(control, 'min-h-11 resize-none focus:min-h-16 md:min-h-16')}
           onChange={(event) => {
             const el = event.currentTarget;
             onValue(name, el.value);
