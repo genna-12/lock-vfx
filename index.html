@@ -6,6 +6,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/outfit-var.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Il poster della reel è l'LCP della home, e senza questa riga il
+         browser lo scopre solo dopo aver eseguito il JS: un secondo e mezzo
+         di attesa per un file che è già sul server. Vale solo qui: la pagina
+         Studio non ha immagini sopra la piega. -->
+    <link
+      rel="preload"
+      href="/images/showreel-poster.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+    />
     <title>LockVFX — effetti visivi per cinema, serie e pubblicità</title>
     <!-- Versione statica (crawler senza JS): App.tsx la riallinea alla lingua
          attiva. I due [Nome] sono segnaposto: mancano i nomi dei ragazzi. -->
