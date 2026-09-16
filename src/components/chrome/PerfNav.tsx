@@ -6,6 +6,7 @@ import { MOTION, SETS, type SetId } from '../../brand/tokens';
 import { holdScroll } from '../../lib/camera';
 import { isReturningVisit, quandoEntrati } from '../../lib/loadProgress';
 import { vaiAllaSezione } from '../../lib/scrollProgrammato';
+import { Mark } from '../brand/Mark';
 import { useCoarsePointer, useReducedMotion } from '../../lib/useReducedMotion';
 
 /**
@@ -191,16 +192,30 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                 >
                   {t(`nav.${id}`)}
                 </span>
-                <span
-                  aria-hidden
-                  className={`block h-[13px] w-[9px] rounded-[2px] border transition-colors duration-200 ${
-                    isActive
-                      ? 'border-crimson bg-crimson'
-                      : lampo
+                {/* Dove si è, la perforazione **diventa il marchio**: 12 px,
+                    rosso, al posto del rettangolo pieno
+                    (`rifinitura-spec.md` §4). È uno dei quattro posti in cui
+                    il lucchetto rosso è ammesso, ed è quello che lavora di
+                    più: dice dove si è e, dicendolo, ripete il marchio. Il
+                    riquadro resta 9x13 perché la fila non si muova quando
+                    l'attivo cambia. */}
+                {isActive ? (
+                  <span
+                    aria-hidden
+                    className="grid h-[13px] w-[9px] place-items-center text-crimson"
+                  >
+                    <Mark size={12} />
+                  </span>
+                ) : (
+                  <span
+                    aria-hidden
+                    className={`block h-[13px] w-[9px] rounded-[2px] border transition-colors duration-200 ${
+                      lampo
                         ? 'border-ink bg-ink'
                         : 'border-dust bg-transparent group-hover:border-stone'
-                  }`}
-                />
+                    }`}
+                  />
+                )}
               </a>
             </li>
           );
