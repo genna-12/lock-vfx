@@ -24,8 +24,32 @@ export const LOAD_WEIGHTS = {
 
 export type LoadTask = keyof typeof LOAD_WEIGHTS;
 
-/** Min / max del loader e durata della visita successiva (ms). */
-export const LOADER_TIMING = { min: 800, max: 2500, repeat: 300 } as const;
+/**
+ * I tempi della coreografia (`rifinitura-spec.md` §2), in ms.
+ *
+ * Il tempo lo detta il gesto, non la rete: il progresso è solo un cancello —
+ * la staffa non può *precedere* il caricamento, ma può aspettarlo. Il tetto
+ * è il momento entro cui l'overlay **ha staccato**: oltre, il volo si vede
+ * già sopra la pagina viva.
+ */
+export const LOADER_TIMING = {
+  /** A — i tre path si tracciano, con 80 ms di scarto l'uno dall'altro. */
+  draw: 400,
+  /** Scarto fra un path e l'altro in A. */
+  stagger: 80,
+  /** B — la staffa scende, limitata dal progresso. */
+  close: 1000,
+  /** D — tenuta a lucchetto chiuso, rosso, pieno. */
+  hold: 250,
+  /** E — il volo verso il marchio del chrome. */
+  fly: 500,
+  /** Tetto dello stacco con la coreografia disegnata. */
+  max: 3000,
+  /** Tetto con l'animazione di LockVFX: dura 3,04 s e non si accelera. */
+  maxVideo: 3600,
+  /** Visita successiva nella sessione. */
+  repeat: 300,
+} as const;
 
 /** Quanti secondi di buffer contano come "primo segmento". */
 export const REEL_FIRST_SEGMENT_S = 2;

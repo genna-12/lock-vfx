@@ -33,7 +33,13 @@ export function Wordmark({ href = '#top', home = false, oltre = false }: Wordmar
       aria-label="LockVFX"
       className="pointer-events-auto flex items-center gap-2.5 text-ink transition-opacity duration-200 hover:opacity-70"
     >
-      <Mark size={18} />
+      {/* Il bersaglio del volo del loader: il marchio in volo arriva qui, e
+          fino a quel momento questo resta invisibile — due lucchetti sullo
+          schermo sarebbero due lucchetti (`rifinitura-spec.md` §2, fase E).
+          Il Loader lo trova da qui e gli scrive la `visibility`. */}
+      <span data-chrome-mark className="flex">
+        <Mark size={18} />
+      </span>
       <span
         aria-hidden
         className="text-[14px] font-medium tracking-[-0.01em] transition-opacity duration-[var(--f5)]"

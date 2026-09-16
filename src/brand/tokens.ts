@@ -89,6 +89,32 @@ export const STAGE_BG: 'obsidian' | 'void' = 'obsidian';
  */
 export const WORDMARK_TEXT: 'always' | 'after-first-screen' = 'after-first-screen';
 
+/**
+ * Chi disegna il lucchetto che si chiude, all'ingresso.
+ *
+ * `drawn` è la coreografia del sito (i tre path che si tracciano, la staffa
+ * che scende); `video` è l'animazione prodotta da LockVFX
+ * (`public/loader/logo.webm`, 512², 25 fps, 3,04 s, fondo nero senza alpha →
+ * `mix-blend-mode: screen`), che sostituisce le fasi A–C e lascia al sito la
+ * tenuta e il volo verso il marchio del chrome.
+ *
+ * `drawn` non è solo un'alternativa: è la **riserva**. Dove il webm non si
+ * riproduce — Safari, finché `logo.mp4` non arriva — il loader torna alla
+ * coreografia disegnata senza che nessuno se ne accorga
+ * (`rifinitura-spec.md` §2).
+ */
+export const LOADER_SOURCE: 'drawn' | 'video' = 'video';
+
+/**
+ * La seconda visita nella stessa sessione.
+ *
+ * `breve` = com'è oggi: marchio chiuso e pieno, 300 ms, stacco. `volo` =
+ * solo il volo verso il chrome, 500 ms. `rifinitura-spec.md` §2 le lascia
+ * tutte e due («da provare, la seconda è più elegante»): la costante serve a
+ * guardarle, il default resta lo stato attuale.
+ */
+export const LOADER_REPEAT: 'breve' | 'volo' = 'breve';
+
 /** Camera della carrellata (vedi `momento-1-lo-spazio.md`). */
 export const CAMERA = {
   /** ScrollSmoother su desktop; su touch resta lo scroll nativo. */
