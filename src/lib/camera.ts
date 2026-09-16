@@ -49,8 +49,9 @@ export const SNAP = {
    * corso e tira all'indietro. Su desktop invece funziona ed e' misurato
    * (una corsa sola, 0,65 s), quindi resta li'.
    *
-   * L'interruttore esiste per questo: quando la sonda (`?probe=1`) dira'
-   * chi litiga con chi, si riaccende con un `true` e non con un lotto.
+   * L'interruttore esiste per questo: il giorno in cui si scoprira' chi
+   * litiga con chi, il magnete su touch si riaccende con un `true` e non
+   * con un lotto.
    */
   touch: false,
   /** Attesa dopo che lo scroll si e' fermato **davvero** (`scrollEnd`). */

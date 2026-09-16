@@ -35,3 +35,6 @@ materiale/
 # Materiale di lavoro, non del sito: appunti delle chat e vecchi snapshot.
 Claude outputs/
 _to_delete/_ufficio/
+# I bundle che passano alla Direzione quando il push non e' possibile
+# (`ufficio-agenti.md`): stanno nel repo per comodita', non ne fanno parte.
+_ufficio/

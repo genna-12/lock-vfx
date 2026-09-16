@@ -98,30 +98,6 @@ export function Stage({ onActiveChange }: StageProps) {
 
     const html = document.documentElement;
 
-    /* ---- la sonda ------------------------------------------------------
-       `?probe=1` nell'indirizzo, e nient'altro: un pannello che dice i
-       numeri veri del telefono — finestra, `svh`/`lvh`/`dvh` misurate,
-       altezza del palco, `isTouch`, `normalizeScroll`, e le ultime otto
-       posizioni di scroll con il loro istante, che è come si legge un
-       glitch. Import dinamico: in produzione è un file a parte, e chi non
-       lo chiede non lo scarica. */
-    let probeOff: (() => void) | undefined;
-    let probeMorta = false;
-    if (new URLSearchParams(window.location.search).get('probe') === '1') {
-      void import('../../lib/probe').then(({ mountProbe }) => {
-        if (probeMorta) return;
-        probeOff = mountProbe({
-          isTouch: ScrollTrigger.isTouch,
-          normalizzato: () => Boolean(ScrollTrigger.normalizeScroll()),
-          vh: () => Math.round((ScrollTrigger.getById('stage')?.progress ?? 0) * STAGE_VH),
-        });
-      });
-    }
-    const spegniSonda = () => {
-      probeMorta = true;
-      probeOff?.();
-    };
-
     // Flusso statico: nessuna camera, nessuno smoother. I set tornano in
     // flusso normale (le regole `.static` in globals.css) e la nav resta una
     // lista di ancore. I listener dei due media query rifanno questo effetto
@@ -169,7 +145,6 @@ export function Stage({ onActiveChange }: StageProps) {
       for (const set of sets) io.observe(set);
 
       return () => {
-        spegniSonda();
         io.disconnect();
         for (const light of Object.values(luci)) light?.style.removeProperty('opacity');
         html.classList.remove('static');
@@ -474,7 +449,6 @@ export function Stage({ onActiveChange }: StageProps) {
     }
 
     return () => {
-      spegniSonda();
       window.removeEventListener('orientationchange', rimisura);
       document.removeEventListener('fullscreenchange', rimisura);
       document.removeEventListener('webkitendfullscreen', rimisura, true);
