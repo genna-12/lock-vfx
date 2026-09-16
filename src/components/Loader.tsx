@@ -8,6 +8,7 @@ import {
   isReturningVisit,
   loadProgress,
   markVisited,
+  segnaEntrata,
   whenFontsReady,
 } from '../lib/loadProgress';
 import { useReducedMotion } from '../lib/useReducedMotion';
@@ -145,6 +146,9 @@ export function Loader({ children }: { children: ReactNode }) {
       if (via) return;
       via = true;
       markVisited();
+      // Da qui in poi la pagina si vede: chi conta i tempi dell'interfaccia
+      // (l'indizio di scroll) parte adesso, non dal mount.
+      segnaEntrata();
       const partenza = markRef.current?.getBoundingClientRect();
       const arrivo = chrome?.getBoundingClientRect();
       if (!conVolo || !partenza || !arrivo || !arrivo.height) {

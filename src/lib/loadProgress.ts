@@ -137,6 +137,35 @@ export function whenReelReady(
 
 /* --------------------------------------------------------------------- */
 
+/**
+ * Lo stacco: il momento in cui l'overlay se ne va e la pagina si vede.
+ *
+ * Serve a chi conta il tempo dell'**interfaccia** e non quello del
+ * caricamento — l'indizio di scroll aspetta quattro secondi di pagina
+ * ferma, e quattro secondi dal mount sarebbero quattro secondi di loader.
+ */
+let entrati = false;
+const attese = new Set<() => void>();
+
+export function segnaEntrata(): void {
+  if (entrati) return;
+  entrati = true;
+  for (const fn of attese) fn();
+  attese.clear();
+}
+
+/** Chiama `fn` allo stacco, o subito se è già avvenuto. Ritorna la disdetta. */
+export function quandoEntrati(fn: () => void): () => void {
+  if (entrati) {
+    fn();
+    return () => undefined;
+  }
+  attese.add(fn);
+  return () => {
+    attese.delete(fn);
+  };
+}
+
 const VISIT_KEY = 'lockvfx:visited';
 
 /** Il loader lungo si vede una volta per sessione, non a ogni navigazione. */

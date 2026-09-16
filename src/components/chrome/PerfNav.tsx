@@ -1,11 +1,12 @@
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SETS, type SetId } from '../../brand/tokens';
+import { MOTION, SETS, type SetId } from '../../brand/tokens';
 import { holdScroll } from '../../lib/camera';
+import { isReturningVisit, quandoEntrati } from '../../lib/loadProgress';
 import { vaiAllaSezione } from '../../lib/scrollProgrammato';
-import { useCoarsePointer } from '../../lib/useReducedMotion';
+import { useCoarsePointer, useReducedMotion } from '../../lib/useReducedMotion';
 
 /**
  * Navigazione = quattro perforazioni di pellicola, una per HOLD.
@@ -26,9 +27,28 @@ type PerfNavProps = {
   active?: SetId;
 };
 
+/**
+ * L'indizio di scroll (`rifinitura-spec.md` §3).
+ *
+ * Nessuna freccia, nessuna scritta "scroll": se dopo quattro secondi di
+ * pagina ferma non si è scorso, il **secondo foro** fa due lampi `ink` — è
+ * la nav stessa che dice che ce n'è dell'altra, sotto. Si ripete una volta
+ * dopo altri otto secondi, e poi mai più: un invito che insiste è un
+ * cartello.
+ */
+const INDIZIO = { primo: 4000, secondo: 12000 } as const;
+
 export function PerfNav({ active = 'reel' }: PerfNavProps) {
   const { t } = useTranslation();
   const [onFooter, setOnFooter] = useState(false);
+  const reduce = useReducedMotion();
+  // Si legge al primo render, prima che il Loader segni la visita: da lì in
+  // poi `isReturningVisit()` direbbe di sì a tutti.
+  const [primaVisita] = useState(() => !isReturningVisit());
+  const [indizio, setIndizio] = useState(false);
+  // "Poi mai più": una volta che l'invito è servito — o che è stato spento da
+  // uno scroll — non torna, nemmeno risalendo alla prima sezione.
+  const finito = useRef(false);
   // Sul telefono la nav va in basso al centro: sul bordo destro finisce
   // addosso ai comandi del video ed è dove passa il pollice tutto il tempo
   // (`mobile-semplice-spec.md` §2 e §3).
@@ -49,6 +69,58 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
     io.observe(footer);
     return () => io.disconnect();
   }, []);
+
+  /* ---- l'indizio di scroll -------------------------------------------- */
+  useEffect(() => {
+    // Solo alla prima visita, solo nella prima sezione, e solo a chi non ha
+    // chiesto meno movimento: a quello un lampeggio non si fa.
+    if (!primaVisita || reduce || active !== 'reel' || finito.current) return;
+
+    const timers: number[] = [];
+    let spento = false;
+    /** Chiude l'indizio qui e ora (anche solo perché il componente se ne va). */
+    const spegni = () => {
+      if (spento) return;
+      spento = true;
+      for (const id of timers) window.clearTimeout(id);
+      setIndizio(false);
+      for (const tipo of ['scroll', 'wheel', 'touchstart', 'keydown'] as const) {
+        window.removeEventListener(tipo, basta);
+      }
+    };
+
+    /** L'invito è servito: non si ripropone. */
+    const basta = () => {
+      finito.current = true;
+      spegni();
+    };
+
+    // Due lampi: `f5` acceso, `f5` spento, due volte.
+    const lampeggia = (da: number) => {
+      [true, false, true, false].forEach((acceso, i) => {
+        timers.push(window.setTimeout(() => setIndizio(acceso), da + i * MOTION.f5));
+      });
+    };
+
+    // I quattro secondi contano da quando la pagina si vede, non dal mount:
+    // prima c'è il loader, e quello non è tempo di attesa dell'utente.
+    const disdici = quandoEntrati(() => {
+      if (spento) return;
+      lampeggia(INDIZIO.primo);
+      lampeggia(INDIZIO.secondo);
+      timers.push(window.setTimeout(basta, INDIZIO.secondo + 4 * MOTION.f5));
+      // Qualunque scroll — la rotella, un dito, una freccia della tastiera —
+      // vuol dire che l'invito non serve più.
+      for (const tipo of ['scroll', 'wheel', 'touchstart', 'keydown'] as const) {
+        window.addEventListener(tipo, basta, { passive: true });
+      }
+    });
+
+    return () => {
+      disdici();
+      spegni();
+    };
+  }, [active, primaVisita, reduce]);
 
   // Con la carrellata attiva il salto nativo non serve a niente: i quattro
   // set sono impilati nello stesso punto della pagina, e cio' che li separa
@@ -90,8 +162,11 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
     >
       {/* Su mobile i 44px di target si toccano: lo spazio ce lo mette già il target. */}
       <ul className={coarse ? 'flex flex-row gap-0' : 'flex flex-col gap-0 md:gap-4'}>
-        {SETS.map((id) => {
+        {SETS.map((id, i) => {
           const isActive = id === active;
+          // Il lampo è del **secondo** foro: è quello che dice dove si va
+          // scorrendo, non quello dove si è.
+          const lampo = indizio && i === 1;
           return (
             <li key={id} className={coarse ? 'flex justify-center' : 'flex justify-end'}>
               <a
@@ -121,7 +196,9 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                   className={`block h-[13px] w-[9px] rounded-[2px] border transition-colors duration-200 ${
                     isActive
                       ? 'border-crimson bg-crimson'
-                      : 'border-dust bg-transparent group-hover:border-stone'
+                      : lampo
+                        ? 'border-ink bg-ink'
+                        : 'border-dust bg-transparent group-hover:border-stone'
                   }`}
                 />
               </a>
