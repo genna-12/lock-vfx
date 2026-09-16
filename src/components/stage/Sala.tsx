@@ -29,6 +29,16 @@ type SalaProps = {
 const HOLD = { from: 0.55, to: 0.88 } as const;
 /** Immobilità dopo la quale l'HUD se ne va. */
 const AWAKE_MS = 2500;
+/**
+ * L'anteprima dell'HUD all'ingresso (`rifinitura-spec.md` §7.4).
+ *
+ * Entrando nella Sala per la prima volta l'HUD si mostra da solo, più
+ * trasparente dell'HUD vero, e dopo due secondi e mezzo se ne va: dice che
+ * sotto il film ci sono i comandi e i lavori, senza che nessuno debba
+ * scoprirlo muovendo il mouse. Una volta sola per visita — un'istruzione
+ * ripetuta a ogni ritorno è un cartello.
+ */
+const ANTEPRIMA = { ms: 2500, opacity: 0.75 } as const;
 /** Un fotogramma a 24 fps: la durata del nero fra due lavori. */
 const FRAME_MS = 83;
 /** Dodici fotogrammi di nero alla fine di un video. */
@@ -54,6 +64,11 @@ export function Sala({ works }: SalaProps) {
 
   const [index, setIndex] = useState(0);
   const [awake, setAwake] = useState(false);
+  // L'anteprima dell'HUD all'ingresso: il flag dice se si sta mostrando, il
+  // ref che è già stata mostrata in questa visita.
+  const [anteprima, setAnteprima] = useState(false);
+  const anteprimaFatta = useRef(false);
+  const anteprimaTimer = useRef<number | undefined>(undefined);
   // Dentro il suo HOLD o no: lo dice lo Stage, che la progress ce l'ha già.
   const inHold = useStageWindow(HOLD.from, HOLD.to);
   // Senza carrellata la sala non è una sala: è una sezione di pagina con un
@@ -127,9 +142,23 @@ export function Sala({ works }: SalaProps) {
     segnoTimer.current = window.setTimeout(() => setSegno(null), 700);
   }, []);
 
+  /* ---- l'anteprima dell'HUD all'ingresso (§7.4) ----------------------- */
+  useEffect(() => {
+    // Dove l'HUD non si nasconde mai — telefono in verticale, meno
+    // movimento — non c'è niente da mostrare: è già tutto lì.
+    if (!inHold || portrait || reduced || anteprimaFatta.current) return;
+    anteprimaFatta.current = true;
+    setAnteprima(true);
+    anteprimaTimer.current = window.setTimeout(() => setAnteprima(false), ANTEPRIMA.ms);
+  }, [inHold, portrait, reduced]);
+
+  useEffect(() => () => window.clearTimeout(anteprimaTimer.current), []);
+
   // In verticale su telefono l'HUD non si nasconde: lì è impaginazione, non
-  // un velo che copre il film.
-  const hudVisible = portrait || reduced || awake;
+  // un velo che copre il film. L'anteprima dell'ingresso sta più indietro
+  // dell'HUD vero: si legge, ma non si sostituisce al film.
+  const hudOpacity = portrait || reduced || awake ? 1 : anteprima ? ANTEPRIMA.opacity : 0;
+  const hudVisible = hudOpacity > 0;
 
   // Fuori dall'HOLD il video si ferma e l'HUD sparisce: durante T2 e T3 la
   // sala è un oggetto che si muove nello spazio, non un player.
@@ -542,7 +571,7 @@ export function Sala({ works }: SalaProps) {
           className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] transition-opacity"
           style={{
             background: 'linear-gradient(to top, rgb(2 2 2 / 0.82), rgb(2 2 2 / 0))',
-            opacity: hudVisible ? 1 : 0,
+            opacity: hudOpacity,
             transitionDuration: 'var(--f5)',
           }}
         />
@@ -550,6 +579,7 @@ export function Sala({ works }: SalaProps) {
 
       {/* HUD: deck e didascalia, centrati e modesti. */}
       <div
+        data-hud
         className={
           portrait
             ? 'u-pad flex flex-col gap-5 pt-6'
@@ -559,7 +589,7 @@ export function Sala({ works }: SalaProps) {
           portrait
             ? undefined
             : {
-                opacity: hudVisible ? 1 : 0,
+                opacity: hudOpacity,
                 transform: hudVisible ? 'none' : 'translateY(16px)',
                 pointerEvents: hudVisible ? 'auto' : 'none',
                 transition: `opacity var(--f5) linear, transform var(--f5) var(--ease-arrive)`,
@@ -627,7 +657,7 @@ export function Sala({ works }: SalaProps) {
           portrait
             ? undefined
             : {
-                opacity: hudVisible ? 1 : 0,
+                opacity: hudOpacity,
                 pointerEvents: hudVisible ? 'auto' : 'none',
                 transition: 'opacity var(--f5) linear',
               }
