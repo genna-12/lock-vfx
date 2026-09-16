@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { assertTokensInSync, type SetId } from './brand/tokens';
 import { applyHead } from './lib/head';
+import { inCima } from './lib/inCima';
 import { Loader } from './components/Loader';
 import { Wordmark } from './components/chrome/Wordmark';
 import { LangPill } from './components/chrome/LangPill';
@@ -48,7 +49,7 @@ export default function App() {
       </a>
 
       <header className="u-pad pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between py-[var(--pad)]">
-        <Wordmark home oltre={active !== 'reel'} />
+        <Wordmark home oltre={active !== 'reel'} onTop={inCima} />
         <LangPill />
       </header>
       <PerfNav active={active} />

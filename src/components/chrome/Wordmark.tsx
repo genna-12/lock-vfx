@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { WORDMARK_TEXT } from '../../brand/tokens';
 import { Mark } from '../brand/Mark';
 
@@ -22,14 +23,22 @@ type WordmarkProps = {
   home?: boolean;
   /** Home: la prima schermata è passata. */
   oltre?: boolean;
+  /**
+   * Cosa vuol dire "in cima" in questa pagina. Nella home lo sa `inCima`
+   * (`lib/inCima.ts`): con la carrellata il salto nativo a `#top` non porta
+   * da nessuna parte, perché l'ancora è dentro il contenuto trasformato
+   * dallo smoother. Senza, il link resta un link e funziona da solo.
+   */
+  onTop?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
-export function Wordmark({ href = '#top', home = false, oltre = false }: WordmarkProps) {
+export function Wordmark({ href = '#top', home = false, oltre = false, onTop }: WordmarkProps) {
   const parola = WORDMARK_TEXT === 'always' || !home || oltre;
 
   return (
     <a
       href={href}
+      onClick={onTop}
       aria-label="LockVFX"
       className="pointer-events-auto flex items-center gap-2.5 text-ink transition-opacity duration-200 hover:opacity-70"
     >
