@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
 import { useStageStatic, useStageWindow } from '../../lib/stageProgress';
 import { loadProgress, whenImageReady, whenReelReady } from '../../lib/loadProgress';
+import { REEL, REEL_MOBILE, sorgente } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 
 /**
@@ -18,17 +19,21 @@ import { useReducedMotion } from '../../lib/useReducedMotion';
  * video arriva bastano i due file in `public/video` e `VITE_REEL=on`.
  */
 /**
- * Il sito deve poter vivere anche in una sottocartella (`VITE_BASE`), quindi
- * i percorsi non partono più dalla radice ma da `import.meta.env.BASE_URL`,
- * che finisce sempre con una barra e vale `/` quando il sito sta al suo posto.
+ * Quale showreel, e in quale versione. Lo decide `lib/media.ts` una volta
+ * per visita: dove abitano i file (il sito, come oggi, o R2 quando
+ * `VITE_MEDIA_URL` è pieno), quale delle due qualità regge la rete di chi
+ * guarda, e — sul telefono — il montaggio verticale invece del 16:9, che in
+ * `cover` su uno schermo in piedi mostrerebbe un quarto del fotogramma.
+ *
+ * Un formato solo, MP4 (`rifinitura-spec.md` §8): il WebM raddoppiava i file
+ * da produrre per risparmiare una banda che su R2 è gratis.
  */
-const BASE = import.meta.env.BASE_URL;
-
-const POSTER = `${BASE}images/showreel-poster.webp`;
-const SOURCES = [
-  { src: `${BASE}video/reel.webm`, type: 'video/webm' },
-  { src: `${BASE}video/reel.mp4`, type: 'video/mp4' },
-];
+const VERTICALE =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+const RENDITION = VERTICALE ? REEL_MOBILE : REEL;
+const POSTER = RENDITION.poster;
+const SOURCES = [{ src: sorgente(RENDITION), type: 'video/mp4' }];
 const HAS_VIDEO = (import.meta.env.VITE_REEL ?? 'none') !== 'none';
 
 /** Oltre questa progress della carrellata la reel è fuori scena: si mette in

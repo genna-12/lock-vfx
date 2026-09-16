@@ -32,6 +32,10 @@ dist-ssr
 reference/
 materiale/
 
+# Le versioni web dei video, prodotte da `scripts/encode-video.mjs`: vanno
+# su R2, non in un commit — sono centinaia di megabyte.
+media/
+
 # Materiale di lavoro, non del sito: appunti delle chat e vecchi snapshot.
 Claude outputs/
 _to_delete/_ufficio/

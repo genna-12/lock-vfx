@@ -6,6 +6,8 @@
  * piano). Quando succederà, `loadWorks` diventerà una `fetch` e nient'altro
  * cambierà.
  */
+import { sorgente, workRendition, type Rendition } from '../lib/media';
+
 export type Work = {
   /** Slug stabile: è anche la chiave di React e l'id ARIA. */
   id: string;
@@ -14,10 +16,17 @@ export type Work = {
   /** Produzione o cliente. */
   client: string;
   disciplines: string[];
-  /** 1280×720 WebP o JPG. */
+  /** 1280×720 WebP o JPG. È il poster della rendition. */
   poster: string;
-  /** Breakdown ≤ 1080p, 15–40 s. */
+  /**
+   * Breakdown, nella versione scelta per questa visita: un MP4 solo
+   * (`lib/media.ts`). Il campo resta della forma di prima — `webm`
+   * facoltativo e mai riempito — perché la Sala lo legge così e qui non si
+   * riscrive la Sala per cambiare un percorso.
+   */
   video: { mp4: string; webm?: string };
+  /** Le due versioni prodotte da `scripts/encode-video.mjs`, più il poster. */
+  media: Rendition;
   /** Link al video completo, se c'è. */
   fullUrl?: string;
   /** Un lavoro con i diritti non liberati non si mostra. */
@@ -33,14 +42,15 @@ export type Work = {
 export const WORKS_HAVE_VIDEO = (import.meta.env.VITE_WORKS ?? 'none') !== 'none';
 
 /**
- * Il sito deve poter vivere anche in una sottocartella (`VITE_BASE`), quindi
- * i percorsi non partono più dalla radice ma da `import.meta.env.BASE_URL`,
- * che finisce sempre con una barra e vale `/` quando il sito sta al suo posto.
+ * I percorsi non stanno più qui: li costruisce `lib/media.ts`, che sa dove
+ * abitano i video — nel sito, come oggi, o su R2 quando `VITE_MEDIA_URL` è
+ * pieno — e quale delle due versioni serve a questa visita. Da qui si dice
+ * solo lo slug.
  */
-const BASE = import.meta.env.BASE_URL;
-
-/** Unico poster disponibile finché non arrivano quelli dei lavori. */
-const PLACEHOLDER_POSTER = `${BASE}images/showreel-poster.webp`;
+function media(slug: string): Pick<Work, 'poster' | 'video' | 'media'> {
+  const r = workRendition(slug);
+  return { poster: r.poster, video: { mp4: sorgente(r) }, media: r };
+}
 
 const PLACEHOLDERS: Work[] = [
   {
@@ -49,8 +59,7 @@ const PLACEHOLDERS: Work[] = [
     year: 2026,
     client: 'Produzione',
     disciplines: ['Environment', 'Compositing'],
-    poster: PLACEHOLDER_POSTER,
-    video: { mp4: `${BASE}video/works/lavoro-01.mp4`, webm: `${BASE}video/works/lavoro-01.webm` },
+    ...media('lavoro-01'),
     fullUrl: 'https://vimeo.com/',
     rights: 'cleared',
     order: 1,
@@ -61,8 +70,7 @@ const PLACEHOLDERS: Work[] = [
     year: 2025,
     client: 'Cliente',
     disciplines: ['CG integration', 'Cleanup'],
-    poster: PLACEHOLDER_POSTER,
-    video: { mp4: `${BASE}video/works/lavoro-02.mp4`, webm: `${BASE}video/works/lavoro-02.webm` },
+    ...media('lavoro-02'),
     rights: 'cleared',
     order: 2,
   },
@@ -72,8 +80,7 @@ const PLACEHOLDERS: Work[] = [
     year: 2025,
     client: 'Produzione',
     disciplines: ['FX / simulazioni', 'Finishing'],
-    poster: PLACEHOLDER_POSTER,
-    video: { mp4: `${BASE}video/works/lavoro-03.mp4`, webm: `${BASE}video/works/lavoro-03.webm` },
+    ...media('lavoro-03'),
     fullUrl: 'https://vimeo.com/',
     rights: 'cleared',
     order: 3,
