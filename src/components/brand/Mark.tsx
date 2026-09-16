@@ -79,14 +79,16 @@ export function Mark({
       {title ? <title>{title}</title> : null}
       <path
         ref={shackleRef}
-        id="shackle"
         data-mark="shackle"
         d={SHACKLE}
         transform={shackleOffset ? `translate(0 ${shackleOffset})` : undefined}
         {...paint}
       />
-      <path id="body" data-mark="body" d={BODY} {...paint} />
-      <path id="keyhole" data-mark="keyhole" d={KEYHOLE} {...paint} />
+      {/* Niente `id`: il marchio sta in pagina più volte (chrome, Stanza,
+          loader) e tre `id` ripetuti sono tre `id` doppi. Chi deve mettere le
+          mani su un tratto usa `data-mark`, che è fatto per quello. */}
+      <path data-mark="body" d={BODY} {...paint} />
+      <path data-mark="keyhole" d={KEYHOLE} {...paint} />
     </svg>
   );
 }

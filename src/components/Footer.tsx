@@ -80,21 +80,32 @@ export function Footer() {
           blocco è un cartello, non una superficie dello spazio. */}
       <section className="mx-auto mb-16 max-w-5xl rounded-[24px] border border-dust/25 p-10 md:p-14">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+          {/* Dov'è il rosso, qui dentro. Non nel richiamo — una riga cap di
+              13 px in `crimson` è rosso usato come colore, ed è anche sotto
+              il contrasto che si chiede al testo piccolo: il richiamo è
+              `stone`. Il rosso sta sull'**indirizzo**, a corpo display: è la
+              cosa che si deve leggere, ed è grande abbastanza perché il rosso
+              regga (4,37:1, sopra i 3:1 del testo grande). Sotto il
+              puntatore torna `ink`: il segnale ha già segnalato.
+              `rifinitura-spec.md` §4. */}
           <div>
-            <p className="u-cap mb-4 text-crimson">{t('footer.cta.kicker')}</p>
+            <p className="u-cap mb-4 text-stone">{t('footer.cta.kicker')}</p>
             <h2 className="u-display text-d3 text-ink">
               {FOOTER_CTA_VARIANT === 'full' ? `${t('footer.cta.title')} ` : null}
               <a
                 href={`mailto:${CONTACT.email}`}
-                className="font-medium transition-colors duration-200 hover:text-crimson"
+                className="font-medium text-crimson transition-colors duration-[var(--f5)] hover:text-ink"
               >
                 {CONTACT.email}
               </a>
             </h2>
           </div>
+          {/* Il pulsante non passa dal rosso: «il rosso è segnale e marchio;
+              mai testo piccolo, mai sfondo» (§4). Sotto il puntatore schiara,
+              come la CTA della pagina Studio. */}
           <a
             href={`mailto:${CONTACT.email}`}
-            className="u-cap group flex h-[46px] shrink-0 items-center gap-2 self-start bg-ink px-6 text-void transition-colors duration-[var(--f5)] hover:bg-crimson hover:text-ink"
+            className="u-cap group flex h-[46px] shrink-0 items-center gap-2 self-start bg-ink px-6 text-void transition-colors duration-[var(--f5)] hover:bg-white"
           >
             {t('footer.cta.button')}
             <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
