@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MOTION, SETS, type SetId } from '../../brand/tokens';
+import { MARK_COLOR, MOTION, SETS, type SetId } from '../../brand/tokens';
 import { holdScroll } from '../../lib/camera';
 import { isReturningVisit, quandoEntrati } from '../../lib/loadProgress';
 import { vaiAllaSezione } from '../../lib/scrollProgrammato';
@@ -198,11 +198,18 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                     il lucchetto rosso è ammesso, ed è quello che lavora di
                     più: dice dove si è e, dicendolo, ripete il marchio. Il
                     riquadro resta 9x13 perché la fila non si muova quando
-                    l'attivo cambia. */}
+                    l'attivo cambia.
+
+                    Il rosso è contato (§4): se il marchio del chrome è già
+                    rosso (`MARK_COLOR = 'crimson'`, §7.1) qui si torna a
+                    `ink` — il foro resta il marchio, ma il rosso persistente
+                    della schermata resta uno solo. */}
                 {isActive ? (
                   <span
                     aria-hidden
-                    className="grid h-[13px] w-[9px] place-items-center text-crimson"
+                    className={`grid h-[13px] w-[9px] place-items-center ${
+                      MARK_COLOR === 'crimson' ? 'text-ink' : 'text-crimson'
+                    }`}
                   >
                     <Mark size={12} />
                   </span>

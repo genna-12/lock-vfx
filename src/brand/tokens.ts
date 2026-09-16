@@ -75,6 +75,23 @@ export const MOTION = {
 export const STAGE_BG: 'obsidian' | 'void' = 'obsidian';
 
 /**
+ * Il colore del marchio nel chrome **della home**.
+ *
+ * `ink` è com'è adesso: il lucchetto lassù è un punto fermo neutro, e il solo
+ * rosso persistente della schermata è il foro attivo della nav (R06). LockVFX
+ * ha chiesto di vedere il marchio rosso (`rifinitura-spec.md` §7.1): con
+ * `crimson` il lucchetto del chrome diventa rosso e — per forza — **il foro
+ * attivo torna `ink`**, perché due rossi persistenti nella stessa schermata
+ * non sono un marchio, sono un errore (§4: il rosso è contato).
+ *
+ * Vale solo per la home: nella pagina Studio il marchio resta `ink`. La
+ * parola "LockVFX" accanto non è mai rossa — è testo piccolo (§4).
+ *
+ * Su `v2` il default è `ink`, su `variante-a` è `crimson`.
+ */
+export const MARK_COLOR: 'ink' | 'crimson' = 'crimson';
+
+/**
  * La parola "LockVFX" accanto al marchio, nel chrome.
  *
  * Non sulla **prima schermata**, sì da lì in poi (Direzione, 9/9): «avevo

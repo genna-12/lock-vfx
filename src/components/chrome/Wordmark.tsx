@@ -1,5 +1,5 @@
 import { useRef, type MouseEvent } from 'react';
-import { WORDMARK_TEXT } from '../../brand/tokens';
+import { MARK_COLOR, WORDMARK_TEXT } from '../../brand/tokens';
 import { useCoarsePointer, useReducedMotion } from '../../lib/useReducedMotion';
 import { Mark } from '../brand/Mark';
 
@@ -70,7 +70,13 @@ export function Wordmark({ href = '#top', home = false, oltre = false, onTop }: 
           fino a quel momento questo resta invisibile — due lucchetti sullo
           schermo sarebbero due lucchetti (`rifinitura-spec.md` §2, fase E).
           Il Loader lo trova da qui e gli scrive la `visibility`. */}
-      <span data-chrome-mark className="flex">
+      {/* Il colore è solo del lucchetto, non della parola accanto: `MARK_COLOR`
+          decide fra il neutro di sempre e il rosso chiesto da LockVFX
+          (`rifinitura-spec.md` §7.1), e solo nella home. */}
+      <span
+        data-chrome-mark
+        className={`flex ${home && MARK_COLOR === 'crimson' ? 'text-crimson' : ''}`}
+      >
         <Mark size={18} shackleRef={shackleRef} />
       </span>
       <span

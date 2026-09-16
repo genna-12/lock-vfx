@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
-import { COLORS, LOADER_REPEAT, LOADER_SOURCE, MOTION } from '../brand/tokens';
+import { COLORS, LOADER_REPEAT, LOADER_SOURCE, MARK_COLOR, MOTION } from '../brand/tokens';
 import { EASE } from '../lib/ease';
 import {
   LOADER_TIMING,
@@ -315,7 +315,10 @@ export function Loader({ children }: { children: ReactNode }) {
       x: volo.dx,
       y: volo.dy,
       scale: volo.scale,
-      color: COLORS.ink,
+      // Il marchio in volo atterra del colore di quello che c'è lassù: con
+      // `MARK_COLOR = 'crimson'` (§7.1) il rosso non si spegne in arrivo,
+      // resta. Altrimenti è il solito passaggio a `ink`.
+      color: COLORS[MARK_COLOR],
       duration: LOADER_TIMING.fly / 1000,
       ease: EASE.arrive,
       onComplete: () => {
