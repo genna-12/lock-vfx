@@ -4,6 +4,7 @@ import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SETS, type SetId } from '../../brand/tokens';
 import { holdScroll } from '../../lib/camera';
+import { vaiAllaSezione } from '../../lib/scrollProgrammato';
 import { useCoarsePointer } from '../../lib/useReducedMotion';
 
 /**
@@ -68,7 +69,11 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // `vaiAllaSezione` fa due cose che qui servono tutte e due: spegne lo snap
+    // per la durata della corsa (con `mandatory`, su iOS, una corsa smooth
+    // viene riagganciata al punto di partenza e torna indietro) e calcola la
+    // meta senza guardare le trasformazioni.
+    vaiAllaSezione(target);
   }
 
   return (
