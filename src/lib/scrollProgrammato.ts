@@ -17,10 +17,24 @@
  * foglio senza `!important` e si toglie con `removeProperty`.
  */
 
-/** Riserva per i browser senza `scrollend`: più lunga di una corsa smooth. */
-const RISERVA_MS = 700;
+/**
+ * Riserva per i browser senza `scrollend` (Safari < 17.4).
+ *
+ * Non un tempo fisso: un tempo fisso è una scommessa sulla lunghezza della
+ * corsa, e la si perde. Misurato il 16/9: dalla cima al foro "Contact" —
+ * 2 532 px — lo scroll finisce a 726 ms e `scrollend` arriva a 738, cioè un
+ * timer di 700 ms riaccendeva lo snap **prima della fine della corsa**, che è
+ * esattamente il rimbalzo che M11 doveva chiudere. E le corse del Lotto 2
+ * (l'arrivo con `#studio`/`#contact`, il ritorno in cima) sono più lunghe.
+ *
+ * Quindi il timer si **riarma**: finché `scrollY` continua a cambiare si
+ * rimanda, e scatta solo quando la pagina è ferma da `FERMO_MS`. Il tetto è
+ * una rete di sicurezza — se qualcosa tiene viva la pagina per sempre, lo
+ * snap deve tornare comunque.
+ */
+const FERMO_MS = 180;
+const TETTO_MS = 4000;
 
-let riaccendi: number | undefined;
 let inCorsa: (() => void) | undefined;
 
 export function scrollProgrammato(vai: () => void): void {
@@ -36,17 +50,35 @@ export function scrollProgrammato(vai: () => void): void {
 
   scroller.style.scrollSnapType = 'none';
 
+  let y = window.scrollY;
+  let riserva = 0;
+  let tetto = 0;
+
   const fine = () => {
     if (inCorsa !== fine) return;
     inCorsa = undefined;
-    window.clearTimeout(riaccendi);
+    window.clearTimeout(riserva);
+    window.clearTimeout(tetto);
     window.removeEventListener('scrollend', fine);
+    window.removeEventListener('scroll', muove);
     scroller.style.removeProperty('scroll-snap-type');
+  };
+  /** Ogni volta che la pagina si muove la riserva riparte da capo. */
+  const arma = () => {
+    window.clearTimeout(riserva);
+    riserva = window.setTimeout(fine, FERMO_MS);
+  };
+  const muove = () => {
+    if (window.scrollY === y) return;
+    y = window.scrollY;
+    arma();
   };
   inCorsa = fine;
 
   window.addEventListener('scrollend', fine);
-  riaccendi = window.setTimeout(fine, RISERVA_MS);
+  window.addEventListener('scroll', muove, { passive: true });
+  arma();
+  tetto = window.setTimeout(fine, TETTO_MS);
 
   vai();
 }
