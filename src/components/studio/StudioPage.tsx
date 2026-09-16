@@ -169,19 +169,13 @@ export function StudioPage() {
             </h2>
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 min-[861px]:grid-cols-2">
               {PEOPLE.map((person) => (
-                <div key={person.email}>
+                <div key={person.vat}>
                   <h3 className="m-0 mb-1 text-[18px] font-medium">{person.name}</h3>
-                  {/* Ruolo, città e le due righe arrivano dai ragazzi: finché
-                      non ci sono, il segnaposto resta visibile e dichiarato. */}
+                  {/* Le due righe arrivano dai ragazzi: finché non ci sono, il
+                      segnaposto resta visibile e dichiarato. Il recapito no:
+                      l'indirizzo del sito è uno solo, ed è quello collettivo
+                      (R23) — qui sotto, nei contatti. */}
                   <p className="m-0 text-[15px] text-stone">{t('landing.persone.placeholder')}</p>
-                  <p className="m-0 mt-1 text-[15px]">
-                    <a
-                      href={`mailto:${person.email}`}
-                      className="text-stone transition-colors duration-[var(--f5)] hover:text-ink"
-                    >
-                      {person.email}
-                    </a>
-                  </p>
                 </div>
               ))}
             </div>

@@ -44,7 +44,6 @@
   },
   "contact": {
     "title": "Parliamone.",
-    "city": "[Città]",
     "fields": {
       "name": "Nome",
       "email": "Email",

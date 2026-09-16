@@ -1,25 +1,31 @@
 /**
  * Le persone dietro il nome collettivo.
  *
- * Sono dati, non testi: i nomi e gli indirizzi non si traducono, e devono
- * stare in un posto solo perché la Stanza — e domani il footer, che agli
- * stessi nomi aggiungerà le P.IVA — leggano la stessa lista.
+ * Sono dati, non testi: i nomi e i numeri non si traducono, e devono stare
+ * in un posto solo perché il footer e la Stanza leggano la stessa lista.
  *
- * ⚠ Segnaposto: nomi, email individuali, contatto collettivo e città veri
- * arrivano da LockVFX. Alla sostituzione cambia solo questo file (la città
- * sta in i18n insieme al resto della riga).
+ * **Nome e cognome per esteso, partita IVA, e nient'altro** (Direzione, 9/9,
+ * ticket R23; `handoff-legale.md` §1): niente email individuali — non
+ * esistono caselle personali e l'unico indirizzo del sito è quello
+ * collettivo —, niente città, niente ruoli. Nella lista dei lavori "ruolo"
+ * resta il ruolo di LockVFX **nel lavoro**, che è un'altra cosa.
  */
 export type Person = {
   name: string;
-  email: string;
   /** Partita IVA: obbligatoria in home page (art. 35 D.P.R. 633/1972). */
   vat: string;
 };
 
 export const PEOPLE: readonly Person[] = [
-  { name: '[Nome Cognome]', email: '[nome1]@lockvfx.com', vat: '[00000000000]' },
-  { name: '[Nome Cognome]', email: '[nome2]@lockvfx.com', vat: '[00000000000]' },
+  { name: 'Denis Ruscitti', vat: '04397621204' },
+  { name: 'Nicholas Pantieri', vat: '02829650395' },
 ];
 
-/** L'indirizzo collettivo: la riga sotto i nomi, e il rimedio se l'invio fallisce. */
+/**
+ * L'indirizzo collettivo: l'unico del sito — sotto i nomi nella Stanza, nel
+ * footer, e il rimedio se l'invio fallisce.
+ *
+ * ⚠ Segnaposto dichiarato: l'indirizzo vero manca ancora
+ * (`cosa-ci-serve-da-lockvfx.md`).
+ */
 export const CONTACT = { email: 'info@lockvfx.com' } as const;

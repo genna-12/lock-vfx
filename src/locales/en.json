@@ -44,7 +44,6 @@
   },
   "contact": {
     "title": "Let’s talk.",
-    "city": "[City]",
     "fields": {
       "name": "Name",
       "email": "Email",

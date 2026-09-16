@@ -21,16 +21,19 @@ export function CollectiveLine({ className }: { className?: string }) {
   );
 }
 
-/** Le due righe con la partita IVA: mono, l'unico posto dove resta. */
+/**
+ * Le due righe con la partita IVA: mono, l'unico posto dove resta.
+ *
+ * Nome, cognome e numero. **Nient'altro**: niente email individuale (non
+ * esistono caselle personali: l'indirizzo del sito è uno solo, ed è qui
+ * sopra nell'invito), niente città, niente ruoli — Direzione 9/9, R23.
+ */
 export function VatLines({ className }: { className?: string }) {
   return (
     <ul className={`flex flex-col gap-1.5 font-mono text-[12px] leading-[1.6] text-stone ${className ?? ''}`}>
       {PEOPLE.map((person) => (
-        <li key={person.email}>
-          {person.name} — P.IVA {person.vat} —{' '}
-          <a href={`mailto:${person.email}`} className="transition-colors duration-200 hover:text-ink">
-            {person.email}
-          </a>
+        <li key={person.vat}>
+          {person.name} — P. IVA {person.vat}
         </li>
       ))}
     </ul>

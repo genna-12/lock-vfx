@@ -303,21 +303,17 @@ export function Stanza() {
           <span ref={markRef} className="shrink-0 text-ink">
             <Mark size={markH} mode={closed ? 'solid' : 'outline'} shackleRef={shackleRef} />
           </span>
+          {/* I due nomi, e sotto l'**unico** indirizzo del sito. Niente email
+              personali, niente città, niente ruoli (Direzione, 9/9 — R23):
+              non esistono caselle individuali, e scriverle sarebbe dare un
+              recapito che non risponde. */}
           <div className="hidden flex-col gap-[7px] text-[14px] md:flex md:gap-[10px] md:text-[16px]">
             {PEOPLE.map((person) => (
-              <div key={person.email}>
-                <span className="font-medium">{person.name}</span>
-                <span className="mx-2 text-stone">—</span>
-                <a
-                  href={`mailto:${person.email}`}
-                  className="text-stone transition-colors duration-[var(--f5)] hover:text-crimson"
-                >
-                  {person.email}
-                </a>
+              <div key={person.vat} className="font-medium">
+                {person.name}
               </div>
             ))}
             <div className="mt-1 text-t4 text-stone">
-              {t('contact.city')} ·{' '}
               <a
                 href={`mailto:${CONTACT.email}`}
                 className="transition-colors duration-[var(--f5)] hover:text-crimson"
