@@ -3,15 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { segui } from '../lib/agganci';
 import { CONTACT } from '../data/people';
 import { CollectiveLine, PolicyLinks, VatLines } from './legal/LegalLines';
+import { GlassPanel } from './ui/GlassPanel';
 
 /**
  * Il footer.
  *
  * Struttura e contenuti sono quelli del sito precedente, come chiesto da
  * LockVFX: riquadro con l'invito a scrivere, quattro colonne, riga finale.
- * Quello che è cambiato è la materia: niente vetro, niente tilt, niente
- * pillola traslucida — un pannello fermo con un filo di bordo, e il
- * pulsante è lo stesso del form, perché fanno la stessa cosa.
+ * Quello che è cambiato è la materia: niente vetro, niente pillola
+ * traslucida — un pannello con un filo di bordo, e il pulsante è lo stesso
+ * del form, perché fanno la stessa cosa. L'unica cosa che LockVFX ha
+ * chiesto indietro è il cenno della card sotto il puntatore, e sta dietro
+ * `FOOTER_CARD` (`GlassPanel`, `rifinitura-spec.md` §7.6): opaca comunque,
+ * ferma su touch e con reduced motion.
  *
  * Il footer è anche l'unico posto del sito dove la legge chiede di essere
  * esplicita: le due partite IVA in chiaro e la frase sul nome collettivo
@@ -83,10 +87,12 @@ export function Footer() {
       className="u-pad relative w-full bg-void pb-[calc(5rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(7rem+env(safe-area-inset-bottom,0px))]"
       style={{ paddingTop: 'max(calc(var(--pad) * 2), 5rem)' }}
     >
-      {/* L'invito. Un pannello fermo: il raggio grande è l'unica forma
-          arrotondata del sito oltre alle anteprime, ed è voluta — questo
-          blocco è un cartello, non una superficie dello spazio. */}
-      <section className="mx-auto mb-16 max-w-5xl rounded-[24px] border border-dust/25 p-10 md:p-14">
+      {/* L'invito. Il raggio grande è l'unica forma arrotondata del sito
+          oltre alle anteprime, ed è voluta — questo blocco è un cartello,
+          non una superficie dello spazio. Fermo o inclinabile lo decide
+          `FOOTER_CARD` (§7.6): è l'unico pezzo del sito a cui il tilt è
+          ammesso, e comunque mai su touch né con reduced motion. */}
+      <GlassPanel className="mx-auto mb-16 max-w-5xl rounded-[24px] border border-dust/25 p-10 md:p-14">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           {/* Dov'è il rosso, qui dentro. Non nel richiamo — una riga cap di
               13 px in `crimson` è rosso usato come colore, ed è anche sotto
@@ -124,7 +130,7 @@ export function Footer() {
             <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </div>
-      </section>
+      </GlassPanel>
 
       <div className="mx-auto mb-16 grid max-w-5xl grid-cols-2 gap-10 md:grid-cols-4">
         {/* Chi siamo, per davvero: la frase sul nome collettivo e le due
