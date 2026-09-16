@@ -61,6 +61,10 @@ export function Sala({ works }: SalaProps) {
   const flat = useStageStatic();
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
+  // Il segno che compare al tap sul video (pausa o ripresa) e sparisce da
+  // solo: non è un comando, è la conferma che il tap è arrivato.
+  const [segno, setSegno] = useState<'play' | 'pause' | null>(null);
+  const segnoTimer = useRef(0);
   const [portrait, setPortrait] = useState(false);
   const [compact, setCompact] = useState(false);
 
@@ -109,6 +113,19 @@ export function Sala({ works }: SalaProps) {
   );
 
   useEffect(() => () => window.clearTimeout(awakeTimer.current), []);
+  useEffect(() => () => window.clearTimeout(segnoTimer.current), []);
+
+  /** Tap sul video: pausa o riprendi, con un segno che si spegne da solo. */
+  const tapSulVideo = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const inPausa = video.paused;
+    if (inPausa) void video.play().catch(() => undefined);
+    else video.pause();
+    setSegno(inPausa ? 'play' : 'pause');
+    window.clearTimeout(segnoTimer.current);
+    segnoTimer.current = window.setTimeout(() => setSegno(null), 700);
+  }, []);
 
   // In verticale su telefono l'HUD non si nasconde: lì è impaginazione, non
   // un velo che copre il film.
@@ -357,6 +374,7 @@ export function Sala({ works }: SalaProps) {
             ref={videoRef}
             className="h-full w-full object-cover"
             poster={work.poster}
+            autoPlay={WORKS_HAVE_VIDEO && !reduced}
             muted
             loop={false}
             playsInline
@@ -365,18 +383,26 @@ export function Sala({ works }: SalaProps) {
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
           />
+
+          {/* Il video parte da solo: nessun pulsante "riproduci" — non è mai
+              stato chiesto e occuperebbe l'immagine (`mobile-semplice-spec.md`
+              §5). Il tap sul video mette in pausa e riprende, e il segno che
+              compare lo dice per mezzo secondo. Il riquadro invisibile sta
+              sotto i due comandi in alto a destra, che hanno lo `z-10`. */}
           <button
             type="button"
-            onClick={() => {
-              const video = videoRef.current;
-              if (video && WORKS_HAVE_VIDEO) void video.play().catch(() => undefined);
-              toggleFullscreen();
-            }}
-            aria-label={t('sala.play')}
-            className="u-cap absolute inset-0 grid place-items-center text-ink"
+            onClick={tapSulVideo}
+            aria-label={t(playing ? 'sala.pause' : 'sala.play')}
+            className="absolute inset-0 grid place-items-center"
           >
-            <span className="rounded-frame border border-dust/50 bg-void/60 px-5 py-3">
-              {t('sala.play')}
+            <span
+              aria-hidden
+              className="grid h-14 w-14 place-items-center rounded-full bg-void/60 text-ink transition-opacity duration-[var(--f5)]"
+              style={{ opacity: segno ? 1 : 0 }}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                {segno === 'pause' ? <path d="M9 5v14M15 5v14" /> : <path d="M7 4l13 8-13 8V4z" />}
+              </svg>
             </span>
           </button>
 
