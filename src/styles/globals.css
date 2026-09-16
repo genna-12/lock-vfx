@@ -484,10 +484,15 @@
   scroll-snap-type: y mandatory;
 }
 
-/* Con un campo a fuoco lo snap si spegne: la tastiera accorcia la finestra,
-   la sezione resta alta come lo schermo intero e lo snap incastrerebbe chi
-   sta scrivendo. */
-.snap:has(:focus) {
+/* Con un **campo** a fuoco lo snap si spegne: la tastiera accorcia la
+   finestra, la sezione resta alta come lo schermo intero e lo snap
+   incastrerebbe chi sta scrivendo.
+
+   Solo i campi, non un elemento qualsiasi: con `:has(:focus)` bastava un tap
+   su un foro della nav — che resta a fuoco — per lasciare lo snap spento per
+   tutto il resto della visita (misurato dopo il tap: `scroll-snap-type: none`
+   con lo stile inline gia' pulito). La tastiera la aprono questi tre. */
+.snap:has(input:focus, textarea:focus, select:focus) {
   scroll-snap-type: none;
 }
 
@@ -503,22 +508,26 @@
   scroll-snap-align: start;
 }
 
-/* L'unico movimento rimasto sul telefono: ogni sezione entra una volta
-   sola, con una dissolvenza corta e dodici pixel di salita. Ad accenderla e'
-   l'`IntersectionObserver` dello Stage a soglia 0,55 (`data-seen`); con
-   `prefers-reduced-motion` la transizione globale la riduce a un istante, e
-   resta un cambio secco. */
+/* L'unico movimento rimasto sul telefono: ogni sezione entra una volta sola,
+   con una dissolvenza corta. Ad accenderla e' l'`IntersectionObserver` dello
+   Stage a soglia 0,55 (`data-seen`); con `prefers-reduced-motion` la
+   transizione globale la riduce a un istante, e resta un cambio secco.
+
+   **Niente piu' salita di dodici pixel** (M12, 9/9). La Direzione sentiva
+   «degli scatti nel momento in cui si scrolla», e la traccia dice quale
+   delle due cause era: durante un trascinamento lento la posizione di scroll
+   e' **monotona** — zero inversioni, zero arretramenti, quindi non e' il
+   motore di snap che riaggancia — mentre il contenuto della sezione che
+   entra si alza di dodici pixel **mentre il dito e' ancora giu'** e si sta
+   guardando. Quel movimento e' lo scatto. La dissolvenza resta: l'opacita'
+   non sposta niente. */
 .snap .stage [data-set] {
   opacity: 0;
-  transform: translateY(12px);
-  transition:
-    opacity var(--f8) linear,
-    transform var(--f8) var(--ease-arrive);
+  transition: opacity var(--f8) linear;
 }
 
 .snap .stage [data-set][data-seen='true'] {
   opacity: 1;
-  transform: none;
 }
 
 /* Le luci restano, ma qui sono ferme e a schermo: si accendono con la
