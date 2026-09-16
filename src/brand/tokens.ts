@@ -71,8 +71,13 @@ export const MOTION = {
  * confrontarle senza rifare la timeline: `obsidian` e' com'e' adesso.
  *
  * ⚠ In attesa della scelta: le due prove sono in `materiale/prove/`.
+ *
+ * Con `void` lo spazio è nero da cima a fondo e la stanza rischia di
+ * sparirci dentro: la luce SALA sale dal 10 % al 14 % per tenerla
+ * (`rifinitura-spec.md` §4, ed è l'unica luce che si muove). Su `v2` il
+ * default è `obsidian`, su `variante-a` è `void`.
  */
-export const STAGE_BG: 'obsidian' | 'void' = 'obsidian';
+export const STAGE_BG: 'obsidian' | 'void' = 'void';
 
 /**
  * Il colore del marchio nel chrome **della home**.
@@ -146,11 +151,18 @@ export const CAMERA = {
  * Le luci sono opacità di layer, mai `filter` — un filtro in animazione
  * costa un repaint per fotogramma e appiattisce i figli 3D.
  */
+/** Il valore di `--light-sala` in `globals.css`: il fondo `obsidian`. */
+const LIGHT_SALA_BASE = 'rgb(255 246 232 / 0.1)';
+
 export const LIGHTS = {
   /** Schermo: nessuna luce, il video è la sorgente. */
   schermo: null,
-  /** Sala: luce dall'alto, fredda solo quanto basta. */
-  sala: 'rgb(255 246 232 / 0.1)',
+  /**
+   * Sala: luce dall'alto, fredda solo quanto basta. Sul fondo tutto nero
+   * (`STAGE_BG = 'void'`) sale al 14 %: senza lo stacco dell'`obsidian` è
+   * la luce l'unica cosa che tiene la stanza staccata dal nero (§4).
+   */
+  sala: STAGE_BG === 'void' ? 'rgb(255 246 232 / 0.14)' : LIGHT_SALA_BASE,
   /** Taglio: key calda da sinistra. */
   taglio: 'rgb(255 236 214 / 0.15)',
 } as const;
@@ -181,7 +193,9 @@ const CSS_MIRROR: Array<[string, string]> = [
   ['--f8', `${MOTION.f8}ms`],
   ['--f12', `${MOTION.f12}ms`],
   ['--smooth', `${CAMERA.smooth}s`],
-  ['--light-sala', LIGHTS.sala],
+  // Il confronto è col valore scritto in `globals.css`: l'aumento che porta
+  // `STAGE_BG = 'void'` lo scrive lo Stage sul proprio nodo, non su `:root`.
+  ['--light-sala', LIGHT_SALA_BASE],
   ['--light-taglio', LIGHTS.taglio],
   ['--pad', SPACE.pad],
   ['--gap-section', SPACE.sectionGap],

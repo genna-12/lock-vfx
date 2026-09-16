@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
-import { CAMERA, COLORS, STAGE_BG, type SetId } from '../../brand/tokens';
+import { CAMERA, COLORS, LIGHTS, STAGE_BG, type SetId } from '../../brand/tokens';
 import {
   MOVE,
   SALA_LIVE,
@@ -97,6 +97,12 @@ export function Stage({ onActiveChange }: StageProps) {
     if (!root) return;
 
     const html = document.documentElement;
+
+    // L'intensità della luce SALA dipende dal fondo dello spazio: si scrive
+    // qui, sul nodo dello stage, così `:root` resta quello di `globals.css`
+    // e le luci — che stanno qui dentro — la ereditano. Con `STAGE_BG =
+    // 'obsidian'` riscrive lo stesso valore che c'era.
+    root.style.setProperty('--light-sala', LIGHTS.sala);
 
     /* ---- la sonda ------------------------------------------------------
        `?probe=1` nell'indirizzo, e nient'altro: un pannello che dice i
