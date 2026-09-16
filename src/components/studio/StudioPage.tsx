@@ -86,8 +86,12 @@ export function StudioPage() {
       <div className="u-pad sticky top-0 z-10 flex items-center justify-between bg-linear-to-b from-void from-70% to-transparent py-[26px]">
         <Wordmark href={import.meta.env.BASE_URL} />
         <div className="flex items-center gap-7">
+          {/* "Torna al sito" riporta **allo Studio**, non in cima: da lì si
+              è arrivati, e rimettere davanti tutta la carrellata sarebbe far
+              rifare la strada a chi è appena tornato indietro (§7.7 — R21).
+              La home, arrivando con `#studio`, taglia sulla sezione. */}
           <a
-            href={import.meta.env.BASE_URL}
+            href={`${import.meta.env.BASE_URL}#studio`}
             className="text-[14px] text-stone transition-colors duration-[var(--f5)] hover:text-ink"
           >
             ← {t('landing.back')}

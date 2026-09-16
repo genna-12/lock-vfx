@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { assertTokensInSync, type SetId } from './brand/tokens';
+import { agganciDiArrivo } from './lib/agganci';
 import { applyHead } from './lib/head';
 import { inCima } from './lib/inCima';
 import { Loader } from './components/Loader';
@@ -10,6 +11,7 @@ import { PerfNav } from './components/chrome/PerfNav';
 import { Stage } from './components/stage/Stage';
 import { Footer } from './components/Footer';
 import { PrivacyDialog } from './components/ui/PrivacyDialog';
+import { quandoEntrati } from './lib/loadProgress';
 
 /**
  * Struttura della pagina.
@@ -29,6 +31,11 @@ export default function App() {
   const handleActiveChange = useCallback((id: SetId) => setActive(id), []);
 
   useEffect(() => assertTokensInSync(), []);
+  // Si arriva con `#studio` o `#contact` (da "Torna al sito", da uno
+  // "Scrivici" della pagina Studio, da un link condiviso): appena l'overlay
+  // ha staccato si taglia sulla sezione, senza rifare la carrellata davanti
+  // a chi ha già scelto dove andare.
+  useEffect(() => quandoEntrati(agganciDiArrivo), []);
   useEffect(() => {
     applyHead({
       title: t('meta.title'),

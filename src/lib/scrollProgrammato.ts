@@ -93,10 +93,12 @@ export function scrollProgrammato(vai: () => void): void {
  * le trasformazioni non le vede, e domani qualcuno rimetterà un `transform`
  * su una sezione senza pensare a questa funzione.
  */
-export function vaiAllaSezione(el: HTMLElement): void {
+export function vaiAllaSezione(el: HTMLElement, comportamento: ScrollBehavior = 'smooth'): void {
   let top = 0;
   for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) {
     top += n.offsetTop;
   }
-  scrollProgrammato(() => window.scrollTo({ top, behavior: 'smooth' }));
+  // `auto` è lo stacco: si arriva da un'altra pagina già sapendo dove si va,
+  // e non si guarda scorrere mezzo sito per arrivarci.
+  scrollProgrammato(() => window.scrollTo({ top, behavior: comportamento }));
 }

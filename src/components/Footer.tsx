@@ -1,5 +1,6 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { segui } from '../lib/agganci';
 import { CONTACT } from '../data/people';
 import { CollectiveLine, PolicyLinks, VatLines } from './legal/LegalLines';
 
@@ -65,6 +66,13 @@ export function Footer() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
   const link = 'text-t3 text-stone transition-colors duration-200 hover:text-ink';
+  /* I link alle sezioni del footer sono àncore vere — senza JavaScript
+     funzionano — ma con la carrellata un'ancora non basta: i quattro set
+     stanno nello stesso punto della pagina e li separa la posizione di
+     scroll dentro il pin. `segui` porta la camera dove dice il link, e sul
+     telefono spegne lo snap per la durata della corsa. */
+  const alSet = (event: MouseEvent<HTMLAnchorElement>) =>
+    segui(event, event.currentTarget.getAttribute('href') ?? '');
 
   return (
     <footer
@@ -100,11 +108,16 @@ export function Footer() {
               </a>
             </h2>
           </div>
-          {/* Il pulsante non passa dal rosso: «il rosso è segnale e marchio;
+          {/* "Scrivici" porta al **form**, non al client di posta: il form è
+              il modo che il sito offre per scrivere, e la casella resta lì
+              sopra per chi preferisce la sua (§7.8 — R22).
+
+              Il pulsante non passa dal rosso: «il rosso è segnale e marchio;
               mai testo piccolo, mai sfondo» (§4). Sotto il puntatore schiara,
               come la CTA della pagina Studio. */}
           <a
-            href={`mailto:${CONTACT.email}`}
+            href="#contact"
+            onClick={alSet}
             className="u-cap group flex h-[46px] shrink-0 items-center gap-2 self-start bg-ink px-6 text-void transition-colors duration-[var(--f5)] hover:bg-white"
           >
             {t('footer.cta.button')}
@@ -125,16 +138,16 @@ export function Footer() {
         <div>
           <p className="u-cap mb-4 text-stone">{t('footer.columns.studio.title')}</p>
           <ul className="flex flex-col gap-2.5">
-            <li><a href="#reel" className={link}>{t('nav.reel')}</a></li>
-            <li><a href="#studio" className={link}>{t('nav.studio')}</a></li>
-            <li><a href="#work" className={link}>{t('nav.work')}</a></li>
+            <li><a href="#reel" onClick={alSet} className={link}>{t('nav.reel')}</a></li>
+            <li><a href="#studio" onClick={alSet} className={link}>{t('nav.studio')}</a></li>
+            <li><a href="#work" onClick={alSet} className={link}>{t('nav.work')}</a></li>
           </ul>
         </div>
 
         <div>
           <p className="u-cap mb-4 text-stone">{t('footer.columns.contact.title')}</p>
           <ul className="flex flex-col gap-2.5">
-            <li><a href="#contact" className={link}>{t('footer.columns.contact.write')}</a></li>
+            <li><a href="#contact" onClick={alSet} className={link}>{t('footer.columns.contact.write')}</a></li>
             <li><a href={`mailto:${CONTACT.email}`} className={link}>{CONTACT.email}</a></li>
           </ul>
         </div>
