@@ -48,7 +48,7 @@ export default function App() {
       </a>
 
       <header className="u-pad pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between py-[var(--pad)]">
-        <Wordmark home />
+        <Wordmark home oltre={active !== 'reel'} />
         <LangPill />
       </header>
       <PerfNav active={active} />
