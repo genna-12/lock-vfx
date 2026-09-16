@@ -152,6 +152,17 @@
 /* ---------- Componenti minimi ------------------------------------------- */
 
 @layer components {
+  /* ---- Il marchio del chrome respira ---------------------------------
+     Col puntatore sopra, la staffa si solleva di tre unita' di viewBox e
+     torna (`rifinitura-spec.md` §3): il lucchetto e' un oggetto, non
+     un'immagine, e lo si impara toccandolo. Tre unita' sono 3px **nello
+     spazio utente dell'SVG**, non a schermo — su un marchio alto 18 px si
+     leggono come mezzo pixel di respiro. Niente su touch: la regola la
+     accende il JS solo dove c'e' un puntatore fine. */
+  [data-chrome-mark] [data-mark='shackle'] {
+    transition: transform var(--f5) var(--ease-arrive);
+  }
+
   /* Etichetta maiuscola: l'unico trattamento "tecnico" ammesso nella UI. */
   .u-cap {
     font-family: var(--font-text);

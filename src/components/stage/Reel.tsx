@@ -49,6 +49,13 @@ export function Reel() {
   const fillRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
   const [manualPlay, setManualPlay] = useState(false);
+  /* L'icona dell'audio non sta sempre lì: si sveglia al primo movimento del
+     puntatore sulla reel, con la stessa salita di 16 px dell'HUD della Sala
+     (`rifinitura-spec.md` §3). I due schermi del sito si comportano allo
+     stesso modo, e la prima schermata resta quello che deve essere: il
+     girato, e nient'altro. Chi arriva col tastierino la trova comunque, al
+     fuoco. */
+  const [audioSveglio, setAudioSveglio] = useState(false);
 
   // Reduced motion o risparmio dati: il poster resta fermo e il video parte
   // solo se lo si chiede. Sono due utenti diversi con lo stesso bisogno.
@@ -179,7 +186,11 @@ export function Reel() {
       {/* Come la sala e la stanza: fuori scena i controlli escono dal giro
           del Tab, altrimenti si arriva col tastierino sul play di un set
           alle spalle della camera. */}
-      <div className="absolute inset-0 bg-void" inert={!inScene}>
+      <div
+        className="absolute inset-0 bg-void"
+        inert={!inScene}
+        onPointerMove={() => setAudioSveglio(true)}
+      >
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover [object-position:50%_50%]"
@@ -211,9 +222,16 @@ export function Reel() {
           <button
             type="button"
             onClick={toggleAudio}
+            onFocus={() => setAudioSveglio(true)}
             aria-pressed={!muted}
             aria-label={t(muted ? 'reel.audioOn' : 'reel.audioOff')}
             className="absolute right-[var(--pad)] bottom-8 grid h-11 w-11 place-items-center text-ink/80 transition-colors duration-200 hover:text-ink"
+            style={{
+              opacity: audioSveglio ? 1 : 0,
+              transform: audioSveglio ? 'none' : 'translateY(16px)',
+              pointerEvents: audioSveglio ? 'auto' : 'none',
+              transition: 'opacity var(--f5) linear, transform var(--f5) var(--ease-arrive)',
+            }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
               <path d="M4 9v6h3.5L13 19V5L7.5 9H4z" />

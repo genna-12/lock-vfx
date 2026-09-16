@@ -1,5 +1,6 @@
-import type { MouseEvent } from 'react';
+import { useRef, type MouseEvent } from 'react';
 import { WORDMARK_TEXT } from '../../brand/tokens';
+import { useCoarsePointer, useReducedMotion } from '../../lib/useReducedMotion';
 import { Mark } from '../brand/Mark';
 
 /**
@@ -32,13 +33,36 @@ type WordmarkProps = {
   onTop?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
+/** Di quanto si solleva la staffa sotto il puntatore, in unità di viewBox. */
+const RESPIRO = 3;
+
 export function Wordmark({ href = '#top', home = false, oltre = false, onTop }: WordmarkProps) {
   const parola = WORDMARK_TEXT === 'always' || !home || oltre;
+  const shackleRef = useRef<SVGPathElement>(null);
+  const coarse = useCoarsePointer();
+  const reduce = useReducedMotion();
+
+  /**
+   * Il lucchetto respira quando lo tocchi: la staffa si solleva di tre unità
+   * e torna (`rifinitura-spec.md` §3). È gratis, e insegna che quello lassù
+   * è un oggetto — quindi che ci si può fare click.
+   *
+   * Niente su touch: lì "hover" vuol dire "ho già premuto", e un lucchetto
+   * che si apre mentre si torna in cima direbbe la cosa sbagliata.
+   */
+  const respira = (su: boolean) => {
+    if (coarse || reduce) return;
+    const el = shackleRef.current;
+    if (el) el.style.transform = su ? `translateY(-${RESPIRO}px)` : '';
+  };
 
   return (
     <a
       href={href}
       onClick={onTop}
+      onPointerEnter={() => respira(true)}
+      onPointerLeave={() => respira(false)}
+      onBlur={() => respira(false)}
       aria-label="LockVFX"
       className="pointer-events-auto flex items-center gap-2.5 text-ink transition-opacity duration-200 hover:opacity-70"
     >
@@ -47,7 +71,7 @@ export function Wordmark({ href = '#top', home = false, oltre = false, onTop }: 
           schermo sarebbero due lucchetti (`rifinitura-spec.md` §2, fase E).
           Il Loader lo trova da qui e gli scrive la `visibility`. */}
       <span data-chrome-mark className="flex">
-        <Mark size={18} />
+        <Mark size={18} shackleRef={shackleRef} />
       </span>
       <span
         aria-hidden
