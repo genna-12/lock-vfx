@@ -1,8 +1,5 @@
-import gsap from 'gsap';
-import { ScrollSmoother } from 'gsap/ScrollSmoother';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CAMERA, SETS, type SetId } from '../brand/tokens';
-import { holdScroll } from './camera';
+import { carrellataViva } from './carrellataViva';
 import { vaiAllaSezione } from './scrollProgrammato';
 
 /**
@@ -45,24 +42,12 @@ export function vaiAlSet(id: SetId, modo: 'corsa' | 'stacco' = 'corsa'): void {
     if (id === 'contact') fuocoSulForm();
   };
 
-  const stage = ScrollTrigger.getById('stage');
-  const smoother = ScrollSmoother.get();
-  if (stage && smoother) {
-    const meta = holdScroll(stage, id);
-    if (modo === 'stacco') {
-      smoother.scrollTop(meta);
-      arrivato();
-      return;
-    }
-    // Si anima la posizione dello smoother — barra e camera insieme, ogni
-    // fotogramma. Il perché sta in `inCima.ts`.
-    gsap.to(smoother, {
-      scrollTop: meta,
-      duration: CAMERA.smooth,
-      ease: CAMERA.t1,
-      overwrite: 'auto',
-      onComplete: arrivato,
-    });
+  // Con la camera in scena la corsa è sua: barra e camera insieme, ogni
+  // fotogramma. Il come sta in `stage/carrellata.ts`, che è il chunk che sul
+  // telefono non si scarica; il perché, in `inCima.ts`.
+  const camera = carrellataViva();
+  if (camera) {
+    camera.vaiAlSet(id, modo, arrivato);
     return;
   }
 

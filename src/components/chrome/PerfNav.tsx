@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollSmoother } from 'gsap/ScrollSmoother';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MOTION, SETS, type SetId } from '../../brand/tokens';
-import { holdScroll } from '../../lib/camera';
+import { carrellataViva } from '../../lib/carrellataViva';
 import { isReturningVisit, quandoEntrati } from '../../lib/loadProgress';
 import { vaiAllaSezione } from '../../lib/scrollProgrammato';
 import { Mark } from '../brand/Mark';
@@ -129,11 +127,10 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
   // (reduced motion, JS a terra) non si intercetta il click: l'ancora resta
   // un'ancora e funziona da sola.
   function goToHold(event: MouseEvent<HTMLAnchorElement>, id: SetId) {
-    const stage = ScrollTrigger.getById('stage');
-    const smoother = ScrollSmoother.get();
-    if (stage && smoother) {
+    const camera = carrellataViva();
+    if (camera) {
       event.preventDefault();
-      smoother.scrollTo(holdScroll(stage, id), true);
+      camera.vaiAllHold(id);
       return;
     }
     // Senza carrellata le sezioni sono quattro blocchi veri, uno sotto
