@@ -90,6 +90,21 @@ export const STAGE_BG: 'obsidian' | 'void' = 'obsidian';
 export const WORDMARK_TEXT: 'always' | 'after-first-screen' = 'after-first-screen';
 
 /**
+ * Il colore del marchio nel chrome.
+ *
+ * Nata come variante (`rifinitura-spec.md` §7.1), è diventata la direzione:
+ * §9.1 — «dobbiamo usare esattamente il loro logo» — fissa `crimson` come
+ * default, **in tutte le pagine**, e con la staffa chiusa: lassù non c'è una
+ * metafora che si chiude, c'è il loro logo. La costante resta perché il
+ * rosso nel chrome è una scelta di marca, non una legge del codice.
+ *
+ * Da qui la conseguenza già prevista in §7.1: il foro attivo della nav non
+ * porta più il marchio (R06 annullato). Due lucchetti rossi sulla stessa
+ * riga sono uno di troppo.
+ */
+export const MARK_COLOR: 'ink' | 'crimson' = 'crimson';
+
+/**
  * Chi disegna il lucchetto che si chiude, all'ingresso.
  *
  * `drawn` è la coreografia del sito (i tre path che si tracciano, la staffa

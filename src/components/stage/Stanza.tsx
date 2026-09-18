@@ -301,7 +301,11 @@ export function Stanza() {
           {/* Il colore sta sul contenitore: il fotogramma rosso della
               chiusura è del marchio intero, non della sola staffa. */}
           <span ref={markRef} className="shrink-0 text-ink">
-            <Mark size={markH} mode={closed ? 'solid' : 'outline'} shackleRef={shackleRef} />
+            {/* Riempito sempre (§9.1): è il loro logo anche qui. L'unica
+                staffa che si muove nel sito resta questa, perché è l'unico
+                posto dove chiudersi vuol dire qualcosa — il messaggio è
+                partito. */}
+            <Mark size={markH} shackleRef={shackleRef} />
           </span>
           {/* I due nomi, e sotto l'**unico** indirizzo del sito. Niente email
               personali, niente città, niente ruoli (Direzione, 9/9 — R23):

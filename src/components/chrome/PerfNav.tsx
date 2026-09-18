@@ -4,15 +4,14 @@ import { MOTION, SETS, type SetId } from '../../brand/tokens';
 import { carrellataViva } from '../../lib/carrellataViva';
 import { isReturningVisit, quandoEntrati } from '../../lib/loadProgress';
 import { vaiAllaSezione } from '../../lib/scrollProgrammato';
-import { Mark } from '../brand/Mark';
 import { useCoarsePointer, useReducedMotion } from '../../lib/useReducedMotion';
 
 /**
  * Navigazione = quattro perforazioni di pellicola, una per HOLD.
  *
  * La forma non è decorativa: è la stessa perforazione che sta sul bordo del
- * marchio. Il foro attivo è pieno `crimson` (l'unico rosso persistente del
- * sito); l'etichetta compare a sinistra su hover o quando il foro è attivo.
+ * marchio. Il foro attivo è pieno `ink`, gli altri sono contorni `stone` al
+ * 40 % (§9.1); l'etichetta compare a sinistra su hover o quando è attivo.
  *
  * Sono àncore vere: senza JS la nav resta una lista di link funzionante.
  * Lo step 2 sostituisce il salto nativo con `smoother.scrollTo()` e collega
@@ -189,30 +188,21 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                 >
                   {t(`nav.${id}`)}
                 </span>
-                {/* Dove si è, la perforazione **diventa il marchio**: 12 px,
-                    rosso, al posto del rettangolo pieno
-                    (`rifinitura-spec.md` §4). È uno dei quattro posti in cui
-                    il lucchetto rosso è ammesso, ed è quello che lavora di
-                    più: dice dove si è e, dicendolo, ripete il marchio. Il
-                    riquadro resta 9x13 perché la fila non si muova quando
+                {/* Quattro perforazioni uguali: dove si è è piena `ink`, le
+                    altre sono il contorno `stone` al 40 %
+                    (`rifinitura-spec.md` §9.1). Il marchio qui non ci sta più
+                    — R06 è annullato: il lucchetto rosso ora vive in alto a
+                    sinistra, ed era il secondo della riga a non farsi capire.
+                    Il riquadro resta 9x13 perché la fila non si muova quando
                     l'attivo cambia. */}
-                {isActive ? (
-                  <span
-                    aria-hidden
-                    className="grid h-[13px] w-[9px] place-items-center text-crimson"
-                  >
-                    <Mark size={12} />
-                  </span>
-                ) : (
-                  <span
-                    aria-hidden
-                    className={`block h-[13px] w-[9px] rounded-[2px] border transition-colors duration-200 ${
-                      lampo
-                        ? 'border-ink bg-ink'
-                        : 'border-dust bg-transparent group-hover:border-stone'
-                    }`}
-                  />
-                )}
+                <span
+                  aria-hidden
+                  className={`block h-[13px] w-[9px] rounded-[2px] border transition-colors duration-200 ${
+                    isActive || lampo
+                      ? 'border-ink bg-ink'
+                      : 'border-stone/40 bg-transparent group-hover:border-stone'
+                  }`}
+                />
               </a>
             </li>
           );

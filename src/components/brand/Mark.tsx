@@ -17,9 +17,10 @@ import { MARK_VIEWBOX } from '../../brand/mark';
  * cosi' chi anima (il Loader col progresso, la Stanza all'invio) lavora con
  * il numero del disegno e non con una conversione in px.
  *
- * Due modi: `solid` (pieno, per il wordmark e la favicon) e `outline`
- * (contorno di 1,5 px reali, per il Loader e la Stanza). Chiuso e pieno
- * sono la stessa cosa: e' il gesto della fine del caricamento e dell'invio.
+ * Dal 18/9 (§9.1) il marchio in pagina e' **sempre pieno**: nel chrome, nel
+ * loader e nella conferma della Stanza. Il modo `outline` resta solo per la
+ * riserva disegnata del loader (`LOADER_SOURCE = 'drawn'`), dove i tre path
+ * si tracciano e un contorno e' l'unico modo per tracciare qualcosa.
  */
 
 type MarkProps = {

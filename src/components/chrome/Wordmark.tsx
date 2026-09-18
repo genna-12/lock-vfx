@@ -1,5 +1,6 @@
 import { useRef, type MouseEvent } from 'react';
-import { WORDMARK_TEXT } from '../../brand/tokens';
+import { MARK_COLOR, WORDMARK_TEXT } from '../../brand/tokens';
+import { SHACKLE_CLOSED } from '../../brand/mark';
 import { useCoarsePointer, useReducedMotion } from '../../lib/useReducedMotion';
 import { Mark } from '../brand/Mark';
 
@@ -36,6 +37,10 @@ type WordmarkProps = {
 /** Di quanto si solleva la staffa sotto il puntatore, in unità di viewBox. */
 const RESPIRO = 3;
 
+/** Il marchio lassù è il logo: chiuso, e del colore che dice `MARK_COLOR`. */
+const CHIUSA = `translateY(${SHACKLE_CLOSED}px)`;
+const RESPIRA = `translateY(${SHACKLE_CLOSED - RESPIRO}px)`;
+
 export function Wordmark({ href = '#top', home = false, oltre = false, onTop }: WordmarkProps) {
   const parola = WORDMARK_TEXT === 'always' || !home || oltre;
   const shackleRef = useRef<SVGPathElement>(null);
@@ -47,13 +52,17 @@ export function Wordmark({ href = '#top', home = false, oltre = false, onTop }: 
    * e torna (`rifinitura-spec.md` §3). È gratis, e insegna che quello lassù
    * è un oggetto — quindi che ci si può fare click.
    *
+   * Si parte da chiuso (§9.1), quindi il respiro va **da 25 a 22**, non da 0
+   * a −3: lo stile in linea vince sul `transform` del disegno, e lasciarlo
+   * vuoto spalancherebbe il lucchetto invece di riposarlo.
+   *
    * Niente su touch: lì "hover" vuol dire "ho già premuto", e un lucchetto
    * che si apre mentre si torna in cima direbbe la cosa sbagliata.
    */
   const respira = (su: boolean) => {
     if (coarse || reduce) return;
     const el = shackleRef.current;
-    if (el) el.style.transform = su ? `translateY(-${RESPIRO}px)` : '';
+    if (el) el.style.transform = su ? RESPIRA : CHIUSA;
   };
 
   return (
@@ -70,8 +79,11 @@ export function Wordmark({ href = '#top', home = false, oltre = false, onTop }: 
           fino a quel momento questo resta invisibile — due lucchetti sullo
           schermo sarebbero due lucchetti (`rifinitura-spec.md` §2, fase E).
           Il Loader lo trova da qui e gli scrive la `visibility`. */}
-      <span data-chrome-mark className="flex">
-        <Mark size={18} shackleRef={shackleRef} />
+      <span
+        data-chrome-mark
+        className={`flex ${MARK_COLOR === 'crimson' ? 'text-crimson' : 'text-ink'}`}
+      >
+        <Mark size={18} shackleOffset={SHACKLE_CLOSED} shackleRef={shackleRef} />
       </span>
       <span
         aria-hidden
