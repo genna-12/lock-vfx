@@ -176,12 +176,14 @@ export const LIGHTS = {
 } as const;
 
 /**
- * Solo due raggi in tutto il sito, `frame` e `card`. `pill` è la terza voce
- * e **l'unica eccezione**: la pillola della lingua (`rifinitura-spec.md`
- * §9.3) è tonda, non smussata — il valore vive qui perché nessun componente
- * deve scriverlo a mano.
+ * Solo due raggi in tutto il sito, `frame` e `card`. `pill` e `glass` sono la
+ * famiglia **vetro**, e vivono in un angolo solo: la pillola della lingua è
+ * tonda (`rifinitura-spec.md` §9.3), la sua tendina è morbida — 20 px, e le
+ * voci dentro 14, che è 20 meno i 6 di padding (raggi concentrici, non un
+ * quinto token). Il resto del sito tiene 2 e 6: se `glass` comincia a
+ * comparire altrove, non è il raggio ad essere sbagliato, è il posto.
  */
-export const RADIUS = { frame: 2, card: 6, pill: 9999 } as const;
+export const RADIUS = { frame: 2, card: 6, pill: 9999, glass: 20 } as const;
 
 export const SPACE = {
   pad: 'clamp(20px, 3.4vw, 48px)',
