@@ -152,7 +152,7 @@ export function LangPill() {
            più stanno in uno pseudo-elemento, dove non spostano niente. `inset`
            si conta sul *padding box* (30 px: il bottone è alto 32 con 1 px di
            bordo), quindi ±7 px in verticale — non ±6 — per arrivare a 44. */
-        className="relative flex h-8 items-center gap-2 rounded-full border border-stone/28 px-3 text-ink transition-colors duration-200 hover:border-stone/60 after:absolute after:-inset-x-1 after:-inset-y-[7px] after:content-['']"
+        className="relative flex h-8 items-center gap-2 rounded-pill border border-stone/28 px-3 text-ink transition-colors duration-200 hover:border-stone/60 after:absolute after:-inset-x-1 after:-inset-y-[7px] after:content-['']"
       >
         <span className="u-cap text-[12px] leading-none">{current}</span>
         <svg
@@ -183,7 +183,7 @@ export function LangPill() {
             transitionDuration: reduce ? '0ms' : aperta ? '160ms' : '120ms',
             boxShadow: '0 12px 32px rgb(0 0 0 / 0.5)',
           }}
-          className="absolute top-[calc(100%+8px)] right-0 z-10 min-w-[160px] origin-top-right list-none rounded-[10px] border border-stone/20 bg-obsidian/85 py-1 backdrop-blur-[16px] transition-[opacity,transform] ease-[var(--ease-arrive)] outline-none"
+          className="absolute top-[calc(100%+8px)] right-0 z-10 min-w-[160px] origin-top-right list-none rounded-card border border-stone/20 bg-obsidian/85 py-1 backdrop-blur-[16px] transition-[opacity,transform] ease-[var(--ease-arrive)] outline-none"
         >
           {lingue.map((lng, i) => {
             const scelta = lng === current;

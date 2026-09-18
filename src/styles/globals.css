@@ -87,9 +87,11 @@
   --text-cap--line-height: 1;
   --text-cap--letter-spacing: 0.14em;
 
-  /* Solo due raggi in tutto il sito. */
+  /* Solo due raggi in tutto il sito, più `pill`: l'unica eccezione tonda
+     (`rifinitura-spec.md` §9.3, `RADIUS.pill` in tokens.ts). */
   --radius-frame: 2px;
   --radius-card: 6px;
+  --radius-pill: 9999px;
 
   /* Curve. */
   --ease-cut: linear;

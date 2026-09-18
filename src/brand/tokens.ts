@@ -175,8 +175,13 @@ export const LIGHTS = {
   taglio: 'rgb(255 236 214 / 0.15)',
 } as const;
 
-/** Solo due raggi in tutto il sito. Nient'altro è arrotondato. */
-export const RADIUS = { frame: 2, card: 6 } as const;
+/**
+ * Solo due raggi in tutto il sito, `frame` e `card`. `pill` è la terza voce
+ * e **l'unica eccezione**: la pillola della lingua (`rifinitura-spec.md`
+ * §9.3) è tonda, non smussata — il valore vive qui perché nessun componente
+ * deve scriverlo a mano.
+ */
+export const RADIUS = { frame: 2, card: 6, pill: 9999 } as const;
 
 export const SPACE = {
   pad: 'clamp(20px, 3.4vw, 48px)',
