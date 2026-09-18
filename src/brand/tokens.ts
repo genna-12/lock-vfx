@@ -111,6 +111,22 @@ export const WORDMARK_TEXT: 'always' | 'after-first-screen' = 'after-first-scree
 export const MARK_COLOR: 'ink' | 'crimson' = 'crimson';
 
 /**
+ * La card dell'invito, nel footer.
+ *
+ * `flat` è com'è adesso: un pannello fermo con un filo di bordo, niente
+ * vetro, niente tilt. `glass` rimette quello del sito precedente, che LockVFX
+ * ha chiesto indietro (`rifinitura-spec.md` §7.6) e che la Direzione ammette
+ * a queste condizioni (§4): **solo** su questa card, rotazione ±4°, luce al
+ * 14 %, nessun blur del fondo — la card resta opaca. Spento su touch e con
+ * reduced motion, dove torna `flat` senza nemmeno un listener.
+ *
+ * Non tocca il blocco legale, che è lì per la legge e non è materia di
+ * variante. Nata come variante di `variante-a`, dal 18/9 (§9.4) è il default
+ * anche qui: LockVFX il cenno della card lo ha chiesto indietro.
+ */
+export const FOOTER_CARD: 'flat' | 'glass' = 'glass';
+
+/**
  * Chi disegna il lucchetto che si chiude, all'ingresso.
  *
  * `drawn` è la coreografia del sito (i tre path che si tracciano, la staffa
