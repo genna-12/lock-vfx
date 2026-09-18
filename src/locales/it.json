@@ -7,7 +7,8 @@
     "contact": "Contatti"
   },
   "a11y": {
-    "skip": "Vai al contenuto"
+    "skip": "Vai al contenuto",
+    "lang": "Lingua"
   },
   "meta": {
     "title": "LockVFX — effetti visivi per cinema, serie e pubblicità",

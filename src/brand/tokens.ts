@@ -136,25 +136,6 @@ export const LOADER_SOURCE: 'drawn' | 'video' = 'video';
  */
 export const LOADER_REPEAT: 'breve' | 'volo' = 'breve';
 
-/**
- * Il cambio lingua, in alto a destra.
- *
- * Le due direzioni di `rifinitura-spec.md` §4, da guardare una accanto
- * all'altra. `foro` = le due sigle di oggi con un **foro di perforazione**
- * acceso sotto quella attiva: la stessa grammatica della nav, che dice dove
- * si è con una perforazione e non con un riquadro. `interruttore` = una
- * perforazione lunga 24×12 con il cursore `ink` che scorre fra le due
- * posizioni e le sigle ai lati.
- *
- * La Direzione consiglia `foro` — coerente, minimo, senza vetro — ed è il
- * default. Il vetro traslucido con blur è **respinto**: è la pillola di
- * tutti.
- *
- * ⚠ In attesa della scelta dei ragazzi: le due prove sono negli screenshot
- * del Lotto 4.
- */
-export const LANG_PILL: 'foro' | 'interruttore' = 'foro';
-
 /** Camera della carrellata (vedi `momento-1-lo-spazio.md`). */
 export const CAMERA = {
   /** ScrollSmoother su desktop; su touch resta lo scroll nativo. */
