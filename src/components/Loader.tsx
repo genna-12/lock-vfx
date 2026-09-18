@@ -23,9 +23,9 @@ import { Mark } from './brand/Mark';
  * vale la **v3** di `rifinitura-spec.md` §9.2: il tempo non insegue la rete,
  * la aspetta.
  *
- *   0 attesa    finché il video è scaricato (`canplaythrough`), tetto 6 s.
- *               È il cancello che mancava: a cache vuota il video partiva, si
- *               bloccava, il loader staccava e non si vedeva niente.
+ *   0 attesa    `play()` subito, invisibile; pronto al primo fotogramma
+ *               riprodotto, poi pausa e riavvolgi. Tetto 6 s come rete,
+ *               `play()` rifiutato → riserva disegnata all'istante (§9.5).
  *   A · 300     il video entra in dissolvenza, fermo sul primo fotogramma.
  *   B · 3 033   l'animazione di LockVFX, velocità 1×. Non si accelera.
  *   C · 400     l'ultimo fotogramma, tenuto.
@@ -292,27 +292,49 @@ export function Loader({ children }: { children: ReactNode }) {
         };
         const finita = () => attesa(innesta, LOADER_V3.tenuta);
 
-        // 0 — il cancello. Non si guarda un rettangolo nero che si riempie a
-        // pezzi: o il video c'è tutto, o si passa alla riserva disegnata.
-        // Il tetto vale **solo** finché il video non è partito: una volta in
-        // scena, l'animazione va fino in fondo. Senza questa guardia una rete
-        // lenta la troncava a metà per andare alla riserva — che è il difetto
-        // opposto a quello che il cancello doveva curare.
+        // 0 — il cancello (§9.5). `canplaythrough` non poteva essere il
+        // segnale: iOS Safari non scarica un video finché non lo si fa
+        // partire, `preload="auto"` è ignorato, e l'evento non arriva mai —
+        // sul telefono si vedevano 6 s di nero e poi la riserva disegnata.
+        // Quindi si fa il contrario: `play()` subito, a opacità 0, muto e in
+        // linea (nessuno lo vede); il segnale di "pronto" è il **primo
+        // fotogramma davvero riprodotto**. A quel punto pausa, riavvolgi, e la
+        // coreografia parte da capo: A (ingresso) → B (`play()` di nuovo, dal
+        // buffer). Il tetto vale **solo** finché il video non è partito: una
+        // volta in scena, l'animazione va fino in fondo.
         const rinuncia = () => {
           if (partito) return;
           setSorgente('drawn');
         };
-        if (video.readyState >= 4) {
+        let pronto = false;
+        const apri = () => {
+          if (pronto || partito) return;
+          pronto = true;
+          video.pause();
+          // Si riavvolge: il fotogramma che si è consumato per aprire il
+          // cancello non va perso, l'animazione si vede intera.
+          try {
+            video.currentTime = 0;
+          } catch {
+            /* qualche browser rifiuta il seek prima dei metadati: si riparte da dov'è. */
+          }
           parti();
-        } else {
-          video.addEventListener('canplaythrough', parti, { once: true });
-          video.addEventListener('error', rinuncia, { once: true });
-          attesa(rinuncia, LOADER_V3.attesa);
-        }
+        };
+        const primoFotogramma = () => {
+          if (video.currentTime > 0) apri();
+        };
+        video.addEventListener('timeupdate', primoFotogramma);
+        video.addEventListener('playing', apri, { once: true });
+        video.addEventListener('error', rinuncia, { once: true });
+        // `play()` rifiutato (autoplay negato, risparmio energetico): il video
+        // non arriverà mai, e aspettare i 6 s sarebbe solo nero. Riserva subito.
+        void video.play().catch(rinuncia);
+        attesa(rinuncia, LOADER_V3.attesa);
 
         return () => {
           unsubscribe();
-          video.removeEventListener('canplaythrough', parti);
+          video.removeEventListener('timeupdate', primoFotogramma);
+          video.removeEventListener('playing', apri);
           video.removeEventListener('ended', finita);
           video.removeEventListener('error', rinuncia);
         };
