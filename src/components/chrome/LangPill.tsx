@@ -148,9 +148,11 @@ export function LangPill() {
         aria-controls={montata ? `${id}-lista` : undefined}
         onClick={() => (montata ? chiudi() : apri())}
         onKeyDown={suPillola}
-        /* Il bersaglio arriva a 44 px senza che la pillola cresca: i 6 px in
-           più stanno in uno pseudo-elemento, dove non spostano niente. */
-        className="relative flex h-8 items-center gap-2 rounded-full border border-stone/28 px-3 text-ink transition-colors duration-200 hover:border-stone/60 after:absolute after:-inset-x-1 after:-inset-y-[6px] after:content-['']"
+        /* Il bersaglio arriva a 44 px senza che la pillola cresca: i px in
+           più stanno in uno pseudo-elemento, dove non spostano niente. `inset`
+           si conta sul *padding box* (30 px: il bottone è alto 32 con 1 px di
+           bordo), quindi ±7 px in verticale — non ±6 — per arrivare a 44. */
+        className="relative flex h-8 items-center gap-2 rounded-full border border-stone/28 px-3 text-ink transition-colors duration-200 hover:border-stone/60 after:absolute after:-inset-x-1 after:-inset-y-[7px] after:content-['']"
       >
         <span className="u-cap text-[12px] leading-none">{current}</span>
         <svg
