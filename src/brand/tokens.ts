@@ -62,6 +62,12 @@ export const MOTION = {
   f12: 500,
   easeCut: 'none',
   easeArrive: 'cubic-bezier(0.2, 0, 0, 1)',
+  /**
+   * Il volo del loader: parte piano, attraversa lo schermo, si posa
+   * (`rifinitura-spec.md` §9.2, fase F). È l'unica curva simmetrica del
+   * sito — tutto il resto arriva e basta.
+   */
+  easeVolo: 'cubic-bezier(0.7, 0, 0.2, 1)',
 } as const;
 
 /**

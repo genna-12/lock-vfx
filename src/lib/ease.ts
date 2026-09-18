@@ -14,6 +14,8 @@ gsap.registerPlugin(CustomEase);
 export const EASE = {
   /** cubic-bezier(.2, 0, 0, 1) */
   arrive: CustomEase.create('lock-arrive', 'M0,0 C0.2,0 0,1 1,1'),
+  /** cubic-bezier(.7, 0, .2, 1) — il volo del loader. */
+  volo: CustomEase.create('lock-volo', 'M0,0 C0.7,0 0.2,1 1,1'),
   /** Lo stacco: nessuna curva. */
   cut: 'none',
 } as const;

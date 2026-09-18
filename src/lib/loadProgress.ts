@@ -45,10 +45,36 @@ export const LOADER_TIMING = {
   fly: 500,
   /** Tetto dello stacco con la coreografia disegnata. */
   max: 3000,
-  /** Tetto con l'animazione di LockVFX: dura 3,04 s e non si accelera. */
-  maxVideo: 3600,
   /** Visita successiva nella sessione. */
   repeat: 300,
+} as const;
+
+/**
+ * Loader v3, con l'animazione di LockVFX (`rifinitura-spec.md` §9.2).
+ *
+ * Il ritmo non insegue più il caricamento: lo aspetta. La fase 0 è un
+ * **cancello vero** — finché il video non è scaricato non parte, perché un
+ * video che parte e si blocca è esattamente ciò che a cache vuota faceva
+ * sparire il loader senza che si vedesse niente. Tutto il resto è tempo di
+ * montaggio, e non si accelera.
+ *
+ * Totale dal video pronto: 300 + 3 033 + 400 + 400 + 300 + 900 = 5 333 ms.
+ */
+export const LOADER_V3 = {
+  /** 0 — quanto si aspetta il `canplaythrough`; oltre, la riserva disegnata. */
+  attesa: 6000,
+  /** A — il video entra in dissolvenza, fermo sul primo fotogramma. */
+  ingresso: 300,
+  /** B — l'animazione, a velocità 1×. È la durata vera del file. */
+  animazione: 3033,
+  /** C — l'ultimo fotogramma, tenuto. */
+  tenuta: 400,
+  /** D — dissolvenza incrociata dal video al marchio, stessa misura e posto. */
+  innesto: 400,
+  /** E — il respiro prima di partire. */
+  respiro: 300,
+  /** F — il volo verso il chrome, con l'overlay che si dissolve insieme. */
+  volo: 900,
 } as const;
 
 /** Quanti secondi di buffer contano come "primo segmento". */
