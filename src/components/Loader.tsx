@@ -76,21 +76,28 @@ const MARK_DY = ((FRAME.cy - FRAME.side / 2) / FRAME.side) * VIDEO_ZOOM;
 
 const BASE = import.meta.env.BASE_URL;
 /**
- * Due file, come due `<source>`. L'**mp4 per primo**: è quello che tutti
- * sanno aprire, Safari compreso, ed è quello che abbiamo ricevuto per
- * ultimo. Il webm resta per chi preferisce VP9.
+ * Due file su disco, ma un solo `<source>` a schermo: un Chromium senza
+ * H.264 scaricava comunque `logo.mp4` per intero (429 kB) prima di accorgersi
+ * che doveva riprodurre il webm. `sceltaVideo()` fa la domanda una volta sola
+ * e decide il file **prima** che il `<video>` monti. Il `.webm` resta pronto
+ * per la versione con alpha in arrivo (§9.2).
  */
 const VIDEO_SRC_MP4 = `${BASE}loader/logo.mp4`;
 const VIDEO_SRC_WEBM = `${BASE}loader/logo.webm`;
 
-/** Uno dei due formati si riproduce? Se no, la coreografia disegnata. */
-function videoRiproducibile(): boolean {
-  if (typeof document === 'undefined') return false;
+/**
+ * Una sola domanda (`canPlayType`) per due risposte: si può mostrare il
+ * video (altrimenti la coreografia disegnata), e quale file scaricare — mp4
+ * di norma, webm dove l'mp4 non si riproduce.
+ */
+function sceltaVideo(): { riproducibile: boolean; src: string } {
+  if (typeof document === 'undefined') {
+    return { riproducibile: false, src: VIDEO_SRC_MP4 };
+  }
   const probe = document.createElement('video');
-  return (
-    probe.canPlayType('video/mp4; codecs="avc1.42E01E"') !== '' ||
-    probe.canPlayType('video/webm; codecs="vp9"') !== ''
-  );
+  const mp4 = probe.canPlayType('video/mp4; codecs="avc1.42E01E"') !== '';
+  const webm = probe.canPlayType('video/webm; codecs="vp9"') !== '';
+  return { riproducibile: mp4 || webm, src: mp4 ? VIDEO_SRC_MP4 : VIDEO_SRC_WEBM };
 }
 
 type Fase = 'gesto' | 'volo' | 'fine';
@@ -115,8 +122,11 @@ export function Loader({ children }: { children: ReactNode }) {
   // Il riempimento è l'ultimo fotogramma del gesto disegnato, non uno stato
   // del caricamento: nasce falso e diventa vero una volta sola.
   const [filled, setFilled] = useState(false);
+  // Una sola domanda a `canPlayType`, riusata sia per decidere il ramo
+  // (video o disegnato) sia per il file da scaricare, più sotto.
+  const [scelta] = useState(sceltaVideo);
   const [sorgente, setSorgente] = useState<'drawn' | 'video'>(() =>
-    LOADER_SOURCE === 'video' && videoRiproducibile() ? 'video' : 'drawn'
+    LOADER_SOURCE === 'video' && scelta.riproducibile ? 'video' : 'drawn'
   );
   // Si legge una volta sola, al primo render: `markVisited()` arriva dopo, e
   // da lì in poi la risposta sarebbe sempre sì.
@@ -449,6 +459,7 @@ export function Loader({ children }: { children: ReactNode }) {
             <div className="absolute inset-0 grid place-items-center">
               <video
                 ref={videoRef}
+                src={scelta.src}
                 muted
                 playsInline
                 preload="auto"
@@ -460,10 +471,7 @@ export function Loader({ children }: { children: ReactNode }) {
                   mixBlendMode: 'screen',
                   opacity: 0,
                 }}
-              >
-                <source src={VIDEO_SRC_MP4} type="video/mp4" />
-                <source src={VIDEO_SRC_WEBM} type="video/webm" />
-              </video>
+              />
             </div>
           ) : null}
 
