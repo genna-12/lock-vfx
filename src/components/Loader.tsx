@@ -52,27 +52,31 @@ const SIZE_MOBILE = 96;
 const SHACKLE_B = SHACKLE_CLOSED - 3;
 
 /**
- * Nell'esportazione del 9/9 il lucchetto occupa **un sesto** del fotogramma:
- * per vederlo alla misura del marchio il video va disegnato sei volte più
- * grande e ritagliato. Il fondo è nero senza alpha, quindi il ritaglio non si
- * vede: quello che avanza è nero su nero.
+ * Nella terza esportazione (65466d9) il lucchetto è già ritagliato e occupa
+ * circa l'80% dell'altezza del fotogramma: per vederlo alla misura del
+ * marchio (132px) basta disegnare il video 1,25 volte `size` (~165px). Il
+ * fondo resta nero senza alpha, quindi il poco che avanza sparisce con
+ * `screen`.
  */
-const VIDEO_ZOOM = 6;
+const VIDEO_ZOOM = 1.25;
 
 const BASE = import.meta.env.BASE_URL;
 /**
- * Un file solo. `logo.mp4` (H.264, per iPhone) **non è ancora arrivato**:
- * una `<source>` che punta a un file che non c'è è un 404 a ogni prima
- * visita. Quando arriva, si aggiunge qui e la riserva `drawn` smette di
- * servire su Safari.
+ * Due file, come due `<source>`: `logo.webm` (VP9, con una traccia audio
+ * muta) per chi lo apre, `logo.mp4` (H.264) per Safari/iPhone, che il webm
+ * non lo riproduce. Il browser sceglie da solo la prima che sa aprire.
  */
-const VIDEO_SRC = `${BASE}loader/logo.webm`;
+const VIDEO_SRC_WEBM = `${BASE}loader/logo.webm`;
+const VIDEO_SRC_MP4 = `${BASE}loader/logo.mp4`;
 
-/** Il webm si riproduce? Se no, la coreografia disegnata. */
+/** Uno dei due formati si riproduce? Se no, la coreografia disegnata. */
 function videoRiproducibile(): boolean {
   if (typeof document === 'undefined') return false;
   const probe = document.createElement('video');
-  return probe.canPlayType('video/webm; codecs="vp9"') !== '';
+  return (
+    probe.canPlayType('video/webm; codecs="vp9"') !== '' ||
+    probe.canPlayType('video/mp4; codecs="avc1.42E01E"') !== ''
+  );
 }
 
 type Fase = 'gesto' | 'volo' | 'fine';
@@ -349,7 +353,6 @@ export function Loader({ children }: { children: ReactNode }) {
             // `void` senza chiedere a nessuno di riesportare con l'alpha.
             <video
               ref={videoRef}
-              src={VIDEO_SRC}
               muted
               playsInline
               preload="auto"
@@ -361,7 +364,10 @@ export function Loader({ children }: { children: ReactNode }) {
                 mixBlendMode: 'screen',
                 visibility: videoInScena ? 'visible' : 'hidden',
               }}
-            />
+            >
+              <source src={VIDEO_SRC_WEBM} type="video/webm" />
+              <source src={VIDEO_SRC_MP4} type="video/mp4" />
+            </video>
           ) : null}
           <div ref={markRef} style={{ visibility: videoInScena ? 'hidden' : 'visible' }}>
             <Mark size={size} mode={filled ? 'solid' : 'outline'} shackleRef={shackleRef} />
