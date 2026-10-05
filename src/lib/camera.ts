@@ -57,6 +57,16 @@ export const SNAP = {
   /** Attesa dopo che lo scroll si e' fermato **davvero** (`scrollEnd`). */
   delay: 0.15,
   /**
+   * Da quanto la mano deve essere ferma — rotella, tasti, dito — perche' il
+   * magnete possa partire. `scrollEnd` arriva 200 ms dopo l'ultimo evento
+   * di scroll, e con una rotella lenta (un tacco ogni 0,4–0,6 s) quello
+   * succede **fra un tacco e l'altro**: misurato il 5/10, 5 trazioni in
+   * 10 s mentre la rotella stava ancora girando. 0,7 s e' oltre la pausa
+   * fra due tacchi di chi scorre piano, e prima che la scia dello smoother
+   * (1,2 s) si sia spenta: chi si ferma davvero non vede un'attesa.
+   */
+  idle: 0.7,
+  /**
    * Ogni quanto si ricontrolla se anche la camera si e' fermata. Corto: e'
    * un controllo, non un'attesa — l'attesa e' `delay`, e a farla due volte
    * il magnete attaccava mezzo secondo tardi.

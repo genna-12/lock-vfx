@@ -208,10 +208,15 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
    *  esponenziale dello smoother per niente. */
   const STILL = 1.5 / STAGE_VH;
   let seen = -1;
+  /** L'ultimo gesto sullo scroll (`interrupt`, qui sotto). */
+  let lastInput = 0;
   const settled = () => {
     const st = ScrollTrigger.getById('stage');
     if (!st) return;
-    if (Math.abs(st.progress - seen) > STILL) {
+    // E la mano dev'essere ferma da `SNAP.idle`: senza, il magnete partiva
+    // nella pausa fra due tacchi di una rotella lenta (`camera.ts`).
+    const handBusy = performance.now() - lastInput < SNAP.idle * 1000;
+    if (Math.abs(st.progress - seen) > STILL || handBusy) {
       seen = st.progress;
       wait = gsap.delayedCall(SNAP.check, settled);
       return;
@@ -226,7 +231,10 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
   ScrollTrigger.addEventListener('scrollEnd', onScrollEnd);
 
   // Chi tocca lo scroll ha sempre ragione: il magnete si stacca subito.
-  const interrupt = () => release();
+  const interrupt = () => {
+    lastInput = performance.now();
+    release();
+  };
   window.addEventListener('wheel', interrupt, { passive: true });
   window.addEventListener('touchstart', interrupt, { passive: true });
   window.addEventListener('keydown', interrupt);
