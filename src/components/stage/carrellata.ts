@@ -143,7 +143,17 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
      niente (lo decide `snapProgress`).
 
      La durata cresce con la distanza: completare gli ultimi dieci vh di
-     una transizione e attraversarne novanta non sono lo stesso gesto. */
+     una transizione e attraversarne novanta non sono lo stesso gesto.
+
+     Il magnete muove la **barra**, non il contenuto: `scrollTo(v, true)`,
+     e la camera la raggiunge con la stessa scia della rotella. Prima
+     scriveva `smoother.scrollTop(v)` a ogni fotogramma, che è il salto
+     secco: dentro GSAP alza `isProxyScrolling`, e al fotogramma dopo lo
+     smoother uccide la propria scia e resta dov'è. Un tacco di rotella
+     arrivato durante la trazione veniva così ingoiato — misurato il 5/10:
+     barra a 732, contenuto fermo a 632 per 1,2 s — e la trazione dopo,
+     partendo dal contenuto, riportava indietro la barra (746 → 632): il
+     tacco cancellato. */
   const magnet = { at: 0 };
   let pull: gsap.core.Tween | undefined;
   let wait: gsap.core.Tween | undefined;
@@ -162,13 +172,13 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
     const target = snapProgress(st.progress, st.direction);
     if (Math.abs(target - st.progress) < 0.001) return;
     const to = st.start + target * (st.end - st.start);
-    magnet.at = smoother.scrollTop();
+    magnet.at = window.scrollY;
     const far = Math.min(1, Math.abs(to - magnet.at) / (window.innerHeight * 1.5));
     pull = gsap.to(magnet, {
       at: to,
       duration: SNAP.duration.min + far * (SNAP.duration.max - SNAP.duration.min),
       ease: SNAP.ease,
-      onUpdate: () => smoother.scrollTop(magnet.at),
+      onUpdate: () => smoother.scrollTo(magnet.at, true),
       onComplete: () => {
         pull = undefined;
       },
