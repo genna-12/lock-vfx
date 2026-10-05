@@ -275,6 +275,22 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
     gsap.set(salaVeil, { opacity: 1 });
     gsap.set(sala, { autoAlpha: 0 });
 
+    /* Due layer suoi, e il conto dei fotogrammi torna.
+
+       Con lo smoother `#smooth-content` è un unico layer alto 6 769 px che
+       si muove in `matrix3d`, e il palco ci resta fermo sopra perché il pin
+       gli scrive a ogni fotogramma una `translate` uguale e contraria. Una
+       `translate` 2D Chrome non la promuove: il palco veniva ridipinto e
+       **ri-rasterizzato** dentro il layer del contenuto a ogni fotogramma,
+       HOLD compresi. Misurato il 5/10 da 160 a 380 vh: 9 896 tile in 4,8 s
+       contro 16 con lo scroll nativo. Lo stesso per le luci, che sono
+       opacità animate da GSAP e quindi ridipinte, non composte.
+
+       `.stage` e le luci stanno FUORI da `.world`: qui `will-change` non
+       appiattisce niente. Su `.world` e dentro resta vietato (sopra). */
+    gsap.set(root, { willChange: 'transform' });
+    gsap.set([lightSala, lightTaglio], { willChange: 'opacity' });
+
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
