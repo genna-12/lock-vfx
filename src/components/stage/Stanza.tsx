@@ -104,6 +104,8 @@ export function Stanza() {
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const submitRef = useRef<HTMLButtonElement>(null);
   const confermaRef = useRef<HTMLDivElement>(null);
+  /** Il fuoco era nel form al momento dell'invio riuscito (il form poi sparisce). */
+  const fuocoNelFormRef = useRef(false);
   // «Scrivi un altro messaggio» c'è solo quando un nuovo invio è possibile.
   const [ancora, setAncora] = useState(false);
 
@@ -203,7 +205,10 @@ export function Stanza() {
      rimanderebbe lo stesso messaggio. */
   useEffect(() => {
     if (status !== 'sent') return;
-    confermaRef.current?.focus({ preventScroll: true });
+    // Il fuoco va alla conferma solo se era ancora nel form quando l'invio è
+    // riuscito (un invio differito può arrivare mentre chi scrive è altrove).
+    if (fuocoNelFormRef.current) confermaRef.current?.focus({ preventScroll: true });
+    fuocoNelFormRef.current = false;
     const id = window.setTimeout(() => setAncora(true), remainingThrottle());
     return () => window.clearTimeout(id);
   }, [status]);
@@ -267,7 +272,10 @@ export function Stanza() {
       company: hpRef.current?.value ?? '',
       lang: i18n.language,
     })
-      .then(() => setStatus('sent'))
+      .then(() => {
+        fuocoNelFormRef.current = !!submitRef.current?.form?.contains(document.activeElement);
+        setStatus('sent');
+      })
       .catch((error: unknown) => {
         const throttled = error instanceof SendError && error.reason === 'throttled';
         if (!throttled) {
@@ -280,6 +288,7 @@ export function Stanza() {
         // mancano, e alla scadenza parte da solo — a meno che nel frattempo
         // non sia stato toccato.
         if (sameAsLastSend(values)) {
+          fuocoNelFormRef.current = !!submitRef.current?.form?.contains(document.activeElement);
           setStatus('sent');
           return;
         }
