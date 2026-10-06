@@ -500,7 +500,7 @@ export function Sala({ works }: SalaProps) {
         </div>
 
         {works.length > 1 ? (
-          <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          <ul data-sala-lista className="m-0 flex list-none flex-col gap-3 p-0">
             {works.map((item, i) => (
               <li key={item.id}>
                 {/* Le righe non scelte a 0,75 e non a 0,6: a 13 px il testo

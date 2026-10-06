@@ -663,6 +663,16 @@
   }
 }
 
+/* iPad coricato (1024×768 touch): la nav sta in basso, a 708–752 px, e la
+   prima riga della lista — a 712 px con la sezione al suo posto — le finiva
+   sotto. Il margine sposta la lista oltre la nav con 12 px di respiro
+   (QA bis). Solo qui: sul telefono in piedi la lista sta più in alto. */
+@media (hover: none) and (pointer: coarse) and (min-width: 1024px) {
+  .stage [data-sala-lista] {
+    margin-top: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* ---------- La prima schermata (§2.1) -----------------------------------
    L'unica sezione che non prende l'altezza dal suo contenuto: una schermata
    piena, sempre, anche in reduced motion su desktop. E senza padding —
