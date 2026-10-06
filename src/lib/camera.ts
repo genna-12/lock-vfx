@@ -90,11 +90,17 @@ export const SNAP = {
  * Dove porta il magnete, in progress. `direction` è quella di
  * ScrollTrigger: 1 se si stava scendendo, −1 se si stava risalendo.
  * Restituire il valore ricevuto significa "non spostarti".
+ *
+ * `insiste`: dal secondo gesto consecutivo in discesa dentro la zona di
+ * ritorno (`carrellata.ts`) l'intenzione è chiara e il bersaglio è lo
+ * statement; senza, il primo gesto che si ferma torna alla reel.
  */
-export function snapProgress(progress: number, direction: number): number {
+export function snapProgress(progress: number, direction: number, insiste = false): number {
   const vh = progress * STAGE_VH;
   if (HOLD_SPANS.some((span) => vh >= span.from && vh <= span.to)) return progress;
-  if (vh < RITORNO) return HOLDS.reel / STAGE_VH;
+  if (vh < RITORNO) {
+    return (insiste && direction >= 0 ? HOLDS.studio : HOLDS.reel) / STAGE_VH;
+  }
   const target =
     direction >= 0
       ? HOLD_SPANS.find((span) => span.from > vh)

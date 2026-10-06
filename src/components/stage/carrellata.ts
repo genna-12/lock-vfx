@@ -170,7 +170,7 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
     if (!SNAP.touch && ScrollTrigger.isTouch === 1) return;
     const st = ScrollTrigger.getById('stage');
     if (!st || pull) return;
-    const target = snapProgress(st.progress, st.direction);
+    const target = snapProgress(st.progress, st.direction, descents >= 2);
     if (Math.abs(target - st.progress) < 0.001) return;
     const to = st.start + target * (st.end - st.start);
     magnet.at = window.scrollY;
@@ -232,17 +232,40 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
   ScrollTrigger.addEventListener('scrollEnd', onScrollEnd);
 
   // Chi tocca lo scroll ha sempre ragione: il magnete si stacca subito.
+  /* Il conto dei gesti in discesa (§9.7, zona di ritorno). Un gesto comincia
+     quando la mano era ferma da `SNAP.idle`; è «consecutivo» se il
+     precedente era in discesa, finito da meno di 3 s, e la pagina non è
+     tornata a 0 nel frattempo. Un gesto in salita azzera. Dal secondo, il
+     magnete della zona di ritorno porta allo statement invece che alla reel. */
+  const INSISTE_MS = 3000;
+  let descents = 0;
+  const gesture = (dir: number) => {
+    const now = performance.now();
+    if (now - lastInput < SNAP.idle * 1000) return; // stesso gesto
+    if (dir < 0) descents = 0;
+    else if (dir > 0) {
+      const home = window.scrollY < window.innerHeight * 0.02;
+      descents = descents > 0 && !home && now - lastInput < INSISTE_MS ? descents + 1 : 1;
+    }
+  };
   const interrupt = () => {
     lastInput = performance.now();
     release();
   };
-  window.addEventListener('wheel', interrupt, { passive: true });
+  const onWheel = (e: WheelEvent) => {
+    gesture(Math.sign(e.deltaY));
+    interrupt();
+  };
+  window.addEventListener('wheel', onWheel, { passive: true });
   window.addEventListener('touchstart', interrupt, { passive: true });
   // Dalla tastiera interrompono solo i tasti che scorrono: Tab, Invio o una
   // lettera non sono un gesto sullo scroll e non devono fermare la corsa.
   const TASTI_SCROLL = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar']);
   const interruptTasto = (e: KeyboardEvent) => {
-    if (TASTI_SCROLL.has(e.key)) interrupt();
+    if (!TASTI_SCROLL.has(e.key)) return;
+    const su = e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Home' || ((e.key === ' ' || e.key === 'Spacebar') && e.shiftKey);
+    gesture(su ? -1 : 1);
+    interrupt();
   };
   window.addEventListener('keydown', interruptTasto);
 
@@ -483,7 +506,7 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
     document.removeEventListener('fullscreenchange', rimisura);
     document.removeEventListener('webkitendfullscreen', rimisura, true);
     html.style.removeProperty('--stage-h');
-    window.removeEventListener('wheel', interrupt);
+    window.removeEventListener('wheel', onWheel);
     window.removeEventListener('touchstart', interrupt);
     window.removeEventListener('keydown', interruptTasto);
     ScrollTrigger.removeEventListener('scrollEnd', onScrollEnd);
