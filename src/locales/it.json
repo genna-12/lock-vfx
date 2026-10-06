@@ -67,6 +67,7 @@
       "sent": "Ricevuto. Ti rispondiamo entro due giorni lavorativi.",
       "failed": "Non è partito. Riprova, o scrivici direttamente:"
     },
+    "wait": "Puoi scriverci di nuovo fra {{s}} secondi.",
     "honeypot": "Azienda"
   },
   "privacy": {

@@ -15,7 +15,7 @@ import { MOTION } from '../../brand/tokens';
 import { STAGE_VH } from '../../lib/camera';
 import { useStageWindow } from '../../lib/stageProgress';
 import { useReducedMotion } from '../../lib/useReducedMotion';
-import { SendError, THROTTLE_MS, remainingThrottle, sendContact } from '../../lib/emailjs';
+import { SendError, THROTTLE_MS, remainingThrottle, sameAsLastSend, sendContact } from '../../lib/emailjs';
 import { CONTACT, PEOPLE } from '../../data/people';
 import { openPrivacy } from '../../lib/privacy';
 import { MARK_VIEWBOX, SHACKLE_CLOSED } from '../../brand/mark';
@@ -81,6 +81,14 @@ export function Stanza() {
   const [consent, setConsent] = useState(false);
   const [consentInvalid, setConsentInvalid] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
+  // L'attesa del limite di un invio al minuto, quando il messaggio è
+  // **diverso** dall'ultimo partito: i secondi che mancano, e quelli che
+  // c'erano quando è cominciata (è il numero che si annuncia, una volta).
+  const [attesa, setAttesa] = useState<{ left: number; first: number } | null>(null);
+  // Ha toccato qualcosa durante l'attesa? Allora alla scadenza non si
+  // rimanda da soli: il messaggio non è più quello che aveva chiesto di
+  // spedire.
+  const toccatoRef = useRef(false);
   // Dentro l'HOLD 4 o no: la progress arriva dallo Stage, non da un secondo
   // trigger che rifarebbe lo stesso conto.
   const inHold = useStageWindow(HOLD_FROM, 1.01);
@@ -195,6 +203,7 @@ export function Stanza() {
   /* ---- validazione ------------------------------------------------------- */
   const setValue = useCallback(
     (name: FieldName, value: string) => {
+      toccatoRef.current = true;
       setValues((v) => ({ ...v, [name]: value }));
       // Mentre si scrive non si accendono errori; quelli accesi si spengono
       // appena il campo torna valido.
@@ -220,6 +229,62 @@ export function Stanza() {
     if (el.getBoundingClientRect().bottom <= bottom - 24) return;
     el.scrollIntoView({ block: 'center' });
   }, []);
+
+  /* ---- l'invio ---------------------------------------------------------- */
+  const invia = useCallback(() => {
+    setAttesa(null);
+    setStatus('sending');
+    sendContact({
+      ...values,
+      company: hpRef.current?.value ?? '',
+      lang: i18n.language,
+    })
+      .then(() => setStatus('sent'))
+      .catch((error: unknown) => {
+        const throttled = error instanceof SendError && error.reason === 'throttled';
+        if (!throttled) {
+          setStatus('failed');
+          return;
+        }
+        // Ricarica la pagina e riscrive entro il minuto. Se è **lo stesso**
+        // messaggio, quello di prima è partito davvero e l'esito è quello.
+        // Se è un altro, non è partito niente: lo si dice, con i secondi che
+        // mancano, e alla scadenza parte da solo — a meno che nel frattempo
+        // non sia stato toccato.
+        if (sameAsLastSend(values)) {
+          setStatus('sent');
+          return;
+        }
+        const left = Math.max(1, Math.ceil(remainingThrottle() / 1000));
+        toccatoRef.current = false;
+        setAttesa({ left, first: left });
+        setStatus('failed');
+      });
+  }, [i18n.language, values]);
+
+  // Il conto alla rovescia vive in un intervallo e non in un `setTimeout` per
+  // secondo: lo stato si aggiorna solo quando il numero cambia, e un timer
+  // legato al numero si fermerebbe la prima volta che non cambia.
+  const inviaRef = useRef(invia);
+  useEffect(() => {
+    inviaRef.current = invia;
+  }, [invia]);
+  const inAttesa = attesa !== null;
+  useEffect(() => {
+    if (!inAttesa) return;
+    const id = window.setInterval(() => {
+      const left = Math.ceil(remainingThrottle() / 1000);
+      if (left > 0) {
+        setAttesa((a) => (a && a.left !== left ? { ...a, left } : a));
+        return;
+      }
+      window.clearInterval(id);
+      setAttesa(null);
+      if (toccatoRef.current) setStatus('idle');
+      else inviaRef.current();
+    }, 250);
+    return () => window.clearInterval(id);
+  }, [inAttesa]);
 
   const onSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
@@ -249,25 +314,14 @@ export function Stanza() {
         return;
       }
 
-      setStatus('sending');
-      sendContact({
-        ...values,
-        company: hpRef.current?.value ?? '',
-        lang: i18n.language,
-      })
-        .then(() => setStatus('sent'))
-        .catch((error: unknown) => {
-          // Ricarica la pagina e riscrive entro il minuto: il messaggio di
-          // prima è partito davvero, quindi si vede lo stesso esito.
-          const throttled = error instanceof SendError && error.reason === 'throttled';
-          setStatus(throttled ? 'sent' : 'failed');
-        });
+      invia();
     },
-    [consent, i18n.language, locked, values]
+    [consent, invia, locked, values]
   );
 
   const statusText =
     status === 'sent' ? t('contact.status.sent') : status === 'failed' ? t('contact.status.failed') : '';
+  const hasStatus = Boolean(statusText) || attesa !== null;
 
   return (
     <>
@@ -414,6 +468,7 @@ export function Stanza() {
                 checked={consent}
                 disabled={locked}
                 onChange={(event) => {
+                  toccatoRef.current = true;
                   setConsent(event.currentTarget.checked);
                   setConsentInvalid(false);
                 }}
@@ -441,11 +496,20 @@ export function Stanza() {
                 aria-live="polite"
                 className={clsx(
                   'm-0 text-[13px] text-stone transition-opacity duration-[var(--f5)] md:text-[14px]',
-                  statusText ? 'opacity-100' : 'opacity-0'
+                  hasStatus ? 'opacity-100' : 'opacity-0'
                 )}
               >
-                {statusText}
-                {status === 'failed' ? (
+                {attesa ? (
+                  // Il numero che scende si vede, ma non si annuncia a ogni
+                  // secondo: allo screen reader arriva una volta sola.
+                  <>
+                    <span aria-hidden="true">{t('contact.wait', { s: attesa.left })}</span>
+                    <span className="u-sr-only">{t('contact.wait', { s: attesa.first })}</span>
+                  </>
+                ) : (
+                  statusText
+                )}
+                {status === 'failed' && !attesa ? (
                   <>
                     {' '}
                     <a

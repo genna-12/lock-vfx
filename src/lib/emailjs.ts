@@ -90,6 +90,32 @@ function mode(): Mode {
 /* ---- un invio al minuto -------------------------------------------------- */
 
 let lastSend = 0;
+let lastSig = '';
+
+const SIG_KEY = 'lockvfx:last-send-sig';
+
+/**
+ * L'impronta di un messaggio: un hash corto di nome, email e testo, non il
+ * testo. Serve a una domanda sola — «è lo stesso di prima?» — e per
+ * rispondere non c'è bisogno di tenere in `sessionStorage` quello che una
+ * persona ha scritto.
+ */
+function firma(params: Pick<ContactParams, 'name' | 'email' | 'message'>): string {
+  const testo = [params.name.trim(), params.email.trim().toLowerCase(), params.message.trim()].join('\n');
+  let h = 5381;
+  for (let i = 0; i < testo.length; i++) h = ((h << 5) + h + testo.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
+/**
+ * Il messaggio è identico all'ultimo partito? Solo in quel caso un invio
+ * frenato dal limite può dire «Ricevuto»: un testo diverso non è partito, e
+ * dirlo sarebbe perdere un messaggio facendo finta di niente.
+ */
+export function sameAsLastSend(params: Pick<ContactParams, 'name' | 'email' | 'message'>): boolean {
+  const sig = read(SIG_KEY) ?? lastSig;
+  return sig !== '' && sig === firma(params);
+}
 
 /** Millisecondi che mancano al prossimo invio possibile (0 = si può). */
 export function remainingThrottle(): number {
@@ -98,9 +124,11 @@ export function remainingThrottle(): number {
   return Math.max(0, last + THROTTLE_MS - Date.now());
 }
 
-function markSent(): void {
+function markSent(params: ContactParams): void {
   lastSend = Date.now();
+  lastSig = firma(params);
   write(LAST_KEY, String(lastSend));
+  write(SIG_KEY, lastSig);
 }
 
 const wait = (ms: number) =>
@@ -116,7 +144,7 @@ export async function sendContact(params: ContactParams): Promise<void> {
   // Honeypot: nessuna chiamata e nessun errore. Il bot vede un invio
   // riuscito e se ne va; a noi non arriva niente.
   if (params.company.trim()) {
-    markSent();
+    markSent(params);
     await wait(MOCK_MS);
     return;
   }
@@ -125,7 +153,7 @@ export async function sendContact(params: ContactParams): Promise<void> {
   if (current !== 'live') {
     await wait(MOCK_MS);
     if (current === 'fail') throw new SendError('failed');
-    markSent();
+    markSent(params);
     return;
   }
 
@@ -142,5 +170,5 @@ export async function sendContact(params: ContactParams): Promise<void> {
     if (import.meta.env.DEV) console.warn('[contatti] invio fallito', error);
     throw new SendError('failed');
   }
-  markSent();
+  markSent(params);
 }
