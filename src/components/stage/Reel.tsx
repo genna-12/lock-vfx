@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
 import { useStageStatic, useStageWindow } from '../../lib/stageProgress';
 import { loadProgress, whenImageReady, whenReelReady } from '../../lib/loadProgress';
-import { REEL, REEL_MOBILE, sorgente } from '../../lib/media';
+import { POSTER_TELEFONO, REEL, REEL_MOBILE, sorgente } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 
 /**
@@ -32,7 +32,13 @@ const VERTICALE =
   typeof window !== 'undefined' &&
   window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 const RENDITION = VERTICALE ? REEL_MOBILE : REEL;
-const POSTER = RENDITION.poster;
+/* Il poster segue lo schermo, non il puntatore: quello verticale è per il
+   telefono in piedi, e su un iPad coricato in `cover` sarebbe ingrandito
+   quasi del doppio. La condizione è quella del preload in `index.html`. */
+const POSTER =
+  typeof window !== 'undefined' && window.matchMedia(POSTER_TELEFONO).matches
+    ? REEL_MOBILE.poster
+    : REEL.poster;
 const SOURCES = [{ src: sorgente(RENDITION), type: 'video/mp4' }];
 const HAS_VIDEO = (import.meta.env.VITE_REEL ?? 'none') !== 'none';
 

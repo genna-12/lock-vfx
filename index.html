@@ -9,13 +9,25 @@
     <!-- Il poster della reel è l'LCP della home, e senza questa riga il
          browser lo scopre solo dopo aver eseguito il JS: un secondo e mezzo
          di attesa per un file che è già sul server. Vale solo qui: la pagina
-         Studio non ha immagini sopra la piega. -->
+         Studio non ha immagini sopra la piega. Due righe e un `media` per
+         ciascuna: il telefono scarica solo quello verticale, il resto solo
+         quello orizzontale. Le condizioni sono `POSTER_TELEFONO` in
+         `src/lib/media.ts`: se cambiano, cambiano insieme. -->
     <link
       rel="preload"
       href="/images/showreel-poster.webp"
       as="image"
       type="image/webp"
       fetchpriority="high"
+      media="(min-width: 768px)"
+    />
+    <link
+      rel="preload"
+      href="/images/showreel-poster-mobile.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+      media="(max-width: 767px)"
     />
     <title>LockVFX — effetti visivi per cinema, serie e pubblicità</title>
     <!-- Versione statica (crawler senza JS): App.tsx la riallinea alla lingua

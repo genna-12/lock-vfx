@@ -53,6 +53,16 @@ function riserva(file: string, poster: string): Rendition {
 }
 
 const POSTER_DI_OGGI = 'images/showreel-poster.webp';
+/** Il poster in piedi, 720×1280: quello del telefono (QA, D9). */
+const POSTER_VERTICALE = 'images/showreel-poster-mobile.webp';
+
+/**
+ * Lo schermo su cui si usa il poster verticale. È **la stessa** condizione
+ * del `<link rel="preload" media>` di `index.html`: il file che il browser
+ * precarica deve essere quello che poi si mostra, o si scaricano due poster
+ * per vederne uno.
+ */
+export const POSTER_TELEFONO = '(max-width: 767px)';
 
 /** Lo showreel, 16:9. */
 export const REEL: Rendition = MEDIA
@@ -74,7 +84,7 @@ export const REEL_MOBILE: Rendition = MEDIA
       sd: suR2('reel/reel-mobile-sd.mp4'),
       poster: suR2('reel/reel-mobile-poster.webp'),
     }
-  : riserva('video/reel.mp4', POSTER_DI_OGGI);
+  : riserva('video/reel.mp4', POSTER_VERTICALE);
 
 /** Il breakdown di un lavoro, dal suo slug. */
 export function workRendition(slug: string): Rendition {
