@@ -2,6 +2,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useId,
   useImperativeHandle,
   useRef,
   type PointerEvent as ReactPointerEvent,
@@ -61,6 +62,7 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
   ref
 ) {
   const { t } = useTranslation();
+  const uid = useId();
   const deckRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -337,6 +339,10 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
       role="listbox"
       tabIndex={0}
       aria-label={t('sala.deck')}
+      // Le opzioni non prendono il fuoco: lo tiene la lista, e questo dice
+      // quale lavoro è scelto, così il cambio con le frecce si annuncia
+      // (QA, D19).
+      aria-activedescendant={works[index] ? `${uid}-${works[index].id}` : undefined}
       className={`deck mx-auto w-full focus-visible:outline-2 focus-visible:outline-offset-2 ${reduced ? 'is-flat' : ''} ${className}`}
       style={
         {
@@ -356,6 +362,7 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
             cardsRef.current[i] = el;
           }}
           className="deck-card"
+          id={`${uid}-${work.id}`}
           role="option"
           aria-selected={i === index}
           style={{ top: '22px' }}
