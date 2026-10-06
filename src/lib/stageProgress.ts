@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { modoIniziale } from './useReducedMotion';
 
 /**
  * La progress della carrellata, distribuita da un posto solo.
@@ -17,7 +18,9 @@ import { useSyncExternalStore } from 'react';
  * finestra: i set sono tutti in scena, e `useStageWindow` risponde `true`.
  */
 let progress = 0;
-let isStatic = false;
+// Deciso prima del primo render, non dall'effetto dello Stage: così Reel,
+// Sala e Stanza nascono già nella forma giusta (QA, D20).
+let isStatic = modoIniziale().flat;
 const listeners = new Set<() => void>();
 
 function emit(): void {

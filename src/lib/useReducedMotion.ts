@@ -26,6 +26,22 @@ const SHORT_LANDSCAPE = '(max-height: 500px) and (orientation: landscape)';
  */
 const COARSE = '(hover: none) and (pointer: coarse)';
 
+/**
+ * La modalità della pagina **adesso**, senza React: le stesse tre domande
+ * che lo Stage si fa con gli hook qui sotto. Serve prima del primo render
+ * (`main.tsx` e il valore iniziale di `stageProgress`): se la classe
+ * `static` arriva dall'effetto dello Stage, il primo layout è quello della
+ * carrellata e poi tutto salta — CLS 0,054 su iPad e 0,066 con reduced
+ * motion, misurati dalla QA (D20).
+ */
+export function modoIniziale(): { flat: boolean; coarse: boolean } {
+  if (typeof window === 'undefined') return { flat: false, coarse: false };
+  const coarse = window.matchMedia(COARSE).matches;
+  const flat =
+    coarse || window.matchMedia(REDUCE).matches || window.matchMedia(SHORT_LANDSCAPE).matches;
+  return { flat, coarse };
+}
+
 function useMedia(query: string): boolean {
   const [matches, setMatches] = useState(
     () => typeof window !== 'undefined' && window.matchMedia(query).matches
