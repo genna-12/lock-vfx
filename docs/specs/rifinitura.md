@@ -158,3 +158,11 @@ Decisione, in tre righe:
 3. **Il segnale minimo a riposo** resta quello già scritto (§3, R03): due lampi del secondo foro a 4 s e 12 s, prima visita, finché non si scrolla. Nessun elemento nuovo: aggiungere un indicatore sarebbe ammettere che la scena non parla.
 
 Da verificare: a 390×844 non cambia niente (su touch non c'è carrellata); con reduced motion idem; il loader stacca con la reel a 0 vh.
+
+### 9.8 I campi del form: una riga, non un rettangolo (7/10, Genna)
+
+«Non voglio che i campi si illuminino di rosso tutto intorno: la linea in basso si colora di rosso e basta.» Giusto: il rettangolo (`outline` aggiunto dalla QA per il fuoco, D17) tradisce il disegno dei campi a solo bordo inferiore.
+
+- **A fuoco**: la riga inferiore passa da `stone` 55 % a **`crimson`, 2 px** (sempre 2 px, anche a riposo, per non far saltare il layout — a riposo 2 px `stone` 55 %), e l'**etichetta** cap sopra il campo passa a `crimson`. Nessun `outline`, né col mouse né da tastiera: la riga a 2 px e l'etichetta sono l'indicatore di fuoco (crimson su void ≥ 3:1, area ≥ 2 px: basta per WCAG 2.4.7/2.4.11).
+- **Errore**: riga `crimson` 2 px + messaggio sotto (com'è); se il campo errato prende il fuoco, l'etichetta diventa `crimson` anch'essa.
+- La checkbox e i pulsanti tengono il loro fuoco (il quadrato della presa visione, il pulsante Invia con `outline` 1 px `crimson` di `globals.css`): la regola riguarda solo i campi di testo e la textarea.

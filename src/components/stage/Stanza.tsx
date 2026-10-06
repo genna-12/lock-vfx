@@ -655,12 +655,18 @@ function Field({
 }: FieldProps) {
   const messageId = `${id}-error`;
   const control = clsx(
-    'w-full rounded-none border-0 border-b bg-transparent px-0 pt-2 pb-[10px] text-[16px] text-ink',
-    // A fuoco, oltre al bordo rosso, l'anello: il fuoco deve vedersi anche
-    // senza distinguere il colore. A riposo il bordo è `stone` al 55 %: su
-    // `void` fa 3,5:1 (QA, D17: al 28 % era 1,65:1, e al 45 % — misurato —
-    // solo 2,63; il 3:1 si passa intorno al 50 %).
-    'transition-colors duration-[var(--f5)] disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson',
+    // La riga è sempre di 2 px — a riposo, a fuoco, in errore — così il
+    // fuoco cambia solo colore e non fa saltare niente (il padding sotto è
+    // sceso di un px per tenere l'altezza di prima).
+    'w-full rounded-none border-0 border-b-2 bg-transparent px-0 pt-2 pb-[9px] text-[16px] text-ink',
+    // Niente anello (§9.8, Genna: «la linea in basso si colora di rosso e
+    // basta»): l'indicatore di fuoco è la riga che passa a `crimson` più
+    // l'etichetta sopra, anch'essa `crimson` (`group-focus-within`). A riposo
+    // la riga è `stone` al 55 %: su `void` fa 3,5:1 (QA, D17). Solo in
+    // modalità a contrasto forzato, dove i colori dei bordi si appiattiscono,
+    // torna l'anello: lì il colore non può dire niente.
+    'outline-none forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-solid forced-colors:focus-visible:outline-offset-2',
+    'transition-colors duration-[var(--f5)] disabled:cursor-default',
     invalid ? 'border-crimson' : 'border-stone/55 focus:border-crimson'
   );
 
@@ -677,8 +683,10 @@ function Field({
   };
 
   return (
-    <label className={clsx('relative flex flex-col gap-[14px]', multiline && 'col-span-full')}>
-      <span className="u-cap text-stone">{label}</span>
+    <label className={clsx('group relative flex flex-col gap-[14px]', multiline && 'col-span-full')}>
+      <span className="u-cap text-stone transition-colors duration-[var(--f5)] group-focus-within:text-crimson">
+        {label}
+      </span>
       {multiline ? (
         <textarea
           {...shared}
@@ -699,7 +707,9 @@ function Field({
             const rows = window.matchMedia(MOBILE).matches ? ROWS.maxCompact : ROWS.max;
             const max = line * rows + parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
             el.style.height = 'auto';
-            el.style.height = `${Math.min(el.scrollHeight, max)}px`;
+            // `scrollHeight` non conta la riga sotto, `height` (border-box) sì.
+            const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+            el.style.height = `${Math.min(el.scrollHeight, max) + border}px`;
           }}
         />
       ) : (
