@@ -465,7 +465,14 @@ export function Loader({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {children}
+      {/* Finché l'overlay è a schermo la pagina sotto non esiste per la
+          tastiera: senza `inert` il Tab portava il fuoco sul marchio e sui
+          link coperti dal nero (QA, D15). `display: contents` perché il
+          contenitore non deve avere una scatola sua: il layout resta quello
+          dei figli, e `inert` vale lo stesso per tutto quello che c'è dentro. */}
+      <div className="contents" inert={fase !== 'fine'}>
+        {children}
+      </div>
 
       {fase !== 'fine' ? (
         <div
