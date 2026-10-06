@@ -153,11 +153,13 @@ Genna: «troppo squadrata, la voglio più stondata e liquid glass, stile visionO
 Denis e Nicholas: «appena apro il sito e scrollo, la showreel non si muove fino a una certa percentuale: con la rotella una scrollata che mi lascia fermo sembra un bug, o sembra che ci sia solo la showreel». Hanno ragione: l'HOLD 1 (0–60 vh) è una zona morta, e una zona morta all'inizio è il posto peggiore. Genna aggiunge il vincolo giusto: la reel inquadrata per intero è **un solo fotogramma** (0 vh), e chi tocca appena la rotella o risale senza arrivare in cima deve comunque ritrovarla.
 
 Decisione, in tre righe:
-1. **Il dolly back parte da 0 vh**, non da 60: la reel arretra (`MOVE.reelZ`, `reelY`) in modo lineare su 0–150 vh, così al primo tacco (≈ 100 px, 11 vh) il riquadro è già visibilmente più piccolo (criterio misurabile: a 100 px di scroll, a 1440×900, i bordi della reel si sono spostati di **≥ 8 px**). Niente altro si anticipa: il velo resta 60→105 e le righe dello statement da 105 (Regola di T1 intatta). **La risposta è la reel stessa che arretra, non un segnale aggiunto**: è il "Director's Monitor" che si allontana, e dice da solo che sotto c'è altro.
+1. **Il dolly back parte da 0 vh**, non da 60: la reel arretra (`MOVE.reelZ`, `reelY`) in modo lineare su 0–150 vh, così al primo tacco (≈ 100 px, 11 vh) il riquadro è già visibilmente più piccolo (criterio misurabile: entro 1 s da un tacco di 100 px, a 1440×900, i bordi della reel si sono spostati di **≥ 8 px** — poi la zona di ritorno riporta a 0). Niente altro si anticipa: il velo resta 60→105 e le righe dello statement da 105 (Regola di T1 intatta). **La risposta è la reel stessa che arretra, non un segnale aggiunto**: è il "Director's Monitor" che si allontana, e dice da solo che sotto c'è altro.
 2. **Zona di ritorno 0–75 vh**: l'HOLD 1 diventa un punto (`{ from: 0, to: 0 }`) e il magnete, a rotella ferma, riporta a **0** da qualunque posizione sotto 75 vh, in entrambe le direzioni; da 75 a 150 porta a 190 (lo statement). Così chi sfiora la rotella, o risale e si ferma vicino alla cima, ritrova la reel inquadrata; chi è andato oltre arriva allo statement. Gli altri HOLD e la regola di direzione non cambiano.
 3. **Il segnale minimo a riposo** resta quello già scritto (§3, R03): due lampi del secondo foro a 4 s e 12 s, prima visita, finché non si scrolla. Nessun elemento nuovo: aggiungere un indicatore sarebbe ammettere che la scena non parla.
 
 Da verificare: a 390×844 non cambia niente (su touch non c'è carrellata); con reduced motion idem; il loader stacca con la reel a 0 vh.
+
+Il sito si apre sempre dalla cima: `history.scrollRestoration = 'manual'` (7/10).
 
 ### 9.8 I campi del form: una riga, non un rettangolo (7/10, Genna)
 
