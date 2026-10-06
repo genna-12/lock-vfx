@@ -607,6 +607,38 @@
   transition: opacity var(--f8) linear;
 }
 
+/* ---------- La Sala senza carrellata, su uno schermo basso ---------------
+   iPad coricato (1024×768 touch, QA D7): riquadro a tutta larghezza,
+   titolo e tre righe di lavori non stanno in 768 px, e con `height: 100lvh`
+   le righe finivano sotto la nav e fuori dalla sezione, dove lo snap non le
+   mostra mai. Due regole:
+
+   - il riquadro non supera lo schermo meno il respiro di sopra, la
+     didascalia (96 px) e la fascia di rispetto di sotto, e il video ci sta
+     dentro intero (`contain`);
+   - la sezione Lavori ha l'altezza dello schermo **almeno**: se la lista
+     non ci sta, la sezione si allunga e la lista scorre col resto della
+     pagina, dentro la sua sezione. Dove ci sta (il telefono in piedi) non
+     cambia niente.
+
+   Non sotto i 500 px di altezza: il telefono coricato è fatto per guardare
+   il video, e lì il riquadro resterebbe una striscia. */
+.snap .stage [data-set='work'] {
+  height: auto;
+  min-height: 100lvh;
+}
+
+@media (min-height: 501px) {
+  .static .stage [data-sala-schermo] {
+    max-height: calc(
+      100lvh - clamp(56px, 9vh, 112px) - 96px - 72px - env(safe-area-inset-bottom, 0px)
+    );
+  }
+  .static .stage [data-sala-schermo] video {
+    object-fit: contain;
+  }
+}
+
 /* ---------- La prima schermata (§2.1) -----------------------------------
    L'unica sezione che non prende l'altezza dal suo contenuto: una schermata
    piena, sempre, anche in reduced motion su desktop. E senza padding —

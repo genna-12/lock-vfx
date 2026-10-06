@@ -380,7 +380,7 @@ export function Sala({ works }: SalaProps) {
   if (flat) {
     return (
       <div ref={rootRef} className="u-pad mx-auto flex w-full max-w-[1180px] flex-col gap-7">
-        <div className="relative aspect-video w-full overflow-hidden rounded-frame bg-void">
+        <div data-sala-schermo className="relative aspect-video w-full overflow-hidden rounded-frame bg-void">
           <video
             ref={videoRef}
             className="h-full w-full object-cover"
