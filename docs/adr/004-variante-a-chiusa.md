@@ -1,0 +1,2 @@
+# 004 — Variante A chiusa (6/10)
+Le cinque richieste dei ragazzi (marchio rosso, loader di Nicholas, HUD 2,5 s, sfondo nero, footer con la card 3D) sono tutte su `v2` come default, salvo lo sfondo (`STAGE_BG`), che fra `obsidian` e `void` è indistinguibile (misurato: 2/255) e resta `obsidian`. Il branch `variante-a-rw` è da cancellare. Niente più branch di varianti: le scelte si fanno dietro costanti su `v2` e si decidono da screenshot.

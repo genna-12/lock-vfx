@@ -1,0 +1,4 @@
+# 001 — Il magnete muove la barra, non la camera (6/10)
+**Contesto.** Su desktop lo scroll lento "andava a scatti". Misurato: il magnete scriveva `smoother.scrollTop(v)` a ogni frame, che dentro ScrollSmoother spegne la scia e ingoia i tacchi della rotella; e partiva nella pausa fra due tacchi (`scrollEnd` a 200 ms).
+**Decisione.** Il magnete usa `smoother.scrollTo(v, true)` (la camera segue con la scia normale) e parte solo quando rotella, tasti e dito sono fermi da `SNAP.idle = 0,7 s`. `will-change` su `.stage` e sulle luci, solo desktop. `inCima`/`vaiAlSet` usano lo stesso meccanismo.
+**Conseguenze.** Contraddice la lettera di `momento-1-lo-spazio.md` (`power2.inOut` sulla camera): il 90 % della corsa arriva in ~1,5 s invece di 1,0. Le manopole sono `SNAP.idle` e `SNAP.duration`. Diagnosi con i numeri: `docs/qa-scroll-diagnosi-2026-10-05.md`.
