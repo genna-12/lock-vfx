@@ -64,6 +64,13 @@ const POSTER_VERTICALE = 'images/showreel-poster-mobile.webp';
  */
 export const POSTER_TELEFONO = '(max-width: 767px)';
 
+/**
+ * Il segnaposto dei lavori segue lo schermo come quello della reel: a
+ * 390 px il poster da desktop (65 kB) non serve a niente (QA bis).
+ */
+const SU_TELEFONO =
+  typeof window !== 'undefined' && window.matchMedia(POSTER_TELEFONO).matches;
+
 /** Lo showreel, 16:9. */
 export const REEL: Rendition = MEDIA
   ? { hd: suR2('reel/reel-hd.mp4'), sd: suR2('reel/reel-sd.mp4'), poster: suR2('reel/reel-poster.webp') }
@@ -94,7 +101,7 @@ export function workRendition(slug: string): Rendition {
         sd: suR2(`works/${slug}-sd.mp4`),
         poster: suR2(`works/${slug}.webp`),
       }
-    : riserva(`video/works/${slug}.mp4`, POSTER_DI_OGGI);
+    : riserva(`video/works/${slug}.mp4`, SU_TELEFONO ? POSTER_VERTICALE : POSTER_DI_OGGI);
 }
 
 /* --------------------------------------------------------------------- */
