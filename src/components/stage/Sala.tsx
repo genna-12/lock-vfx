@@ -503,12 +503,14 @@ export function Sala({ works }: SalaProps) {
           <ul className="m-0 flex list-none flex-col gap-3 p-0">
             {works.map((item, i) => (
               <li key={item.id}>
+                {/* Le righe non scelte a 0,75 e non a 0,6: a 13 px il testo
+                    resta sopra 4,5:1 (QA, D17). */}
                 <button
                   type="button"
                   onClick={() => commit(i)}
                   aria-current={i === index || undefined}
                   className={`flex w-full items-center gap-4 text-left transition-opacity duration-[var(--f5)] ${
-                    i === index ? 'opacity-100' : 'opacity-60 hover:opacity-100'
+                    i === index ? 'opacity-100' : 'opacity-75 hover:opacity-100'
                   }`}
                 >
                   <img

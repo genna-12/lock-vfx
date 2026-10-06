@@ -53,7 +53,8 @@
     "errors": {
       "name": "Come possiamo chiamarti?",
       "email": "Serve un’email a cui rispondere.",
-      "message": "Due righe bastano: progetto, tempi, cosa serve."
+      "message": "Due righe bastano: progetto, tempi, cosa serve.",
+      "consent": "Serve la presa visione dell’informativa."
     },
     "consent": {
       "before": "Ho letto l’",

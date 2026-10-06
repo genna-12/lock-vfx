@@ -189,7 +189,8 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                   {t(`nav.${id}`)}
                 </span>
                 {/* Quattro perforazioni uguali: dove si è è piena `ink`, le
-                    altre sono il contorno `stone` al 40 %
+                    altre sono il contorno `stone` al 60 % (al 40 il contrasto
+                    era 2,28:1, QA D17)
                     (`rifinitura-spec.md` §9.1). Il marchio qui non ci sta più
                     — R06 è annullato: il lucchetto rosso ora vive in alto a
                     sinistra, ed era il secondo della riga a non farsi capire.
@@ -200,7 +201,7 @@ export function PerfNav({ active = 'reel' }: PerfNavProps) {
                   className={`block h-[13px] w-[9px] rounded-[2px] border transition-colors duration-200 ${
                     isActive || lampo
                       ? 'border-ink bg-ink'
-                      : 'border-stone/40 bg-transparent group-hover:border-stone'
+                      : 'border-stone/60 bg-transparent group-hover:border-stone'
                   }`}
                 />
               </a>

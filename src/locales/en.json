@@ -53,7 +53,8 @@
     "errors": {
       "name": "What should we call you?",
       "email": "We need an email to reply to.",
-      "message": "Two lines are enough: project, timing, what you need."
+      "message": "Two lines are enough: project, timing, what you need.",
+      "consent": "Please confirm you’ve read the privacy notice."
     },
     "consent": {
       "before": "I have read the ",

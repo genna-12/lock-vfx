@@ -495,18 +495,22 @@ export function Stanza() {
               <input ref={hpRef} name="company" tabIndex={-1} autoComplete="off" />
             </label>
 
-            <label
-              className={clsx(
-                'col-span-full flex items-start gap-3 text-[13px] leading-[1.45] text-stone md:text-[14px] md:leading-[1.5]',
-                !locked && 'cursor-pointer'
-              )}
-            >
+            {/* La presa visione. Il link all'informativa non sta più dentro
+                l'etichetta: sul telefono un tocco impreciso spuntava la
+                casella invece di aprirla (QA, D18). L'etichetta dice il testo
+                del Legale, identico; il link viene subito dopo, in linea, con
+                un'area di 44 px fatta di padding e rimangiata dai margini —
+                la riga non si alza, e la Stanza resta in una schermata. */}
+            <div className="relative col-span-full flex items-start gap-3 text-[13px] leading-[1.45] text-stone md:text-[14px] md:leading-[1.5]">
               <input
                 ref={consentRef}
+                id={`${uid}-consent`}
                 type="checkbox"
                 name="consent"
                 checked={consent}
                 disabled={locked}
+                aria-invalid={consentInvalid || undefined}
+                aria-describedby={consentInvalid ? `${uid}-consent-error` : undefined}
                 onChange={(event) => {
                   toccatoRef.current = true;
                   setConsent(event.currentTarget.checked);
@@ -518,18 +522,33 @@ export function Stanza() {
                   consent ? 'border-ink bg-ink' : consentInvalid ? 'border-crimson' : 'border-stone'
                 )}
               />
-              <span>
-                {t('contact.consent.before')}
+              <p className="m-0">
+                <label htmlFor={`${uid}-consent`} className={clsx(!locked && 'cursor-pointer')}>
+                  {t('contact.consent.before')}
+                  {t('contact.consent.link')}
+                  {t('contact.consent.after')}
+                </label>{' '}
                 <button
                   type="button"
                   onClick={openPrivacy}
-                  className="text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
+                  className="-my-[13px] inline-block py-[13px] text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
                 >
                   {t('contact.consent.link')}
                 </button>
-                {t('contact.consent.after')}
+              </p>
+              {/* Come gli errori dei campi: sotto, in posizione assoluta, e
+                  assente per gli screen reader finché non c'è. */}
+              <span
+                id={`${uid}-consent-error`}
+                aria-hidden={!consentInvalid || undefined}
+                className={clsx(
+                  'absolute top-full left-[26px] mt-1 text-t4 text-stone transition-[opacity,transform] duration-[var(--f5)] ease-[var(--ease-arrive)]',
+                  consentInvalid ? 'translate-y-0 opacity-100' : '-translate-y-1 opacity-0'
+                )}
+              >
+                {t('contact.errors.consent')}
               </span>
-            </label>
+            </div>
 
             <div className="col-span-full flex min-h-11 flex-col-reverse items-stretch gap-3 md:min-h-12 md:flex-row md:items-center md:gap-6 md:justify-between">
               <p
@@ -628,8 +647,12 @@ function Field({
   const messageId = `${id}-error`;
   const control = clsx(
     'w-full rounded-none border-0 border-b bg-transparent px-0 pt-2 pb-[10px] text-[16px] text-ink',
-    'outline-none transition-colors duration-[var(--f5)] disabled:cursor-default',
-    invalid ? 'border-crimson' : 'border-stone/28 focus:border-crimson'
+    // A fuoco, oltre al bordo rosso, l'anello: il fuoco deve vedersi anche
+    // senza distinguere il colore. A riposo il bordo è `stone` al 55 %: su
+    // `void` fa 3,5:1 (QA, D17: al 28 % era 1,65:1, e al 45 % — misurato —
+    // solo 2,63; il 3:1 si passa intorno al 50 %).
+    'transition-colors duration-[var(--f5)] disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson',
+    invalid ? 'border-crimson' : 'border-stone/55 focus:border-crimson'
   );
 
   const shared = {
