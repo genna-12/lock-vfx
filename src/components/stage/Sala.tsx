@@ -350,12 +350,22 @@ export function Sala({ works }: SalaProps) {
   }, [inHold, toggleAudio, toggleFullscreen, togglePlay, wake]);
 
   /* ---- fine video: gira l'anello --------------------------------------- */
+  // Senza carrellata non c'è la deck a cui chiedere il passo: il lavoro
+  // successivo lo sceglie la Sala stessa, con lo stesso `commit` delle righe.
+  const avantiRef = useRef<() => void>(() => undefined);
+  useEffect(() => {
+    avantiRef.current = () => {
+      if (deckRef.current) deckRef.current.step(1);
+      else commit((index + 1) % works.length);
+    };
+  }, [commit, index, works.length]);
+
   const onEnded = useCallback(() => {
     // Il nero comincia subito: dodici fotogrammi di buio, non dodici
     // fotogrammi dell'ultimo fotogramma congelato.
     const black = blackRef.current;
     if (black && !reducedRef.current) black.style.opacity = '1';
-    window.setTimeout(() => deckRef.current?.step(1), END_BLACK_MS);
+    window.setTimeout(() => avantiRef.current(), END_BLACK_MS);
   }, []);
 
   const context = [work.client, String(work.year), ...work.disciplines].join(' · ');
@@ -364,8 +374,9 @@ export function Sala({ works }: SalaProps) {
      La deck coverflow è un oggetto della carrellata: vive di profondità e di
      trascinamento, e in una pagina che scorre non ha senso. Qui i lavori
      sono tre righe — poster, titolo, ruolo — e il riquadro in alto mostra
-     quello scelto. Il pulsante di riproduzione apre il player: sul telefono
-     è quello nativo (M4), su desktop il pieno schermo del riquadro. */
+     quello scelto. Il video parte da solo e alla fine passa al lavoro
+     successivo, come sul desktop; lo schermo intero apre il player: sul
+     telefono quello nativo (M4), su desktop il pieno schermo del riquadro. */
   if (flat) {
     return (
       <div ref={rootRef} className="u-pad mx-auto flex w-full max-w-[1180px] flex-col gap-7">
@@ -382,7 +393,20 @@ export function Sala({ works }: SalaProps) {
             aria-label={work.title}
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
-          />
+            onEnded={onEnded}
+          >
+            {WORKS_HAVE_VIDEO ? (
+              <>
+                {work.video.webm ? <source src={work.video.webm} type="video/webm" /> : null}
+                <source src={work.video.mp4} type="video/mp4" />
+              </>
+            ) : null}
+          </video>
+
+          {/* Lo stacco fra due lavori e il nero di fine video, come sul
+              desktop: la regola di `sala-deck-spec` non cambia con la forma
+              della pagina. */}
+          <div ref={blackRef} aria-hidden className="pointer-events-none absolute inset-0 bg-void opacity-0" />
 
           {/* Il video parte da solo: nessun pulsante "riproduci" — non è mai
               stato chiesto e occuperebbe l'immagine (`mobile-semplice-spec.md`
