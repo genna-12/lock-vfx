@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type SetId } from '../../brand/tokens';
-import { setStageStatic } from '../../lib/stageProgress';
+import { publishVisibile, setStageStatic } from '../../lib/stageProgress';
 import { useCoarsePointer, useReducedMotion, useShortLandscape } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
 import { Reel } from './Reel';
@@ -120,8 +120,18 @@ export function Stage({ onActiveChange }: StageProps) {
       );
       for (const set of sets) io.observe(set);
 
+      // Un secondo osservatore, a soglia zero: non "quale si guarda" ma
+      // "quali si vedono", anche di un pixel. È quello che dice ai video
+      // quando fermarsi e quando ripartire (D11).
+      const vista = new IntersectionObserver((entries) => {
+        for (const entry of entries) publishVisibile(entry.target.id, entry.isIntersecting);
+      });
+      for (const set of sets) vista.observe(set);
+
       return () => {
         io.disconnect();
+        vista.disconnect();
+        for (const set of sets) publishVisibile(set.id, false);
         for (const light of Object.values(luci)) light?.style.removeProperty('opacity');
         html.classList.remove('static');
         html.classList.remove('snap');

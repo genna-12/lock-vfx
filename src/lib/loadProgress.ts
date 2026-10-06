@@ -180,6 +180,11 @@ export function segnaEntrata(): void {
   attese.clear();
 }
 
+/** Lo stacco è già avvenuto? */
+export function giaEntrati(): boolean {
+  return entrati;
+}
+
 /** Chiama `fn` allo stacco, o subito se è già avvenuto. Ritorna la disdetta. */
 export function quandoEntrati(fn: () => void): () => void {
   if (entrati) {

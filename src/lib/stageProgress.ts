@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { modoIniziale } from './useReducedMotion';
+import { giaEntrati, quandoEntrati } from './loadProgress';
 
 /**
  * La progress della carrellata, distribuita da un posto solo.
@@ -22,6 +23,8 @@ let progress = 0;
 // Sala e Stanza nascono già nella forma giusta (QA, D20).
 let isStatic = modoIniziale().flat;
 const listeners = new Set<() => void>();
+/** In flusso statico: le sezioni che hanno almeno un pixel a schermo. */
+const visibili = new Set<string>();
 
 function emit(): void {
   for (const listener of listeners) listener();
@@ -58,6 +61,40 @@ export function useStageStatic(): boolean {
     () => isStatic,
     () => false
   );
+}
+
+/**
+ * La chiama lo Stage in flusso statico, dal suo `IntersectionObserver`: una
+ * sezione è entrata o uscita dallo schermo.
+ */
+export function publishVisibile(id: string, visibile: boolean): void {
+  if (visibili.has(id) === visibile) return;
+  if (visibile) visibili.add(id);
+  else visibili.delete(id);
+  emit();
+}
+
+/**
+ * La sezione `id` è a schermo? Con la carrellata la risposta la dà la
+ * finestra della camera (`useStageWindow`), e qui è sempre `true`; nella
+ * pagina semplice è l'`IntersectionObserver` dello Stage. Serve ai video:
+ * una Reel che gira mentre si guarda la Sala è batteria e banda per niente
+ * (QA, D11).
+ */
+export function useSetVisibile(id: string): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => !isStatic || visibili.has(id),
+    () => false
+  );
+}
+
+/**
+ * Il loader ha staccato? I video della pagina semplice partono dopo, non
+ * sotto l'overlay (`mobile-semplice-spec.md` §5).
+ */
+export function useEntrati(): boolean {
+  return useSyncExternalStore(quandoEntrati, giaEntrati, () => false);
 }
 
 /** `true` quando la camera è dentro la finestra (estremi esclusi). */

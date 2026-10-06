@@ -114,6 +114,14 @@ function ambiente(): { saveData: boolean; rete: string | undefined; larghezza: n
   };
 }
 
+/**
+ * Chi ha chiesto di risparmiare dati: lì nessun video parte da solo (R13,
+ * `mobile-semplice-spec.md` §5). Parte se lo si chiede, col tap.
+ */
+export function risparmioDati(): boolean {
+  return ambiente().saveData;
+}
+
 /** Le reti su cui un file da 10 Mbit/s si ferma a metà. */
 const LENTE = new Set(['slow-2g', '2g', '3g']);
 

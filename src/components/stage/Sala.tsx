@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
-import { useStageStatic, useStageWindow } from '../../lib/stageProgress';
+import { useEntrati, useSetVisibile, useStageStatic, useStageWindow } from '../../lib/stageProgress';
+import { risparmioDati } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { WORKS_HAVE_VIDEO, type Work } from '../../data/works';
 import { Deck, type DeckHandle } from './Deck';
@@ -50,6 +51,10 @@ export function Sala({ works }: SalaProps) {
   // Specchi per gli effetti che non devono rieseguirsi quando questi valori
   // cambiano (il caricamento del video, per esempio).
   const inHoldRef = useRef(false);
+  const autoplayRef = useRef(false);
+  // Pagina semplice: una pausa data col tap resta, anche uscendo e
+  // rientrando nella sezione.
+  const pausaVolutaRef = useRef(false);
   const reducedRef = useRef(false);
 
   const [index, setIndex] = useState(0);
@@ -58,11 +63,19 @@ export function Sala({ works }: SalaProps) {
   // ce l'ha. Solo `:focus-visible` — dopo un clic il pulsante tiene il
   // fuoco, e con un `:focus-within` qualsiasi l'HUD non si spegnerebbe più.
   const [fuocoTastiera, setFuocoTastiera] = useState(false);
-  // Dentro il suo HOLD o no: lo dice lo Stage, che la progress ce l'ha già.
-  const inHold = useStageWindow(HOLD.from, HOLD.to);
   // Senza carrellata la sala non è una sala: è una sezione di pagina con un
   // riquadro e l'elenco dei lavori (`rifinitura-spec.md` §6.4.3 e §6.4.4).
   const flat = useStageStatic();
+  // Dentro il suo HOLD o no: lo dice lo Stage, che la progress ce l'ha già.
+  // Nella pagina semplice l'HOLD è "a schermo, dopo il loader" (QA, D11).
+  const inFinestra = useStageWindow(HOLD.from, HOLD.to);
+  const visibile = useSetVisibile('work');
+  const entrati = useEntrati();
+  const inHold = flat ? visibile && entrati : inFinestra;
+  // Parte da solo? Non con reduced motion, e nella pagina semplice non col
+  // risparmio dati (R13): lì parte col tap.
+  const [risparmio] = useState(risparmioDati);
+  const autoplay = WORKS_HAVE_VIDEO && !reduced && !(flat && risparmio);
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
   // Il segno che compare al tap sul video (pausa o ripresa) e sparisce da
@@ -124,6 +137,7 @@ export function Sala({ works }: SalaProps) {
     const video = videoRef.current;
     if (!video) return;
     const inPausa = video.paused;
+    pausaVolutaRef.current = !inPausa;
     if (inPausa) void video.play().catch(() => undefined);
     else video.pause();
     setSegno(inPausa ? 'play' : 'pause');
@@ -148,9 +162,9 @@ export function Sala({ works }: SalaProps) {
       awakeTimer.current = window.setTimeout(() => setAwake(false), 0);
       return;
     }
-    if (!WORKS_HAVE_VIDEO || reduced || !video) return;
+    if (!autoplay || !video || (flat && pausaVolutaRef.current)) return;
     void video.play().catch(() => undefined);
-  }, [inHold, reduced]);
+  }, [autoplay, flat, inHold]);
 
   /* ---- linea del tempo ------------------------------------------------ */
   useEffect(() => {
@@ -184,7 +198,7 @@ export function Sala({ works }: SalaProps) {
           const video = videoRef.current;
           if (video) {
             video.currentTime = 0;
-            if (inHoldRef.current && WORKS_HAVE_VIDEO && !reducedRef.current) {
+            if (inHoldRef.current && autoplayRef.current) {
               void video.play().catch(() => undefined);
             }
           }
@@ -214,17 +228,26 @@ export function Sala({ works }: SalaProps) {
 
   useEffect(() => {
     inHoldRef.current = inHold;
+    autoplayRef.current = autoplay;
     reducedRef.current = reduced;
-  }, [inHold, reduced]);
+  }, [autoplay, inHold, reduced]);
 
   // Solo il cambio di lavoro ricarica la sorgente. Entrare e uscire
-  // dall'HOLD mette in pausa e riprende: non riavvolge il film.
+  // dall'HOLD mette in pausa e riprende: non riavvolge il film. Al montaggio
+  // no: le `<source>` sono già quelle giuste, e un `load()` esplicito fa
+  // scaricare il video anche con `preload="none"` — sul telefono partiva
+  // sotto il loader, per una sezione che non si vedeva ancora.
+  const primoIndice = useRef(true);
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    if (primoIndice.current) {
+      primoIndice.current = false;
+      return;
+    }
     video.load();
     if (fillRef.current) fillRef.current.style.width = '0%';
-    if (inHoldRef.current && WORKS_HAVE_VIDEO && !reducedRef.current) {
+    if (inHoldRef.current && autoplayRef.current) {
       void video.play().catch(() => undefined);
     }
   }, [index]);
@@ -394,11 +417,12 @@ export function Sala({ works }: SalaProps) {
             ref={videoRef}
             className="h-full w-full object-cover"
             poster={work.poster}
-            autoPlay={WORKS_HAVE_VIDEO && !reduced}
             muted
             loop={false}
             playsInline
-            preload="metadata"
+            // Parte dopo il loader e solo a schermo (l'effetto qui sopra),
+            // e fino ad allora non si scarica niente (§5).
+            preload="none"
             aria-label={work.title}
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
@@ -490,6 +514,8 @@ export function Sala({ works }: SalaProps) {
                   <img
                     src={item.poster}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="aspect-video w-[108px] shrink-0 rounded-[4px] object-cover"
                   />
                   <span className="flex min-w-0 flex-col gap-1">

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
-import { useStageStatic, useStageWindow } from '../../lib/stageProgress';
+import { useEntrati, useSetVisibile, useStageStatic, useStageWindow } from '../../lib/stageProgress';
 import { loadProgress, whenImageReady, whenReelReady } from '../../lib/loadProgress';
-import { POSTER_TELEFONO, REEL, REEL_MOBILE, sorgente } from '../../lib/media';
+import { POSTER_TELEFONO, REEL, REEL_MOBILE, risparmioDati, sorgente } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 
 /**
@@ -47,11 +47,6 @@ const HAS_VIDEO = (import.meta.env.VITE_REEL ?? 'none') !== 'none';
  *  su 560 ≈ 0,27). */
 const PAUSE_AFTER = 0.27;
 
-function prefersLightData(): boolean {
-  const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-  return conn?.saveData === true;
-}
-
 export function Reel() {
   const { t } = useTranslation();
   const reduce = useReducedMotion();
@@ -70,17 +65,28 @@ export function Reel() {
 
   // Reduced motion o risparmio dati: il poster resta fermo e il video parte
   // solo se lo si chiede. Sono due utenti diversi con lo stesso bisogno.
-  const [lightMode] = useState(() => prefersLightData());
+  const [lightMode] = useState(risparmioDati);
   // Senza showreel non c'e' niente da far partire: il poster e' gia' tutto
   // quello che c'e', e un pulsante che non fa nulla e' peggio di nessun
   // pulsante.
   const still = HAS_VIDEO && (reduce || lightMode) && !manualPlay;
   // La reel è in scena fino a quando la camera non l'ha lasciata indietro.
   // La progress la dà lo Stage: qui non si crea un secondo trigger.
-  const inScene = useStageWindow(-1, PAUSE_AFTER);
+  const inFinestra = useStageWindow(-1, PAUSE_AFTER);
   // Senza carrellata la reel non è più uno schermo a piena pagina: è la
-  // prima sezione di una pagina che scorre.
+  // prima sezione di una pagina che scorre. Lì è in scena quando è a
+  // schermo, e solo dopo il loader (QA, D11).
   const flat = useStageStatic();
+  const visibile = useSetVisibile('reel');
+  const entrati = useEntrati();
+  const inScene = flat ? visibile && entrati : inFinestra;
+  // Una pausa data col tap resta: rientrando nella sezione il video non
+  // riparte da solo contro la volontà di chi l'ha fermato.
+  const pausaVolutaRef = useRef(false);
+  const [playing, setPlaying] = useState(false);
+  const [segno, setSegno] = useState<'play' | 'pause' | null>(null);
+  const segnoTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(segnoTimer.current), []);
 
   /* ---- progresso di caricamento --------------------------------------- */
   useEffect(() => {
@@ -111,7 +117,7 @@ export function Reel() {
     // Fuori scena il girato si ferma: un video che continua a girare dietro
     // a un altro set è lavoro della GPU per niente.
     if (inScene) {
-      if (video.paused) void video.play().catch(() => undefined);
+      if (video.paused && !pausaVolutaRef.current) void video.play().catch(() => undefined);
     } else if (!video.paused) {
       video.pause();
     }
@@ -139,6 +145,25 @@ export function Reel() {
     video.currentTime = ((event.clientX - box.left) / box.width) * video.duration;
   }, []);
 
+  /** Il tap sul video, nella pagina semplice: pausa e riprendi (§5). Con
+   *  reduced motion o il risparmio dati è anche l'unico modo di farlo
+   *  partire, e basta: nessun pulsante in più (QA, D12). */
+  const tapSulVideo = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const inPausa = video.paused;
+    pausaVolutaRef.current = !inPausa;
+    if (inPausa) {
+      setManualPlay(true);
+      void video.play().catch(() => undefined);
+    } else {
+      video.pause();
+    }
+    setSegno(inPausa ? 'play' : 'pause');
+    window.clearTimeout(segnoTimer.current);
+    segnoTimer.current = window.setTimeout(() => setSegno(null), 700);
+  }, []);
+
   const toggleAudio = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -156,8 +181,10 @@ export function Reel() {
      L'`h1` resta, invisibile: è l'unico posto in cui la pagina dice cosa fa,
      e lo dice ai motori e agli screen reader, non agli occhi. Niente
      controlli del browser sopra il video, che sarebbero l'unica cosa scritta
-     sullo schermo; il video, se c'è, parte da solo — muto, in loop — e sta
-     fermo se è stato chiesto meno movimento.
+     sullo schermo; il video, se c'è, parte da solo — muto, in loop, dopo il
+     loader e solo finché è a schermo — e sta fermo se è stato chiesto meno
+     movimento o di risparmiare dati. Un tap lo mette in pausa e lo
+     riprende, ed è anche il modo di farlo partire quando sta fermo.
 
      È l'unica sezione la cui altezza non viene dal contenuto: una schermata
      piena, sempre. */
@@ -170,16 +197,35 @@ export function Reel() {
             ref={videoRef}
             className="absolute inset-0 h-full w-full object-cover"
             poster={POSTER}
-            autoPlay={HAS_VIDEO && !reduce}
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
             tabIndex={-1}
             aria-hidden
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
           >
             {HAS_VIDEO ? SOURCES.map((s) => <source key={s.src} src={s.src} type={s.type} />) : null}
           </video>
+          {HAS_VIDEO ? (
+            <button
+              type="button"
+              onClick={tapSulVideo}
+              aria-label={t(playing ? 'sala.pause' : 'sala.play')}
+              className="absolute inset-0 grid place-items-center"
+            >
+              <span
+                aria-hidden
+                className="grid h-14 w-14 place-items-center rounded-full bg-void/60 text-ink transition-opacity duration-[var(--f5)]"
+                style={{ opacity: segno ? 1 : 0 }}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  {segno === 'pause' ? <path d="M9 5v14M15 5v14" /> : <path d="M7 4l13 8-13 8V4z" />}
+                </svg>
+              </span>
+            </button>
+          ) : null}
         </div>
       </>
     );
