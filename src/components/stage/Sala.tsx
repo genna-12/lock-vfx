@@ -334,6 +334,11 @@ export function Sala({ works }: SalaProps) {
           wake();
           break;
         case ' ':
+          // Play/pausa solo col fuoco sulla deck: su un pulsante lo Spazio
+          // lo preme, su un link lo segue, e la Sala non ci si mette in
+          // mezzo (QA, D10). Nella pagina semplice il riquadro è già un
+          // pulsante, e lo Spazio lo preme da sé.
+          if (!target?.closest('[role="listbox"]')) break;
           event.preventDefault();
           togglePlay();
           break;
