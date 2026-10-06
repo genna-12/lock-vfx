@@ -494,7 +494,7 @@ export function Sala({ works }: SalaProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div data-sala-didascalia className="flex flex-col gap-1.5">
           <h2 className="u-display m-0 text-[clamp(20px,2vw,26px)] text-ink">{work.title}</h2>
           <p className="m-0 text-t4 text-stone">{context}</p>
         </div>

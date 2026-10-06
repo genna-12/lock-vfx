@@ -663,13 +663,40 @@
   }
 }
 
-/* iPad coricato (1024×768 touch): la nav sta in basso, a 708–752 px, e la
-   prima riga della lista — a 712 px con la sezione al suo posto — le finiva
-   sotto. Il margine sposta la lista oltre la nav con 12 px di respiro
-   (QA bis). Solo qui: sul telefono in piedi la lista sta più in alto. */
-@media (hover: none) and (pointer: coarse) and (min-width: 1024px) {
+/* iPad coricato (1024×768 touch, e in generale touch largo ≥ 1024 e alto
+   ≤ 900): la Sala sta tutta nella sezione. Il riquadro è 16:9 e la sua
+   larghezza si calcola dall'altezza (100lvh − 340 px: 56 di respiro in alto,
+   12 fra riquadro e lista, la lista da tre righe da 44, 56 di rispetto sopra
+   la nav e i suoi 60 di ingombro); la didascalia resta per gli screen
+   reader — la riga scelta della lista dice già titolo e discipline — e le
+   righe scendono da 61 a 44 px. Niente scroll interno (QA bis). Sostituisce
+   il margine della lista di f6593a0. */
+@media (hover: none) and (pointer: coarse) and (min-width: 1024px) and (max-height: 900px) {
+  .static .stage [data-set='work'] {
+    padding-top: 56px;
+  }
+  .static .stage [data-sala-schermo] {
+    max-height: calc(100lvh - 340px - env(safe-area-inset-bottom, 0px));
+    width: min(100%, calc((100lvh - 340px - env(safe-area-inset-bottom, 0px)) * 16 / 9));
+    margin-inline: auto;
+  }
+  .stage [data-sala-didascalia] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
   .stage [data-sala-lista] {
-    margin-top: calc(56px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+    margin-top: -16px;
+  }
+  .stage [data-sala-lista] img {
+    width: 78px;
+  }
+  .stage [data-sala-lista] button {
+    height: 44px;
   }
 }
 
