@@ -59,6 +59,7 @@
     "consent": {
       "before": "Ho letto l’",
       "link": "informativa privacy",
+      "open": "Leggi l’informativa",
       "after": " e so che questi dati verranno usati solo per rispondermi."
     },
     "send": "Invia",

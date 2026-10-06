@@ -59,6 +59,7 @@
     "consent": {
       "before": "I have read the ",
       "link": "privacy notice",
+      "open": "Read the notice",
       "after": " and understand my data will be used only to reply to me."
     },
     "send": "Send",

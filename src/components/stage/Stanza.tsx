@@ -542,7 +542,7 @@ export function Stanza() {
                   onClick={openPrivacy}
                   className="-my-[13px] inline-block py-[13px] text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
                 >
-                  {t('contact.consent.link')}
+                  {t('contact.consent.open')}
                 </button>
               </p>
               {/* Come gli errori dei campi: sotto, in posizione assoluta, e
