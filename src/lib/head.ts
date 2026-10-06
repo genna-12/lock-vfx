@@ -10,8 +10,10 @@
  * nessun canonical. Quando il dominio arriva non si tocca più il codice: si
  * riempie `VITE_SITE_URL` fra le variabili del progetto (Cloudflare Pages) e
  * con essa si accendono da sole la canonical di tutte e due le pagine,
- * `og:url` e l'indirizzo assoluto dell'immagine OG. L'unica cosa che resta
- * da fare a mano è la riga `Sitemap:` in `public/robots.txt`.
+ * `og:url` e l'indirizzo assoluto dell'immagine OG. Il build li scrive già
+ * nell'HTML (`vite.config.ts`, per i crawler che non eseguono JavaScript),
+ * insieme a `sitemap.xml` e alla riga `Sitemap:` di `robots.txt`; qui si
+ * ritrovano gli stessi tag e si riallineano, senza doppioni.
  *
  * `VITE_PREVIEW=1` marca la versione che i ragazzi guardano prima del
  * lancio: le due pagine dichiarano `noindex, nofollow`. La meta è la seconda

@@ -32,6 +32,41 @@ function previewHeaders(isPreview: boolean): Plugin {
 }
 
 /**
+ * Gli indirizzi assoluti della scheda social, scritti nell'HTML al build.
+ *
+ * WhatsApp, LinkedIn, Facebook e Slack leggono `og:image` e `og:url` senza
+ * eseguire JavaScript: se nell'HTML c'è `/og.png`, l'anteprima esce senza
+ * immagine anche quando `src/lib/head.ts` la corregge a runtime (QA, D4).
+ * Quindi qui si sostituisce `%VITE_SITE_URL%` nei due `index.html` — prima
+ * dell'hook di Vite che fa la stessa cosa con le variabili, così una
+ * variabile vuota non diventa un avviso — e, se l'indirizzo c'è, si
+ * aggiungono `og:url` e `canonical` della pagina. Vuoto (in locale, in
+ * anteprima finché il dominio non c'è) i percorsi restano relativi come
+ * prima e i due tag non si scrivono: un canonical sbagliato è peggio di
+ * nessun canonical.
+ */
+function siteUrl(site: string, base: string): Plugin {
+  return {
+    name: 'lockvfx:site-url',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html, ctx) {
+        const out = html.replaceAll('%VITE_SITE_URL%', site);
+        if (!site) return out;
+        const pagina = `${site}${base}${ctx.path.includes('/studio/') ? 'studio/' : ''}`;
+        return {
+          html: out,
+          tags: [
+            { tag: 'meta', attrs: { property: 'og:url', content: pagina }, injectTo: 'head' },
+            { tag: 'link', attrs: { rel: 'canonical', href: pagina }, injectTo: 'head' },
+          ],
+        };
+      },
+    },
+  };
+}
+
+/**
  * Il testo della pagina Studio, dentro l'HTML (R07).
  *
  * `/studio/` è l'unica pagina di parole del sito: quella che i motori
@@ -103,13 +138,17 @@ export default defineConfig(({ mode }) => {
   // Cloudflare: si guardano tutte e due, come fa Vite per il codice client.
   const env = { ...loadEnv(mode, process.cwd(), 'VITE_'), ...process.env };
 
+  const base = env.VITE_BASE ?? '/';
+  const site = String(env.VITE_SITE_URL ?? '').replace(/\/+$/, '');
+
   return {
-    base: env.VITE_BASE ?? '/',
+    base,
     plugins: [
       react(),
       tailwindcss(),
+      siteUrl(site, base),
       previewHeaders(env.VITE_PREVIEW === '1'),
-      prerenderStudio('dist', env.VITE_BASE ?? '/'),
+      prerenderStudio('dist', base),
     ],
     build: {
       rollupOptions: {
