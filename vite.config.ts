@@ -35,6 +35,15 @@ function fileDiServizio(isPreview: boolean, site: string, base: string): Plugin 
       this.emitFile({ type: 'asset', fileName: '_headers', source: `${righe.join('\n')}\n` });
 
       if (!site || isPreview) return;
+      // `_redirects`: il sottodominio `lock-vfx.pages.dev` rimanda al dominio
+      // vero, con il percorso. Solo in produzione: in anteprima il pages.dev
+      // è l'unico indirizzo che c'è. Le anteprime di branch
+      // (`<branch>.lock-vfx.pages.dev`) non sono toccate.
+      this.emitFile({
+        type: 'asset',
+        fileName: '_redirects',
+        source: `https://lock-vfx.pages.dev/* ${site}${base}:splat 301\n`,
+      });
       const url = (path: string) => `  <url><loc>${site}${base}${path}</loc></url>`;
       this.emitFile({
         type: 'asset',
