@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { type SetId } from '../../brand/tokens';
 import { publishVisibile, setStageStatic } from '../../lib/stageProgress';
 import { useCoarsePointer, useReducedMotion, useShortLandscape } from '../../lib/useReducedMotion';
@@ -37,6 +38,8 @@ type StageProps = {
 };
 
 export function Stage({ onActiveChange }: StageProps) {
+  // I nomi delle sezioni sono quelli della nav, nella lingua attiva (QA, D13).
+  const { t } = useTranslation();
   // La Sala riceve i lavori e non sa da dove vengono: oggi un array, domani
   // un `works.json` pubblicato dalla dashboard.
   const [works] = useState(loadWorks);
@@ -174,7 +177,7 @@ export function Stage({ onActiveChange }: StageProps) {
 
       <div className="camera">
         <div className="world">
-          <section id="reel" data-set="reel" className="set" aria-label="Showreel">
+          <section id="reel" data-set="reel" className="set" aria-label={t('nav.reel')}>
             <div data-leaf="reel" className="absolute inset-0">
               <Reel />
               <div
@@ -189,7 +192,7 @@ export function Stage({ onActiveChange }: StageProps) {
             id="studio"
             data-set="studio"
             className="set pointer-events-none grid place-items-center"
-            aria-label="Studio"
+            aria-label={t('nav.studio')}
           >
             <Statement />
           </section>
@@ -202,7 +205,7 @@ export function Stage({ onActiveChange }: StageProps) {
         id="work"
         data-set="work"
         className="pointer-events-none absolute inset-0"
-        aria-label="Lavori"
+        aria-label={t('nav.work')}
       >
         <div data-leaf="sala" className="absolute inset-0">
           <Sala works={works} />
@@ -223,7 +226,7 @@ export function Stage({ onActiveChange }: StageProps) {
         id="contact"
         data-set="contact"
         className="u-pad absolute inset-0"
-        aria-label="Contatti"
+        aria-label={t('nav.contact')}
       >
         <Stanza />
       </section>
