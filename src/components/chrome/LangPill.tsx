@@ -149,7 +149,9 @@ export function LangPill() {
       <button
         ref={pillRef}
         type="button"
-        aria-label={t('a11y.lang')}
+        // Il nome è «Lingua: Italiano» **più la sigla che si vede**: chi usa
+        // la voce dice «IT», e il nome deve contenerlo (WCAG 2.5.3, QA D16).
+        aria-labelledby={`${id}-nome ${id}-sigla`}
         aria-haspopup="listbox"
         aria-expanded={montata}
         aria-controls={montata ? `${id}-lista` : undefined}
@@ -162,7 +164,12 @@ export function LangPill() {
            da `md` in su (±6). In tutti e due i casi, 44. */
         className="relative flex h-9 items-center gap-2 rounded-pill px-3 text-ink after:absolute after:-inset-x-1 after:-inset-y-1 after:content-[''] md:h-8 md:after:-inset-y-1.5 u-vetro-pill"
       >
-        <span className="u-cap text-[12px] leading-none">{current}</span>
+        <span id={`${id}-nome`} className="u-sr-only">
+          {`${t('a11y.lang')}: ${nomeLingua(current)}`}
+        </span>
+        <span id={`${id}-sigla`} className="u-cap text-[12px] leading-none">
+          {current}
+        </span>
         {/* Il chevron si gira quando la tendina è giù: è l'unico segno che
             dice "questo è aperto" quando il pannello sta sopra il video. */}
         <svg
@@ -181,6 +188,13 @@ export function LangPill() {
           <path d="M2 4L5 7L8 4" stroke="currentColor" strokeWidth="1.2" />
         </svg>
       </button>
+
+      {/* La scelta si annuncia: la pillola cambia sigla, ma uno screen
+          reader non lo direbbe. Nasce già piena e non parla al montaggio;
+          parla quando la lingua cambia. */}
+      <span aria-live="polite" className="u-sr-only">
+        {`${t('a11y.lang')}: ${nomeLingua(current)}`}
+      </span>
 
       {montata ? (
         <ul
