@@ -329,15 +329,17 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
     });
 
     tl
-      /* ---- T1 · DOLLY BACK (60 → 150) ------------------------------
-         La reel arretra e si vela; lo statement viene avanti dal buio;
-         il fondo passa a obsidian e si accende la luce di sala. */
+      /* ---- T1 · DOLLY BACK (0 → 150) -------------------------------
+         La reel arretra dal primo tacco, lineare (§9.7: a 60 il primo
+         tratto era una zona morta e sembrava un bug); poi si vela da 60;
+         lo statement viene avanti dal buio; il fondo passa a obsidian e si
+         accende la luce di sala. */
       .to(reelScreen, {
         z: () => MOVE.reelZ * amplitude(),
         y: () => window.innerHeight * MOVE.reelY * amplitude(),
-        duration: 90,
-        ease: CAMERA.t1,
-      }, 60)
+        duration: T1.dolly.duration,
+        ease: 'none',
+      }, T1.dolly.at)
       .to(reelVeil, { opacity: T1.veil.to, duration: T1.veil.duration }, T1.veil.at)
       .to(reelScreen, { autoAlpha: 0, duration: 30 }, 120)
       // Il colore del fondo dello Studio e' una prova aperta: con

@@ -31,11 +31,21 @@ export const HOLDS: Record<SetId, number> = {
  * posizione a cui il magnete porta.
  */
 export const HOLD_SPANS: ReadonlyArray<{ from: number; to: number; at: number }> = [
-  { from: 0, to: 60, at: HOLDS.reel },
+  // L'HOLD 1 è un fotogramma solo: la reel inquadrata per intero esiste a
+  // 0 vh, e dal primo tacco comincia ad arretrare (`rifinitura.md` §9.7).
+  { from: 0, to: 0, at: HOLDS.reel },
   { from: 150, to: 230, at: HOLDS.studio },
   { from: 310, to: 420, at: HOLDS.work },
   { from: 500, to: STAGE_VH, at: HOLDS.contact },
 ];
+
+/**
+ * La zona di ritorno (§9.7): a rotella ferma, sotto questi vh il magnete
+ * riporta alla reel in **entrambe** le direzioni. Chi sfiora la rotella, o
+ * risale e si ferma vicino alla cima, ritrova la reel inquadrata; da qui a
+ * 150 vale la regola di direzione (scendendo → statement, risalendo → reel).
+ */
+export const RITORNO = 75;
 
 /** Tempi del magnete: `momento-1`, sezione Magneti. */
 export const SNAP = {
@@ -84,6 +94,7 @@ export const SNAP = {
 export function snapProgress(progress: number, direction: number): number {
   const vh = progress * STAGE_VH;
   if (HOLD_SPANS.some((span) => vh >= span.from && vh <= span.to)) return progress;
+  if (vh < RITORNO) return HOLDS.reel / STAGE_VH;
   const target =
     direction >= 0
       ? HOLD_SPANS.find((span) => span.from > vh)
@@ -128,13 +139,16 @@ export const MOVE = {
  * Tempi interni di T1 (Regola di T1 in `momento-1`, decisione della
  * Direzione del 7/9): nessuna riga di testo sopra la fotografia. Il velo
  * scurisce la reel PRIMA che arrivino le parole, e le righe partono a reel
- * già velata. Il dolly back non cambia: si deve vedere per intero.
+ * già velata. Il dolly back invece parte da 0 (`dolly`, §9.7): il primo tacco
+ * deve muovere qualcosa, e quel qualcosa è la reel stessa che arretra.
  *
  * Con questi numeri la prima riga supera 0,3 di opacità a ~110vh, quando il
  * velo è al massimo da cinque vh — il vincolo («niente sopra 0,3 finché il
  * velo non è ≥ 0,7», cioè da 97vh) è rispettato con margine.
  */
 export const T1 = {
+  /** Dolly back della reel: lineare su 0–150, così ogni tacco conta uguale. */
+  dolly: { at: 0, duration: 150 },
   /** Velo della reel: 0 → 0,85 su 60–105. */
   veil: { at: 60, duration: 45, to: 0.85 },
   /** Righe dello statement: da 105, 30vh ciascuna, stagger 8vh. */
