@@ -5,28 +5,57 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 /**
- * Il file `_headers` di Cloudflare Pages, scritto dal build e solo quando il
- * build è un'anteprima.
+ * I file di servizio che il build scrive accanto alle pagine.
  *
- * Tenerlo in `public/` sarebbe stato più corto, ma vorrebbe dire che il
- * giorno del lancio qualcuno deve ricordarsi di cancellarlo: un `noindex`
- * dimenticato è il tipo di errore che si scopre sei mesi dopo, quando il
- * sito non è mai comparso su Google. Così il file esiste soltanto se esiste
- * `VITE_PREVIEW=1`, cioè esattamente insieme alla meta `robots` che
- * `src/lib/head.ts` scrive nella pagina: si spengono insieme, togliendo la
- * variabile dal pannello di Cloudflare.
+ * - **`_headers`** di Cloudflare Pages, sempre. In produzione dice ai
+ *   browser di tenere per un anno i file in `/assets/` (hanno l'impronta
+ *   nel nome: se cambiano, cambia il nome) e i font in `/fonts/` (non
+ *   cambiano: se un giorno cambiassero, si cambia anche il nome del file).
+ *   In anteprima ci aggiunge `X-Robots-Tag: noindex, nofollow`.
+ * - **`sitemap.xml`** e la riga **`Sitemap:`** di `robots.txt`, solo quando
+ *   il dominio c'è (`VITE_SITE_URL`) e non è un'anteprima: una sitemap con
+ *   indirizzi relativi non serve, e una che fa indicizzare l'anteprima fa
+ *   danni.
+ *
+ * Tenere `_headers` in `public/` sarebbe stato più corto, ma la riga del
+ * `noindex` vorrebbe dire che il giorno del lancio qualcuno deve ricordarsi
+ * di toglierla: un `noindex` dimenticato è il tipo di errore che si scopre
+ * sei mesi dopo, quando il sito non è mai comparso su Google. Così si
+ * spegne insieme alla meta `robots` che `src/lib/head.ts` scrive nella
+ * pagina, togliendo `VITE_PREVIEW` dal pannello di Cloudflare.
  */
-function previewHeaders(isPreview: boolean): Plugin {
+function fileDiServizio(isPreview: boolean, site: string, base: string): Plugin {
+  const cache = 'Cache-Control: public, max-age=31536000, immutable';
   return {
-    name: 'lockvfx:preview-headers',
+    name: 'lockvfx:file-di-servizio',
     apply: 'build',
     generateBundle() {
-      if (!isPreview) return;
+      const righe = [`${base}assets/*`, `  ${cache}`, `${base}fonts/*`, `  ${cache}`];
+      if (isPreview) righe.push('/*', '  X-Robots-Tag: noindex, nofollow');
+      this.emitFile({ type: 'asset', fileName: '_headers', source: `${righe.join('\n')}\n` });
+
+      if (!site || isPreview) return;
+      const url = (path: string) => `  <url><loc>${site}${base}${path}</loc></url>`;
       this.emitFile({
         type: 'asset',
-        fileName: '_headers',
-        source: '/*\n  X-Robots-Tag: noindex, nofollow\n',
+        fileName: 'sitemap.xml',
+        source: [
+          '<?xml version="1.0" encoding="UTF-8"?>',
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+          url(''),
+          url('studio/'),
+          '</urlset>',
+          '',
+        ].join('\n'),
       });
+    },
+    // `robots.txt` sta in `public/` e Vite lo copia così com'è: la riga si
+    // aggiunge al file già scritto.
+    async writeBundle(options) {
+      if (!site || isPreview || !options.dir) return;
+      const robots = `${options.dir}/robots.txt`;
+      const testo = await readFile(robots, 'utf8');
+      await writeFile(robots, `${testo.trimEnd()}\n\nSitemap: ${site}${base}sitemap.xml\n`);
     },
   };
 }
@@ -147,7 +176,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       siteUrl(site, base),
-      previewHeaders(env.VITE_PREVIEW === '1'),
+      fileDiServizio(env.VITE_PREVIEW === '1', site, base),
       prerenderStudio('dist', base),
     ],
     build: {

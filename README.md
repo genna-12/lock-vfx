@@ -15,11 +15,13 @@ tutte con un default che funziona (`.env.example` le elenca tutte).
   vuoto il sito non dichiara `canonical` né `og:url`: un canonical
   sbagliato è peggio di nessun canonical. Quando il dominio c'è si riempie
   questa, e con essa si accendono da sole la canonical di tutte e due le
-  pagine, `og:url` e l'indirizzo assoluto dell'immagine OG. Resta da fare a
-  mano solo la riga `Sitemap:` in `public/robots.txt`.
+  pagine, `og:url` e l'indirizzo assoluto dell'immagine OG — scritti già
+  nell'HTML dal build, per i crawler delle anteprime social che non
+  eseguono JavaScript — più `sitemap.xml` e la riga `Sitemap:` di
+  `robots.txt` (non in anteprima). Non resta niente da fare a mano.
 - `VITE_PREVIEW=1` — è l'anteprima che guardano i ragazzi, non il sito
-  vero: le due pagine dichiarano `noindex, nofollow` e il build scrive
-  `dist/_headers` con `X-Robots-Tag` (lo legge Cloudflare Pages, e lo legge
+  vero: le due pagine dichiarano `noindex, nofollow` e il build aggiunge a
+  `dist/_headers` la riga `X-Robots-Tag` (lo legge Cloudflare Pages, e lo legge
   anche chi non esegue il JavaScript). Si spengono insieme togliendo la
   variabile: non c'è nessun file da ricordarsi di cancellare al lancio.
 - `VITE_BASE` — la sottocartella, se il sito non sta alla radice del
