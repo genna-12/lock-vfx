@@ -238,7 +238,13 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
   };
   window.addEventListener('wheel', interrupt, { passive: true });
   window.addEventListener('touchstart', interrupt, { passive: true });
-  window.addEventListener('keydown', interrupt);
+  // Dalla tastiera interrompono solo i tasti che scorrono: Tab, Invio o una
+  // lettera non sono un gesto sullo scroll e non devono fermare la corsa.
+  const TASTI_SCROLL = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar']);
+  const interruptTasto = (e: KeyboardEvent) => {
+    if (TASTI_SCROLL.has(e.key)) interrupt();
+  };
+  window.addEventListener('keydown', interruptTasto);
 
   const ctx = gsap.context(() => {
     const q = gsap.utils.selector(root);
@@ -477,7 +483,7 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
     html.style.removeProperty('--stage-h');
     window.removeEventListener('wheel', interrupt);
     window.removeEventListener('touchstart', interrupt);
-    window.removeEventListener('keydown', interrupt);
+    window.removeEventListener('keydown', interruptTasto);
     ScrollTrigger.removeEventListener('scrollEnd', onScrollEnd);
     release();
     ctx.revert();
