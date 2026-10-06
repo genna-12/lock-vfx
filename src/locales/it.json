@@ -68,6 +68,7 @@
       "failed": "Non è partito. Riprova, o scrivici direttamente:"
     },
     "wait": "Puoi scriverci di nuovo fra {{s}} secondi.",
+    "again": "Scrivi un altro messaggio",
     "honeypot": "Azienda"
   },
   "privacy": {

@@ -15,7 +15,7 @@ import { MOTION } from '../../brand/tokens';
 import { STAGE_VH } from '../../lib/camera';
 import { useStageWindow } from '../../lib/stageProgress';
 import { useReducedMotion } from '../../lib/useReducedMotion';
-import { SendError, THROTTLE_MS, remainingThrottle, sameAsLastSend, sendContact } from '../../lib/emailjs';
+import { SendError, remainingThrottle, sameAsLastSend, sendContact } from '../../lib/emailjs';
 import { CONTACT, PEOPLE } from '../../data/people';
 import { openPrivacy } from '../../lib/privacy';
 import { MARK_VIEWBOX, SHACKLE_CLOSED } from '../../brand/mark';
@@ -102,6 +102,10 @@ export function Stanza() {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const confermaRef = useRef<HTMLDivElement>(null);
+  // «Scrivi un altro messaggio» c'è solo quando un nuovo invio è possibile.
+  const [ancora, setAncora] = useState(false);
 
   // In flusso statico (reduced motion) non c'è carrellata e non c'è un HOLD:
   // la stanza è sempre raggiungibile.
@@ -190,15 +194,31 @@ export function Stanza() {
     };
   }, [closed, reduced]);
 
-  /* ---- un invio al minuto ------------------------------------------------ */
-  // Dopo l'invio il form resta compilato e fermo: chi ha scritto vede cosa ha
-  // mandato. Passato il minuto la staffa si riapre e si può scrivere ancora.
+  /* ---- la conferma, e il messaggio dopo --------------------------------
+     A invio riuscito il form non c'è più: c'è la conferma (`stanza-spec.md`
+     «La conferma»), e il fuoco va lì — il pulsante che lo aveva è sparito
+     con il form, e il fuoco non deve cadere sul `body`. Passato il minuto
+     del limite compare «Scrivi un altro messaggio»: riapre il form **vuoto**
+     e la staffa. Non torna da solo, e non torna compilato: un clic distratto
+     rimanderebbe lo stesso messaggio. */
   useEffect(() => {
     if (status !== 'sent') return;
-    const left = remainingThrottle() || THROTTLE_MS;
-    const id = window.setTimeout(() => setStatus('idle'), left);
+    confermaRef.current?.focus({ preventScroll: true });
+    const id = window.setTimeout(() => setAncora(true), remainingThrottle());
     return () => window.clearTimeout(id);
   }, [status]);
+
+  const scriviAncora = useCallback(() => {
+    setValues({ name: '', email: '', message: '' });
+    setInvalid({ name: false, email: false, message: false });
+    setConsent(false);
+    setConsentInvalid(false);
+    setAncora(false);
+    setStatus('idle');
+    // Il form torna al prossimo render: il fuoco va sul primo campo appena
+    // c'è, così chi ha chiesto di scrivere può cominciare.
+    requestAnimationFrame(() => nameRef.current?.focus({ preventScroll: true }));
+  }, []);
 
   /* ---- validazione ------------------------------------------------------- */
   const setValue = useCallback(
@@ -233,6 +253,14 @@ export function Stanza() {
   /* ---- l'invio ---------------------------------------------------------- */
   const invia = useCallback(() => {
     setAttesa(null);
+    // Durante l'invio i campi diventano `disabled`, e un elemento disabilitato
+    // perde il fuoco, che cade sul `body`. Il pulsante invece resta
+    // raggiungibile (`aria-disabled`): il fuoco si porta lì, e da lì passa
+    // alla conferma o resta dov'è se l'invio fallisce.
+    if (document.activeElement && document.activeElement !== submitRef.current) {
+      const form = submitRef.current?.form;
+      if (form?.contains(document.activeElement)) submitRef.current?.focus({ preventScroll: true });
+    }
     setStatus('sending');
     sendContact({
       ...values,
@@ -390,13 +418,25 @@ export function Stanza() {
 
           {/* A invio riuscito il form lascia il posto alla conferma: il
               marchio che si chiude (nella colonna qui accanto, che sul
-              telefono compare adesso) e una riga sola. Era la firma della
-              Stanza e stava sotto il pulsante *per essere vista all'invio*:
-              qui si vede meglio, ed è l'unica cosa a schermo. */}
+              telefono compare adesso), la riga di ringraziamento e l'email a
+              cui arriverà la risposta, com'è stata scritta — di tutto quello
+              che si è scritto è l'unica cosa che conta ancora. Prende il
+              fuoco: è così che lo screen reader la legge (una regione live
+              che nasce già piena, molti non la annunciano). */}
           {closed ? (
-            <p aria-live="polite" className="m-0 max-w-[40ch] text-[16px] text-stone">
-              {t('contact.status.sent')}
-            </p>
+            <div ref={confermaRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
+              <p className="m-0 max-w-[40ch] text-[16px] text-stone">{t('contact.status.sent')}</p>
+              <p className="m-0 text-[14px] break-all text-stone">{values.email.trim()}</p>
+              {ancora ? (
+                <button
+                  type="button"
+                  onClick={scriviAncora}
+                  className="mt-3 inline-flex min-h-11 items-center self-start text-[14px] text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
+                >
+                  {t('contact.again')}
+                </button>
+              ) : null}
+            </div>
           ) : (
           <form
             noValidate
@@ -522,10 +562,13 @@ export function Stanza() {
                 ) : null}
               </p>
               <button
+                ref={submitRef}
                 type="submit"
-                disabled={locked}
-                // Lo stato `sent` qui non arriva più: quando il messaggio è
-                // partito il form non c'è, c'è la conferma.
+                // `aria-disabled` e non `disabled`: un pulsante disabilitato
+                // perde il fuoco. Il doppio invio lo ferma `locked` in
+                // `onSubmit`. Lo stato `sent` qui non arriva più: quando il
+                // messaggio è partito il form non c'è, c'è la conferma.
+                aria-disabled={locked || undefined}
                 className={clsx(
                   'u-cap h-[44px] min-w-[150px] bg-ink px-[26px] text-void transition-colors duration-[var(--f5)] hover:bg-white md:h-[46px]',
                   status === 'sending' && 'cursor-default opacity-60'

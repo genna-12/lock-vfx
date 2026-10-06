@@ -68,6 +68,7 @@
       "failed": "It didn’t go through. Try again, or write to us directly:"
     },
     "wait": "You can write again in {{s}} seconds.",
+    "again": "Write another message",
     "honeypot": "Company"
   },
   "privacy": {
