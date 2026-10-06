@@ -476,6 +476,30 @@
   .page-studio section { break-inside: avoid; }
 }
 
+/* ---------- La nav verticale non copre il testo (QA, D8) ------------------
+   Da 768 px in su, col mouse, la nav sta a destra a metà altezza, e il foro
+   attivo porta la sua etichetta: con «CONTATTI» occupa fino a ~136 px dal
+   bordo. Il paragrafo dello Studio e il campo «Messaggio» arrivavano a
+   `--pad` dal bordo, cioè sotto. Spostare la nav più in fuori non bastava
+   (l'etichetta resta larga uguale): si lasciano 96 px in più a destra alle
+   due colonne di testo — la tipografia non cambia, cambia la misura.
+
+   Lo Statement è centrato in 1180 px: dove lo schermo è più largo il
+   margine c'è già, e si aggiunge solo quello che manca (zero da ~1372 px).
+   La Stanza è larga quanto lo schermo, ma il form si ferma a 640 px: sugli
+   schermi larghi la riserva toglie solo vuoto. Lì sono 112 px e non 96:
+   l'etichetta è «CONTATTI», la più lunga, e con 96 la riga del campo
+   finiva a 5 px da lei e si leggeva come una riga sola. Sul touch la nav è
+   in basso e queste regole non servono. */
+@media (min-width: 768px) and (not ((hover: none) and (pointer: coarse))) {
+  [data-statement] {
+    padding-right: calc(var(--pad) + max(0px, 96px - max(0px, (100vw - 1180px) / 2)));
+  }
+  .stanza-fit {
+    padding-right: 112px;
+  }
+}
+
 /* ---------- Modalita' statica -------------------------------------------
    `prefers-reduced-motion`, oppure GSAP che non parte: niente camera, i set
    tornano in flusso normale, uno per schermata, luci spente.
