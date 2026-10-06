@@ -337,7 +337,7 @@ export const Deck = forwardRef<DeckHandle, DeckProps>(function Deck(
       role="listbox"
       tabIndex={0}
       aria-label={t('sala.deck')}
-      className={`deck mx-auto w-full ${reduced ? 'is-flat' : ''} ${className}`}
+      className={`deck mx-auto w-full focus-visible:outline-2 focus-visible:outline-offset-2 ${reduced ? 'is-flat' : ''} ${className}`}
       style={
         {
           '--card-w': cardHeightVar,

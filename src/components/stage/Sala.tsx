@@ -54,6 +54,10 @@ export function Sala({ works }: SalaProps) {
 
   const [index, setIndex] = useState(0);
   const [awake, setAwake] = useState(false);
+  // Un comando dell'HUD ha il fuoco **da tastiera**: l'HUD resta su finché
+  // ce l'ha. Solo `:focus-visible` — dopo un clic il pulsante tiene il
+  // fuoco, e con un `:focus-within` qualsiasi l'HUD non si spegnerebbe più.
+  const [fuocoTastiera, setFuocoTastiera] = useState(false);
   // Dentro il suo HOLD o no: lo dice lo Stage, che la progress ce l'ha già.
   const inHold = useStageWindow(HOLD.from, HOLD.to);
   // Senza carrellata la sala non è una sala: è una sezione di pagina con un
@@ -129,7 +133,7 @@ export function Sala({ works }: SalaProps) {
 
   // In verticale su telefono l'HUD non si nasconde: lì è impaginazione, non
   // un velo che copre il film.
-  const hudVisible = portrait || reduced || awake;
+  const hudVisible = portrait || reduced || awake || fuocoTastiera;
 
   // Fuori dall'HOLD il video si ferma e l'HUD sparisce: durante T2 e T3 la
   // sala è un oggetto che si muove nello spazio, non un player.
@@ -506,8 +510,22 @@ export function Sala({ works }: SalaProps) {
       inert={!inHold}
       className={`absolute inset-0 bg-void ${portrait ? 'flex flex-col' : ''}`}
       onPointerMove={portrait ? undefined : wake}
-      onPointerDown={portrait ? undefined : wake}
+      onPointerDown={
+        portrait
+          ? undefined
+          : () => {
+              // Il puntatore riprende il comando: l'HUD torna al timer.
+              setFuocoTastiera(false);
+              wake();
+            }
+      }
       onTouchStart={portrait ? undefined : wake}
+      // Con la tastiera i comandi ricevevano il fuoco a opacità zero (QA,
+      // D6): finché uno di loro ce l'ha, l'HUD si vede.
+      onFocus={(event) => setFuocoTastiera(event.target.matches(':focus-visible'))}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFuocoTastiera(false);
+      }}
     >
       {/* Lo schermo. In verticale non è più a piena pagina: è un 16:9 in alto,
           e sotto ci sta l'impaginazione. */}
@@ -662,7 +680,7 @@ export function Sala({ works }: SalaProps) {
           onClick={togglePlay}
           aria-label={t(playing ? 'sala.pause' : 'sala.play')}
           aria-pressed={playing}
-          className="grid h-10 w-10 place-items-center text-ink/80 transition-colors duration-200 hover:text-ink"
+          className="grid h-10 w-10 place-items-center text-ink/80 transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             {playing ? <path d="M9 5v14M15 5v14" /> : <path d="M7 4l13 8-13 8V4z" />}
@@ -673,7 +691,7 @@ export function Sala({ works }: SalaProps) {
           onClick={toggleAudio}
           aria-label={t(muted ? 'sala.audioOn' : 'sala.audioOff')}
           aria-pressed={!muted}
-          className="grid h-10 w-10 place-items-center text-ink/80 transition-colors duration-200 hover:text-ink"
+          className="grid h-10 w-10 place-items-center text-ink/80 transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M4 9v6h3.5L13 19V5L7.5 9H4z" />
@@ -684,7 +702,7 @@ export function Sala({ works }: SalaProps) {
           type="button"
           onClick={toggleFullscreen}
           aria-label={t('sala.fullscreen')}
-          className="grid h-10 w-10 place-items-center text-ink/80 transition-colors duration-200 hover:text-ink"
+          className="grid h-10 w-10 place-items-center text-ink/80 transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
