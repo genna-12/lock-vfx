@@ -1,6 +1,7 @@
 import { CAMERA, SETS, type SetId } from '../brand/tokens';
 import { carrellataViva } from './carrellataViva';
-import { vaiAllaSezione } from './scrollProgrammato';
+import { quandoUsciti } from './loadProgress';
+import { aScrollFermo, vaiAllaSezione } from './scrollProgrammato';
 
 /**
  * Gli agganci: portare a un set da un link, e arrivarci da un'altra pagina.
@@ -21,20 +22,25 @@ import { vaiAllaSezione } from './scrollProgrammato';
  *   andare: si taglia, come in sala di montaggio (`rifinitura-spec.md` §7.7).
  */
 
-/** Il primo campo del form: chi ha chiesto di scrivere può cominciare. */
-function fuocoSulForm(tentativi = 6): void {
-  const campo = document.querySelector<HTMLInputElement>('#contact input[name="name"]');
-  if (!campo) return;
-  // `preventScroll`: la posizione l'abbiamo appena decisa noi, il browser non
-  // la deve correggere portandosi il campo a metà schermo.
-  campo.focus({ preventScroll: true });
-  // Con la carrellata la Stanza entra in scena quando la camera ci arriva:
-  // se si taglia lì, per un fotogramma o due il set è ancora
-  // `visibility: hidden` e su un elemento invisibile il fuoco non si posa.
-  // Si riprova per qualche fotogramma, poi si lascia perdere.
-  if (document.activeElement !== campo && tentativi > 0) {
-    requestAnimationFrame(() => fuocoSulForm(tentativi - 1));
-  }
+/**
+ * Il primo campo del form: chi ha chiesto di scrivere può cominciare.
+ *
+ * Un tentativo solo, ma al momento giusto: quando l'overlay del loader non
+ * c'è più (prima la pagina è `inert`, e il fuoco non si posa) **e** la pagina
+ * è ferma (con la carrellata la Stanza entra in scena quando la camera ci
+ * arriva, e fino ad allora è `visibility: hidden`). Prima erano sei
+ * fotogrammi di tentativi alla cieca, e dopo il loader lungo non bastavano:
+ * alla prima visita su `/#contact` il fuoco restava sul `body` (QA, D14).
+ */
+function fuocoSulForm(): void {
+  quandoUsciti(() =>
+    aScrollFermo(() => {
+      const campo = document.querySelector<HTMLInputElement>('#contact input[name="name"]');
+      // `preventScroll`: la posizione l'abbiamo appena decisa noi, il browser
+      // non la deve correggere portandosi il campo a metà schermo.
+      campo?.focus({ preventScroll: true });
+    })
+  );
 }
 
 export function vaiAlSet(id: SetId, modo: 'corsa' | 'stacco' = 'corsa'): void {

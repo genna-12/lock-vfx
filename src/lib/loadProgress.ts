@@ -192,6 +192,35 @@ export function quandoEntrati(fn: () => void): () => void {
   };
 }
 
+/**
+ * L'uscita: l'overlay non c'è più, nemmeno in dissolvenza. Lo stacco qui
+ * sopra arriva quando il marchio parte per il volo — la pagina si vede, ma
+ * per altri 900 ms sta sotto un velo e fuori dal giro del Tab (`inert`).
+ * Chi deve **posare il fuoco** (il primo campo del form, arrivando con
+ * `#contact`) aspetta questa, non quella.
+ */
+let usciti = false;
+const attesaUscita = new Set<() => void>();
+
+export function segnaUscita(): void {
+  if (usciti) return;
+  usciti = true;
+  for (const fn of attesaUscita) fn();
+  attesaUscita.clear();
+}
+
+/** Chiama `fn` quando l'overlay è sparito, o subito. Ritorna la disdetta. */
+export function quandoUsciti(fn: () => void): () => void {
+  if (usciti) {
+    fn();
+    return () => undefined;
+  }
+  attesaUscita.add(fn);
+  return () => {
+    attesaUscita.delete(fn);
+  };
+}
+
 const VISIT_KEY = 'lockvfx:visited';
 
 /** Il loader lungo si vede una volta per sessione, non a ogni navigazione. */

@@ -15,6 +15,7 @@ import {
 } from '../../lib/camera';
 import { annunciaCarrellata } from '../../lib/carrellataViva';
 import { publishProgress, setStageStatic } from '../../lib/stageProgress';
+import { aScrollFermo } from '../../lib/scrollProgrammato';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -427,7 +428,27 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
       const meta = holdScroll(st, id);
       if (modo === 'stacco') {
         smoother.scrollTop(meta);
-        arrivato();
+        /* Il bersaglio si ricontrolla a pagina ferma. Una volta su cinque
+           la QA ha visto l'arrivo su `#contact` finire a 620 vh, col footer
+           in vista: qualcosa — un refresh delle misure dopo i font, il
+           salto all'ancora del browser — sposta la barra dopo lo stacco.
+           Se nel frattempo nessuno ha toccato lo scroll e la barra non è
+           dove deve, si rifà lo stacco: l'HOLD è il posto, non un'ipotesi. */
+        let toccato = false;
+        const tocca = () => {
+          toccato = true;
+        };
+        const eventi = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
+        for (const e of eventi) window.addEventListener(e, tocca, { passive: true, once: true });
+        aScrollFermo(() => {
+          for (const e of eventi) window.removeEventListener(e, tocca);
+          const ora = ScrollTrigger.getById('stage');
+          if (!toccato && ora) {
+            const giusto = holdScroll(ora, id);
+            if (Math.abs(window.scrollY - giusto) > 2) smoother.scrollTop(giusto);
+          }
+          arrivato();
+        });
         return;
       }
       corsa(meta, arrivato);

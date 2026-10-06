@@ -10,6 +10,7 @@ import {
   loadProgress,
   markVisited,
   segnaEntrata,
+  segnaUscita,
   whenFontsReady,
 } from '../lib/loadProgress';
 import { useReducedMotion } from '../lib/useReducedMotion';
@@ -454,6 +455,11 @@ export function Loader({ children }: { children: ReactNode }) {
       tende?.kill();
     };
   }, [fase, volo]);
+
+  // L'overlay se n'è andato davvero: da qui il fuoco si può posare.
+  useEffect(() => {
+    if (fase === 'fine') segnaUscita();
+  }, [fase]);
 
   const inGesto = fase === 'gesto';
 

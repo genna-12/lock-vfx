@@ -32,6 +32,34 @@
  * una rete di sicurezza — se qualcosa tiene viva la pagina per sempre, lo
  * snap deve tornare comunque.
  */
+/**
+ * `fn` quando la pagina è ferma: né la barra né il contenuto dello smoother
+ * si sono mossi per `quiete` fotogrammi di fila. Serve a chi deve fare una
+ * cosa **una volta**, nel posto giusto: con la carrellata la camera arriva
+ * un secondo dopo la barra, e un set ancora in viaggio può essere
+ * `visibility: hidden`. Il tetto è la rete di sicurezza. Ritorna la disdetta.
+ */
+export function aScrollFermo(fn: () => void, quiete = 8, tettoMs = 4000): () => void {
+  const contenuto = document.getElementById('smooth-content');
+  const leggi = () => `${window.scrollY}|${contenuto?.style.transform ?? ''}`;
+  let prima = leggi();
+  let fermi = 0;
+  let raf = 0;
+  const t0 = performance.now();
+  const passo = () => {
+    const ora = leggi();
+    fermi = ora === prima ? fermi + 1 : 0;
+    prima = ora;
+    if (fermi >= quiete || performance.now() - t0 > tettoMs) {
+      fn();
+      return;
+    }
+    raf = requestAnimationFrame(passo);
+  };
+  raf = requestAnimationFrame(passo);
+  return () => cancelAnimationFrame(raf);
+}
+
 const FERMO_MS = 180;
 const TETTO_MS = 4000;
 
