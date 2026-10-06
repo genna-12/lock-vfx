@@ -1,10 +1,11 @@
 # Da fare — Genna (per uscire domenica 11/10)
 
-*Solo le cose che una macchina non può fare: account, pannelli, telefono, i ragazzi. In ordine di urgenza. Spunta e aggiorna; la chat lead legge questo file all'avvio.*
+*Solo le cose che una macchina non può fare: account, pannelli, telefono, i ragazzi. In ordine di urgenza. Spunta e aggiorna; la chat lead legge questo file all'avvio. **I passi dei pannelli (Hostinger → Cloudflare, Pages, EmailJS, R2, variabili, controlli) sono in `docs/GUIDA-LANCIO.md`.***
 
 ## Subito
 
-- [ ] **Push** del bundle corrente (`_ufficio/lockvfx-06-10.bundle`): `git fetch .\_ufficio\lockvfx-06-10.bundle v2:v2-cloud` · `git checkout -B v2 v2-cloud` · `git push origin v2`. Poi l'anteprima si aggiorna da sola.
+- [x] ~~Push del bundle `lockvfx-06-10`~~ fatto il 7/10.
+- [ ] **Push** del bundle corrente (`_ufficio/lockvfx-07-10.bundle`: primo tacco che risponde, campi sottolineati, apertura sempre dalla cima): `git fetch .\_ufficio\lockvfx-06-10.bundle v2:v2-cloud` · `git checkout -B v2 v2-cloud` · `git push origin v2`. Poi l'anteprima si aggiorna da sola.
 - [ ] **Prova sul telefono vero** (Safari e Chrome iPhone), prima visita: loader intero (video → logo → volo), reel a pieno schermo, scroll senza scatti, nav che tiene, video dei lavori (quando ci saranno), tendina della lingua di vetro, Stanza in una schermata, invio del form. Scrivi in una riga ciò che non va.
 - [ ] **Prova su PC con la rotella e col trackpad**: lo scroll lento deve essere fluido; i magneti scattano solo a rotella ferma (0,7 s). Se ti sembrano pigri, dillo: le manopole sono `SNAP.idle` e `SNAP.duration` in `carrellata.ts`.
 
@@ -16,12 +17,14 @@
 - [ ] Profili social veri (Instagram, LinkedIn) oppure dimmi di togliere le icone.
 - [ ] Da Nicholas, quando può: l'animazione del loader a **1024×1024 ProRes 4444 con alpha** (quella attuale è 512² senza alpha: va, ma su monitor grandi si vede).
 
-## Account e pannelli
+## Account e pannelli (passi dettagliati in `docs/GUIDA-LANCIO.md`)
+
+- [ ] **Domini**: `lockvfx.com` e `lockvfx.it` sono su Hostinger → spostare i **nameserver** su Cloudflare (gratis; il dominio resta comprato su Hostinger). Serve per Pages, per `media.lockvfx.com` (R2) e per i redirect `.it` → `.com`, `www` → apex. Attenzione ai record della casella `info@lockvfx.com` (MX/SPF/DKIM).
 
 - [ ] **EmailJS**: crea service + template (parametri `from_name`, `reply_to`, `message`, `lang`, `page`; destinatario `info@lockvfx.com`; `Reply-To: {{reply_to}}`); nel pannello attiva **allowlist del dominio** e un limite giornaliero. Le tre chiavi vanno in Cloudflare Pages → Settings → Environment variables (**Production**): `VITE_EMAILJS_PUBLIC_KEY`, `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID` (+ `VITE_EMAILJS_AUTOREPLY_TEMPLATE_ID` se vuoi la risposta automatica). **Mai** `VITE_EMAILJS_MOCK` in produzione. Dopo il deploy: **un invio vero** dal sito.
-- [ ] **Dominio**: comprato (o trasferito) su Cloudflare; Custom domain sul progetto Pages; redirect `www` → apex (o viceversa) e `*.pages.dev` → dominio.
-- [ ] **Cloudflare R2**: bucket `lockvfx-media`, accesso pubblico (dominio `media.<tuo dominio>` o `r2.dev`). Ci carico io i file codificati (ti passo la cartella `dist-media/`); poi in Pages: `VITE_MEDIA_URL=https://media…` (senza barra finale), `VITE_REEL=on`, `VITE_WORKS=on`.
-- [ ] **Variabili di lancio** in Pages: `VITE_SITE_URL=https://<dominio>` (senza barra finale) e **togliere `VITE_PREVIEW`**. Con questo il build scrive canonical/OG assoluti, `sitemap.xml`, la riga `Sitemap:` in `robots.txt`, e spegne il `noindex`. Se c'era la password di Cloudflare Access, toglierla.
+- [ ] **Custom domain** `lockvfx.com` (+ `www`) sul progetto Pages; redirect rules per `www` e per `lockvfx.it`.
+- [ ] **Cloudflare R2**: bucket `lockvfx-media`, custom domain `media.lockvfx.com`. Ci carico io i file codificati (ti passo la cartella `dist-media/`); poi in Pages: `VITE_MEDIA_URL=https://media…` (senza barra finale), `VITE_REEL=on`, `VITE_WORKS=on`.
+- [ ] **Variabili di lancio** in Pages: `VITE_SITE_URL=https://lockvfx.com` (senza barra finale) e **togliere `VITE_PREVIEW`**. Con questo il build scrive canonical/OG assoluti, `sitemap.xml`, la riga `Sitemap:` in `robots.txt`, e spegne il `noindex`. Se c'era la password di Cloudflare Access, toglierla.
 - [ ] Dopo il deploy di produzione: `curl -I https://<dominio>/` **senza** `X-Robots-Tag`; sorgente della pagina senza `noindex`; anteprima social con il Facebook Sharing Debugger o LinkedIn Post Inspector.
 - [ ] **Search Console**: proprietà, invio di `sitemap.xml`, richiesta di indicizzazione di `/` e `/studio/`.
 

@@ -1,0 +1,4 @@
+# 005 — Il primo tacco risponde (7/10)
+**Contesto.** I ragazzi: «appena scrollo la showreel non si muove fino a una certa percentuale: sembra un bug». L'HOLD 1 (0–60 vh) era una zona morta all'inizio. Genna: la reel inquadrata è un solo fotogramma, chi tocca appena la rotella deve ritrovarla.
+**Decisione.** Dolly back lineare da 0 a 150 vh (al primo tacco la reel arretra di ≥ 8 px per lato entro 1 s); velo e righe invariati (Regola di T1). HOLD 1 = punto; zona di ritorno 0–75 vh: a mano ferma si torna a 0, ma dal secondo gesto consecutivo in discesa (entro 3 s) il magnete porta a 190; fra 75 e 150 vale la direzione. `history.scrollRestoration = 'manual'`: il sito si apre sempre dalla cima. Nessun indicatore aggiunto: la risposta è il "Director's Monitor" che arretra.
+**Conseguenze.** Un utente che scende con un tacco ogni > 3 s torna a 0 ogni volta (accettato: è un comportamento da esplorazione, non da lettura). Spec: `docs/specs/rifinitura.md` §9.7.

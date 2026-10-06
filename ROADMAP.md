@@ -3,6 +3,7 @@
 ## Chiusi (una riga ciascuno)
 - Costruzione (Step 0–9 bis, settembre): carrellata desktop, pagina Studio, Stanza con EmailJS, Lighthouse 100/100 desktop.
 - Rifinitura, Lotti 0–6 (8–18/9): anteprima Cloudflare Pages, mobile semplice (snap nativo), dati veri (nomi, P. IVA), loader v3 col video di Nicholas, marchio ufficiale rosso, pillola della lingua di vetro, footer con la card 3D, GSAP solo su desktop, Studio prerenderizzata, impianto video HD/SD + R2.
+- 7/10 (Lotto 8): il primo tacco risponde (dolly da 0, zona di ritorno), campi sottolineati, apertura dalla cima. Validato.
 - 5–6/10: scroll a scatti risolto (ADR 001); QA pre-lancio: 21 difetti corretti + 5 note, sitemap/robots/404/`_headers` di produzione, media alleggeriti (home a cache vuota 555 → 316 kB). Validato.
 
 ## Attivo — T1 · Pronto a uscire (entro sabato 10/10)

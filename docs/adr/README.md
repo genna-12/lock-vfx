@@ -8,3 +8,4 @@ Una riga per decisione. Le decisioni di design e brand prese prima del 6/10 vivo
 | 002 | Il cancello del loader è il primo fotogramma riprodotto, non `canplaythrough` | `002-loader-cancello.md` |
 | 003 | Il marchio è il logo ufficiale riempito, rosso nel chrome; un solo vetro (pillola + tendina) con i raggi `pill`/`glass` | `003-marchio-e-vetro.md` |
 | 004 | Variante A chiusa: le scelte sono su `v2`; nessun branch di varianti | `004-variante-a-chiusa.md` |
+| 005 | Il primo tacco risponde: dolly back da 0 vh, HOLD 1 ridotto a un punto, zona di ritorno 0–75 (primo gesto → 0, dal secondo → 190); il sito si apre sempre dalla cima | `005-primo-tacco.md` |

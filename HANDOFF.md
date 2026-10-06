@@ -1,10 +1,10 @@
-# Handoff (6 ottobre 2026, notte)
+# Handoff (7 ottobre 2026)
 
 ## Stato
-Branch `v2`, cantiere cloud a `80245a2` (+ i commit dei file di stato); `origin/v2` è fermo a `c886479`: **32 commit da spingere** (bundle `_ufficio/lockvfx-06-10.bundle`, comandi in `docs/DA-FARE-GENNA.md`). Scroll desktop sistemato e validato (ADR 001); QA pre-lancio completa (`docs/qa-2026-10-06.md`): 21 difetti + 5 note corretti, validati con misure, console pulita, home a cache vuota 316 kB desktop / 345 kB telefono. Sitemap, robots, 404 e `_headers` di produzione già nel build. Testi e video veri **non ancora arrivati**: i segnaposto sono elencati in `docs/CONTENUTI.md`.
+Branch `v2`; `origin/v2` a `b515261` (Genna ha spinto il 7/10). Cantiere cloud a `a964f11` + questo commit: **5 commit da spingere** (bundle `_ufficio/lockvfx-07-10.bundle`). Lotto 8 (7/10, dai ragazzi): il primo tacco di rotella fa arretrare la reel (dolly da 0 vh), zona di ritorno 0–75 vh col secondo gesto in discesa che porta allo statement, `scrollRestoration` manuale, campi del form sottolineati senza rettangolo — validato `ok con note`. Scroll desktop sistemato e validato (ADR 001); QA pre-lancio completa (`docs/qa-2026-10-06.md`): 21 difetti + 5 note corretti, validati con misure, console pulita, home a cache vuota 316 kB desktop / 345 kB telefono. Sitemap, robots, 404 e `_headers` di produzione già nel build. Testi e video veri **non ancora arrivati**: i segnaposto sono elencati in `docs/CONTENUTI.md`.
 
 ## Prossimo passo
-Appena Genna conferma il push e la prova sul telefono: (a) se arrivano testi/master → agente Sonnet con `docs/CONTENUTI.md` come spec, poi validatore (desktop + 390×844 + R13 con i video veri) e nuovo bundle; (b) se arriva l'informativa dal Legale → in `privacy.body` it/en; (c) tutto il resto è in mano a Genna (`docs/DA-FARE-GENNA.md`).
+Genna segue `docs/GUIDA-LANCIO.md` (Hostinger → Cloudflare, Pages, EmailJS, R2, variabili). Appena Genna conferma il push e la prova sul telefono: (a) se arrivano testi/master → agente Sonnet con `docs/CONTENUTI.md` come spec, poi validatore (desktop + 390×844 + R13 con i video veri) e nuovo bundle; (b) se arriva l'informativa dal Legale → in `privacy.body` it/en; (c) tutto il resto è in mano a Genna (`docs/DA-FARE-GENNA.md`).
 
 ## In sospeso
 - `privacy.body` è un segnaposto: **bloccante per il lancio** (il form raccoglie dati).
