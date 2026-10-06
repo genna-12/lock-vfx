@@ -381,40 +381,38 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
 
   ScrollTrigger.refresh();
 
+  /* ---- la corsa: marchio → in cima, link del footer, «Scrivici» ------
+     Come il magnete: si anima un numero e a ogni fotogramma si sposta la
+     **barra** (`scrollTo(v, true)`), e la camera la segue con la sua scia.
+     Prima si animava `scrollTop` dello smoother, che è il salto secco: alza
+     `isProxyScrolling`, e dopo la corsa una barra trascinata (o «trova
+     nella pagina», o uno `scrollTo`) muoveva la barra ma non la pagina —
+     misurato dalla QA: barra a 300 vh, contenuto fermo a 0 (D3).
+
+     La corsa occupa il posto del magnete (`pull`): finché va, il magnete
+     non parte, e il primo gesto sullo scroll la stacca con lo stesso
+     `interrupt` — chi tocca lo scroll ha sempre ragione. */
+  const corsa = (meta: number, arrivato?: () => void) => {
+    release();
+    const proxy = { at: window.scrollY };
+    pull = gsap.to(proxy, {
+      at: meta,
+      duration: CAMERA.smooth,
+      ease: CAMERA.t1,
+      onUpdate: () => smoother.scrollTo(proxy.at, true),
+      onComplete: () => {
+        pull = undefined;
+        arrivato?.();
+      },
+    });
+  };
+
   /* ---- chi muove la camera, per chi non sa che esista ----------------
      Il marchio, la nav e i link interni chiedono qui. Le tre funzioni sono
      quelle di prima, spostate: `inCima.ts` e `agganci.ts` non importano più
      gsap, e restano nel chunk iniziale. */
   annunciaCarrellata({
-    inCima: () => {
-      /* `smoother.scrollTo(0, true)` qui non porta in cima, e il motivo è
-         dentro GSAP: con `smooth` e lo smoother non in pausa si limita a
-         spostare la **barra** e lascia che sia la camera a raggiungerla da
-         sola. Con il pin da 560vh la camera non la raggiunge — misurato
-         dalla Sala: barra a 0, contenuto fermo a −3 285, cioè la pagina non
-         si muove di un pixel. Si anima quindi la posizione dello smoother,
-         che è esattamente quello che GSAP stesso fa quando lo smoother è in
-         pausa: ogni fotogramma scrive la barra e la camera insieme.
-
-         Chi tocca lo scroll ha sempre ragione, come per i magneti: al primo
-         gesto la corsa si stacca. */
-      const corsa = gsap.to(smoother, {
-        scrollTop: 0,
-        duration: CAMERA.smooth,
-        ease: CAMERA.t1,
-        overwrite: 'auto',
-        onComplete: () => stacca(),
-      });
-      const ferma = () => corsa.kill();
-      const stacca = () => {
-        window.removeEventListener('wheel', ferma);
-        window.removeEventListener('touchstart', ferma);
-        window.removeEventListener('keydown', ferma);
-      };
-      window.addEventListener('wheel', ferma, { passive: true, once: true });
-      window.addEventListener('touchstart', ferma, { passive: true, once: true });
-      window.addEventListener('keydown', ferma, { once: true });
-    },
+    inCima: () => corsa(0),
     vaiAllHold: (id) => {
       const st = ScrollTrigger.getById('stage');
       if (!st) return;
@@ -432,13 +430,7 @@ export function montaCarrellata(root: HTMLElement, notify: (id: SetId) => void):
         arrivato();
         return;
       }
-      gsap.to(smoother, {
-        scrollTop: meta,
-        duration: CAMERA.smooth,
-        ease: CAMERA.t1,
-        overwrite: 'auto',
-        onComplete: arrivato,
-      });
+      corsa(meta, arrivato);
     },
   });
 
