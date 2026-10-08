@@ -7,7 +7,8 @@
 - 5–6/10: scroll a scatti risolto (ADR 001); QA pre-lancio: 21 difetti corretti + 5 note, sitemap/robots/404/`_headers` di produzione, media alleggeriti (home a cache vuota 555 → 316 kB). Validato.
 
 ## Attivo — T1 · Pronto a uscire (entro sabato 10/10)
-1. **Genna**: `docs/DA-FARE-GENNA.md` (push, prova telefono/rotella, EmailJS, dominio, R2, variabili, Legale).
+0. **Infrastruttura (in corso, 8/10)**: DNS su Cloudflare ✔, custom domain Pages ✔, redirect `www`/`.it` (in corso), SPF/DMARC (da fare), EmailJS §3, R2 da abilitare, variabili §5 — `docs/GUIDA-LANCIO.md`.
+1. **Genna**: `docs/DA-FARE-GENNA.md` (push del bundle `lockvfx-08-10`, prova telefono/rotella del Lotto 8, materiali, Legale).
 2. **Contenuti** quando arrivano testi e master: procedura `docs/CONTENUTI.md` (agente Sonnet) → validazione → push. Include la riverifica R13 con i video veri.
 3. **Informativa privacy** in `privacy.body` + decisione sul link "Cookie policy" (Legale fase 2). **Bloccante.**
 4. **Lancio**: `VITE_SITE_URL`, via `VITE_PREVIEW`, dominio, `main` allineato, controlli post-deploy (curl, OG, Search Console).
