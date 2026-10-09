@@ -41,7 +41,7 @@ Il sito manda il messaggio dal browser a EmailJS, che lo inoltra a `info@lockvfx
    - **Subject**: `Nuovo messaggio dal sito — {{from_name}}`
    - **Content**: apri il **Code Editor** del template e incolla tutto `docs/emailjs/notifica.html` (versione grafica in stile LockVFX, già provata).
    I nomi dei parametri sono **esattamente** `from_name`, `reply_to`, `message`, `lang`, `page`: il sito li manda così. Salva; segna il **Template ID** (es. `template_x9y8z7`).
-4. (Facoltativo) Secondo template di **risposta automatica** a chi scrive: To Email `{{reply_to}}`, oggetto «Ricevuto — LockVFX», testo breve («Grazie, ti rispondiamo entro due giorni lavorativi.»). Segna il suo Template ID: va in `VITE_EMAILJS_AUTOREPLY_TEMPLATE_ID`. Se non lo vuoi, non impostare quella variabile.
+4. Secondo template, **risposta automatica** a chi scrive: incolla `docs/emailjs/risposta-automatica.html` nel Code Editor; oggetto e campi sono in cima al file (To Email `{{reply_to}}`, Reply To `info@lockvfx.com`). Segna il Template ID: va in `VITE_EMAILJS_AUTOREPLY_TEMPLATE_ID`. **Non** collegarlo nella scheda *Auto-Reply* della notifica: lo manda già il sito, e collegarlo darebbe due risposte. Ogni contatto consuma così 2 dei 200 invii gratuiti al mese.
 5. **Account → General**: copia la **Public Key** (es. `AbCdEfGh123456789`).
 6. **Account → Security**: imposta il **limite di frequenza** (rate limit) se il pannello lo offre. La **restrizione dei domini** (whitelist) secondo la pagina prezzi è solo dal piano Personal (9 $/mese): col gratuito non c'è, e va bene così — il sito ha già honeypot e un invio al minuto per browser, il destinatario è fisso nel template, e il peggio che può fare un bot è mandare spam a info@ o consumare i 200 invii del mese (allora il form mostra l'indirizzo email come rimedio). Se arriva spam vero, si valuta il Personal; reCAPTCHA no (è Google: terzo nel sito, informativa e banner).
 7. Le tre chiavi (`Service ID`, `Template ID`, `Public Key`) vanno su Cloudflare, sez. 5. **Non** nel repo, **non** in `.env` committati.
@@ -60,22 +60,7 @@ Serve solo quando i master sono stati codificati (`docs/CONTENUTI.md`: `scripts/
 
 ## 5. Variabili e deploy di produzione (Cloudflare Pages)
 
-Workers & Pages → `lock-vfx` → **Settings → Environment variables → Production**:
-
-| variabile | valore | note |
-|---|---|---|
-| `VITE_SITE_URL` | `https://lockvfx.com` | **senza barra finale**; accende canonical, OG assoluti, `sitemap.xml`, riga `Sitemap:` in `robots.txt` |
-| `VITE_PREVIEW` | **(cancellare la variabile)** | finché c'è, le pagine sono `noindex` e `_headers` ha `X-Robots-Tag` |
-| `VITE_EMAILJS_PUBLIC_KEY` | dalla sez. 3 | |
-| `VITE_EMAILJS_SERVICE_ID` | dalla sez. 3 | |
-| `VITE_EMAILJS_TEMPLATE_ID` | dalla sez. 3 | |
-| `VITE_EMAILJS_AUTOREPLY_TEMPLATE_ID` | solo se vuoi la risposta automatica | |
-| `VITE_MEDIA_URL` | `https://media.lockvfx.com` | solo quando i video sono su R2 (sez. 4) |
-| `VITE_REEL` / `VITE_WORKS` | `on` | idem; finché sono `none` resta il poster |
-| `NODE_VERSION` | `22` | c'è già |
-| `VITE_EMAILJS_MOCK` | **mai** in produzione | |
-
-Poi **Deployments → Retry deployment** (le variabili entrano solo in un build nuovo) **oppure** un push su `v2`. Il Production branch oggi è `v2`: puoi lasciarlo così fino al lancio; quando vuoi, allinei `main` (`git checkout main && git merge --ff-only v2 && git push`) e in Settings → Builds metti Production branch = `main`.
+**Tutto in `docs/VARIABILI-CLOUDFLARE.md`**: dove si mettono, quali, in quale momento (form adesso, lancio domenica, video dopo), e il Retry deployment.
 
 Se avevi messo la **password** (Zero Trust → Access) sull'anteprima: toglila (Access → Applications → elimina l'app) prima del lancio.
 

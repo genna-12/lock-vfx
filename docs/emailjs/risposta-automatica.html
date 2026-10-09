@@ -1,0 +1,100 @@
+<!--
+  Template EmailJS "Risposta automatica" — arriva a chi ha scritto dal sito, nella lingua in cui ha visto il sito.
+  Impostazioni del template (scheda Settings):
+    Subject:     {{#en}}We've got your message — LockVFX{{/en}}{{^en}}Abbiamo ricevuto il tuo messaggio — LockVFX{{/en}}
+    To Email:    {{reply_to}}
+    From Name:   LockVFX
+    Reply To:    info@lockvfx.com
+  NON collegarlo nella scheda "Auto-Reply" del template di notifica: lo manda già il sito
+  (variabile VITE_EMAILJS_AUTOREPLY_TEMPLATE_ID). Collegarlo anche lì = due risposte e il doppio degli invii.
+
+  Volutamente NON contiene nulla di quello che ha scritto la persona (né nome né messaggio):
+  l'indirizzo di destinazione lo sceglie chi compila il form, quindi un bot potrebbe usare
+  la risposta automatica per spedire il proprio testo a chiunque a nome di lockvfx.com.
+  Senza contenuto dell'utente, il peggio che può succedere è un "grazie" a uno sconosciuto.
+
+  `en` è un interruttore che manda il sito: "1" se il sito era in inglese, vuoto se in italiano.
+-->
+<div style="margin:0;padding:0;background-color:#020202;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#020202;">{{#en}}Your message reached us. We'll get back to you as soon as we can.{{/en}}{{^en}}Il tuo messaggio è arrivato. Ti rispondiamo il prima possibile.{{/en}}</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#020202;">
+    <tr>
+      <td align="center" style="padding:48px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:#0B0B0E;border:1px solid #1C1C21;border-radius:6px;">
+
+          <tr>
+            <td style="height:2px;line-height:2px;font-size:0;background-color:#E60B18;border-radius:6px 6px 0 0;">&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="padding:28px 40px 0 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;letter-spacing:0.02em;color:#F2F0EB;">
+                    <span style="color:#E60B18;">&#9632;</span>&nbsp;LockVFX
+                  </td>
+                  <td align="right" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#7A7873;">
+                    {{#en}}Message received{{/en}}{{^en}}Messaggio ricevuto{{/en}}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- La frase -->
+          <tr>
+            <td style="padding:64px 40px 0 40px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:34px;line-height:1.15;font-weight:300;letter-spacing:-0.01em;color:#F2F0EB;">
+              {{#en}}Thank you.<br>We've got it.{{/en}}{{^en}}Grazie.<br>L'abbiamo ricevuto.{{/en}}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px 0 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr><td style="width:40px;height:2px;line-height:2px;font-size:0;background-color:#E60B18;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px 0 40px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.65;color:#B8B5AE;">
+              {{#en}}Your message has reached us. We read every request ourselves, and we're committed to getting back to you as soon as possible.{{/en}}{{^en}}Il tuo messaggio è arrivato. Leggiamo ogni richiesta di persona, e ci impegniamo a risponderti il prima possibile.{{/en}}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 40px 0 40px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.65;color:#B8B5AE;">
+              {{#en}}Want to add something in the meantime &mdash; references, timing, a shot count? Just reply to this email.{{/en}}{{^en}}Vuoi aggiungere qualcosa nel frattempo &mdash; riferimenti, tempi, numero di shot? Rispondi direttamente a questa email.{{/en}}
+            </td>
+          </tr>
+
+          <!-- Firma -->
+          <tr>
+            <td style="padding:48px 40px 0 40px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#F2F0EB;">
+              Denis Ruscitti &nbsp;&middot;&nbsp; Nicholas Pantieri
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:4px 40px 48px 40px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:#7A7873;">
+              {{#en}}LockVFX &mdash; visual effects for film, series and advertising{{/en}}{{^en}}LockVFX &mdash; effetti visivi per cinema, serie e pubblicità{{/en}}
+            </td>
+          </tr>
+
+          <!-- Piede -->
+          <tr>
+            <td style="padding:20px 40px 28px 40px;border-top:1px solid #1C1C21;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#7A7873;">
+                    {{#en}}An automatic confirmation &mdash; the only one. You haven't been added to any list.{{/en}}{{^en}}Una conferma automatica, l'unica: non ti abbiamo iscritto a nessuna lista.{{/en}}
+                  </td>
+                  <td align="right" valign="top" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;white-space:nowrap;padding-left:16px;">
+                    <a href="https://lockvfx.com" style="color:#B8B5AE;text-decoration:none;">lockvfx.com&nbsp;&rarr;</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>

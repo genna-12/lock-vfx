@@ -164,6 +164,10 @@ export async function sendContact(params: ContactParams): Promise<void> {
       reply_to: params.email,
       message: params.message,
       lang: params.lang,
+      // EmailJS non sa confrontare valori, solo dire "c'è / non c'è"
+      // (`{{#en}}…{{/en}}{{^en}}…{{/en}}`): per scegliere la lingua della
+      // risposta automatica serve un interruttore, vuoto in italiano.
+      en: params.lang.toLowerCase().startsWith('en') ? '1' : '',
       page: location.href,
     });
   } catch (error) {
