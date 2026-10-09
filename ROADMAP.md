@@ -3,13 +3,14 @@
 ## Chiusi (una riga ciascuno)
 - Costruzione (Step 0–9 bis, settembre): carrellata desktop, pagina Studio, Stanza con EmailJS, Lighthouse 100/100 desktop.
 - Rifinitura, Lotti 0–6 (8–18/9): anteprima Cloudflare Pages, mobile semplice (snap nativo), dati veri (nomi, P. IVA), loader v3 col video di Nicholas, marchio ufficiale rosso, pillola della lingua di vetro, footer con la card 3D, GSAP solo su desktop, Studio prerenderizzata, impianto video HD/SD + R2.
+- 9/10: lancio senza materiali (ADR 007): nomi veri, segnaposto nascosti, Sala vuota col cartello, lavori solo `cleared`. Validato.
 - 7/10 (Lotto 8): il primo tacco risponde (dolly da 0, zona di ritorno), campi sottolineati, apertura dalla cima. Validato.
 - 5–6/10: scroll a scatti risolto (ADR 001); QA pre-lancio: 21 difetti corretti + 5 note, sitemap/robots/404/`_headers` di produzione, media alleggeriti (home a cache vuota 555 → 316 kB). Validato.
 
 ## Attivo — T1 · Pronto a uscire (entro sabato 10/10)
-0. **Infrastruttura (in corso, 8/10)**: DNS su Cloudflare ✔, custom domain Pages ✔, redirect `www`/`.it` (in corso), SPF/DMARC (da fare), EmailJS §3, R2 da abilitare, variabili §5 — `docs/GUIDA-LANCIO.md`.
-1. **Genna**: `docs/DA-FARE-GENNA.md` (push del bundle `lockvfx-08-10`, prova telefono/rotella del Lotto 8, materiali, Legale).
-2. **Contenuti** quando arrivano testi e master: procedura `docs/CONTENUTI.md` (agente Sonnet) → validazione → push. Include la riverifica R13 con i video veri.
+0. **Infrastruttura**: DNS ✔, custom domain ✔, SPF/DMARC ✔; da fare: redirect `www`→apex (manca) e `.it` a 301 (oggi 302), DKIM da controllare, EmailJS §3, R2 da abilitare, variabili §5 — `docs/GUIDA-LANCIO.md`.
+1. **Genna**: `docs/DA-FARE-GENNA.md` (push del bundle `lockvfx-09-10`, prova telefono/rotella del Lotto 8, materiali, Legale).
+2. **Contenuti** (non più bloccanti, ADR 007) quando arrivano testi e master: procedura `docs/CONTENUTI.md` (agente Sonnet) → validazione → push. Include la riverifica R13 con i video veri.
 3. **Informativa privacy** in `privacy.body` + decisione sul link "Cookie policy" (Legale fase 2). **Bloccante.**
 4. **Lancio**: `VITE_SITE_URL`, via `VITE_PREVIEW`, dominio, `main` allineato, controlli post-deploy (curl, OG, Search Console).
 

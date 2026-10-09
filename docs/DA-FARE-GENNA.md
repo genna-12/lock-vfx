@@ -5,11 +5,14 @@
 ## Subito
 
 - [x] ~~Push del bundle `lockvfx-06-10`~~ fatto il 7/10.
-- [x] ~~Push dei bundle `07-10` e `08-10`~~: `origin/v2` è a `8f54fa0` (verificato il 9/10).
-- [ ] **Prova sul telefono vero** (Safari e Chrome iPhone), prima visita: loader intero (video → logo → volo), reel a pieno schermo, scroll senza scatti, nav che tiene, video dei lavori (quando ci saranno), tendina della lingua di vetro, Stanza in una schermata, invio del form. Scrivi in una riga ciò che non va.
+- [x] ~~Push dei bundle `07-10` e `08-10`~~: `origin/v2` era a `8f54fa0` (verificato il 9/10).
+- [ ] **Push** del bundle `_ufficio/lockvfx-09-10.bundle` (nomi veri al posto di «[Nome]», niente lavori finti, Sala vuota col cartello «La prima selezione è in arrivo»): dalla cartella del sito, in PowerShell: `git fetch .\_ufficio\lockvfx-09-10.bundle v2:v2-cloud` · `git checkout -B v2 v2-cloud` · `git push origin v2`.
+- [ ] **Prova sul telefono vero** (Safari e Chrome iPhone), prima visita: loader intero (video → logo → volo), reel a pieno schermo, scroll senza scatti, nav che tiene, video dei lavori (quando ci saranno), tendina della lingua di vetro, Stanza in una schermata, invio del form, **sezione Lavori col cartello** (centrato, «Scrivici» porta al form). Scrivi in una riga ciò che non va.
 - [ ] **Prova su PC con la rotella e col trackpad**: lo scroll lento deve essere fluido; i magneti scattano solo a rotella ferma (0,7 s). Se ti sembrano pigri, dillo: le manopole sono `SNAP.idle` e `SNAP.duration` in `carrellata.ts`.
 
 ## Dai ragazzi (girargli `cosa-ci-serve-da-lockvfx.md` del Project)
+
+*Dal 9/10 **nessuna di queste voci blocca il lancio** (ADR 007): ciò che manca non si vede, e ogni cosa che arriva si aggiunge anche a sito online.*
 
 - [ ] **Master dei video**: showreel 16:9 **e** verticale 9:16 (o 1:1), i tre breakdown. ProRes o H.264 alto bitrate, 1080p/4K, senza limiti di peso. Via WeTransfer/Drive → cartella `materiale/video/` del repo (è ignorata da git).
 - [ ] Per ogni lavoro: titolo, produzione/cliente, anno, discipline di LockVFX, **link al video completo** (Vimeo/YouTube), **autorizzazione scritta** del cliente (email basta: `handoff-legale.md` §4 ha il testo pronto). **Un lavoro senza autorizzazione non va online.**
