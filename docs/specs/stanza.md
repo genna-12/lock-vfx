@@ -33,7 +33,7 @@ A invio riuscito **il form lascia il posto alla conferma**, su telefono e su des
 
 ## Motion
 
-- **Riempimento del marchio**: un livello `crimson` a bordo netto sale dal basso in `f40` (1667 ms, 40 fotogrammi) con `easeArrive`, e resta pieno. La staffa non si muove. Nel codice: `Mark` prop `flood` (sagoma di ritaglio + livello animato con Web Animations). Con reduced motion il marchio compare già rosso.
+- **Riempimento del marchio**: un livello `crimson` a bordo netto sale dal basso in `f48` (2000 ms, 48 fotogrammi) con `easeLivello` (in-out dolce, `cubic-bezier(0.37, 0, 0.63, 1)`: a metà tempo è a metà marchio), e resta pieno. La staffa non si muove. Nel codice: `Mark` prop `flood` (sagoma di ritaglio + livello animato con Web Animations). Con reduced motion il marchio compare già rosso.
 - Errori: il messaggio entra in `f5` con salita di 4 px (`easeArrive`); il bordo cambia in `f5`.
 - Stato testuale: `f5` di opacità. Pulsante: `f5` di colore. Niente altro si muove.
 

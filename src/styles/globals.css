@@ -100,6 +100,8 @@
   --ease-arrive: cubic-bezier(0.2, 0, 0, 1);
   /* Il vetro arriva di slancio e si ferma senza rimbalzare (§9.6). */
   --ease-vetro: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Il livello rosso del marchio nella Stanza: in-out dolce (`easeLivello`). */
+  --ease-livello: cubic-bezier(0.37, 0, 0.63, 1);
 }
 
 /* ---------- Token non-Tailwind (motion, spazio, luci) ------------------- */
@@ -111,7 +113,7 @@
   --f5: 208ms;
   --f8: 333ms;
   --f12: 500ms;
-  --f40: 1667ms;
+  --f48: 2000ms;
 
   /* Camera. */
   --smooth: 1.2s;

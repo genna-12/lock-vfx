@@ -150,12 +150,13 @@ export function Stanza() {
   }, []);
 
   /* ---- il riempimento ------------------------------------------------
-     A invio riuscito il marchio sale di rosso dal basso, in `f40` con la
-     curva d'arrivo, e resta pieno. La salita la fa `Mark` (prop `flood`):
+     A invio riuscito il marchio sale di rosso dal basso, in `f48` con una
+     curva in-out dolce (piano all'inizio e alla fine, costante in mezzo), e
+     resta pieno. La salita la fa `Mark` (prop `flood`):
      qui si decide solo quando, quanto e con che curva. Con reduced motion
      la durata è 0 e il marchio compare già rosso. */
   const flood = inviato
-    ? { color: 'var(--color-crimson)', duration: reduced ? 0 : MOTION.f40, easing: MOTION.easeArrive }
+    ? { color: 'var(--color-crimson)', duration: reduced ? 0 : MOTION.f48, easing: MOTION.easeLivello }
     : undefined;
 
   /* ---- la conferma, e il messaggio dopo --------------------------------

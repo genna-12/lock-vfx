@@ -61,11 +61,11 @@ export const MOTION = {
   f8: 333,
   f12: 500,
   /**
-   * Il marchio che si riempie di rosso nella conferma della Stanza: 40
+   * Il marchio che si riempie di rosso nella conferma della Stanza: 48
    * fotogrammi, l'unico tempo lungo del sito. E' un livello che sale, non
    * uno stacco: deve avere il tempo di farsi guardare.
    */
-  f40: 1667,
+  f48: 2000,
   easeCut: 'none',
   easeArrive: 'cubic-bezier(0.2, 0, 0, 1)',
   /**
@@ -74,6 +74,13 @@ export const MOTION = {
    * sito — tutto il resto arriva e basta.
    */
   easeVolo: 'cubic-bezier(0.7, 0, 0.2, 1)',
+  /**
+   * Il livello rosso del marchio nella Stanza: in-out **dolce** (sinusoide),
+   * quasi a velocita' costante in mezzo — sale piano dall'inizio alla fine,
+   * a meta' tempo e' a meta' marchio. `easeArrive` lo faceva sembrare uno
+   * scatto (85 % a meta' tempo), `easeVolo` e' troppo ripida al centro.
+   */
+  easeLivello: 'cubic-bezier(0.37, 0, 0.63, 1)',
 } as const;
 
 /**
@@ -213,7 +220,7 @@ const CSS_MIRROR: Array<[string, string]> = [
   ['--f5', `${MOTION.f5}ms`],
   ['--f8', `${MOTION.f8}ms`],
   ['--f12', `${MOTION.f12}ms`],
-  ['--f40', `${MOTION.f40}ms`],
+  ['--f48', `${MOTION.f48}ms`],
   ['--smooth', `${CAMERA.smooth}s`],
   ['--light-sala', LIGHTS.sala],
   ['--light-taglio', LIGHTS.taglio],
