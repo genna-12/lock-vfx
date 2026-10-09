@@ -115,7 +115,7 @@
     "chi": {
       "h1": "Effetti visivi per il cinema, la serialità e la pubblicità.",
       "lead": "LockVFX è il nome collettivo con cui {{a}} e {{b}} lavorano insieme sui VFX: dalla singola inquadratura da ripulire alla sequenza da costruire da zero, con lo stesso standard.",
-      "paragraph": "[...]"
+      "paragraph": ""
     },
     "servizi": {
       "h2": "Cosa facciamo",
@@ -166,7 +166,10 @@
     },
     "persone": {
       "h2": "Le persone",
-      "placeholder": "[due righe su di te — testo in arrivo da LockVFX]",
+      "bio": {
+        "denis": "",
+        "nicholas": ""
+      },
       "transparency": "Due liberi professionisti con partita IVA separata, che lavorano insieme e con altri: LockVFX non è una società."
     },
     "contatti": {

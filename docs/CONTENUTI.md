@@ -4,19 +4,17 @@
 
 ## 1. Testi (i18n)
 
-Le chiavi stanno in `src/locales/it.json` e `src/locales/en.json`: **ogni modifica va in entrambe**, stessa chiave. Segnaposto ancora aperti (grep `\[` nei json per trovarli):
+Le chiavi stanno in `src/locales/it.json` e `src/locales/en.json`: **ogni modifica va in entrambe**, stessa chiave. Dal 9/10 (`docs/specs/lancio-senza-materiali.md`) nei json non ci sono più segnaposto: un testo che manca è una **stringa vuota**, e il suo blocco non si disegna finché resta vuota. Riempire la chiave basta, i componenti non si toccano.
 
 | chiave | oggi | cosa ci va |
 |---|---|---|
-| `statement.paragraph` | «…con cui [Nome] e [Nome] lavorano insieme…» | i nomi veri (Denis Ruscitti, Nicholas Pantieri) e il paragrafo definitivo dello Studio |
-| `statement.credits.a` / `.b` | «[Nome] · compositing», «[Nome] · 3D/CGI» | nome · disciplina di ciascuno, come la vogliono loro |
-| `statement.credits.c` | «[Città]» | la città **oppure si toglie la riga** (e il suo render in `Statement.tsx`) — decisione dei ragazzi |
-| `landing.chi.lead` | «…[Nome 1] e [Nome 2]…» | i nomi |
-| `landing.chi.paragraph` | «[...]» | il paragrafo "chi siamo" della pagina Studio |
-| `landing.persone.placeholder` | una chiave per entrambi | **due chiavi** `landing.persone.denis` e `landing.persone.nicholas` (o un campo `bio` in `src/data/people.ts`), una bio ciascuno; `StudioPage.tsx` le legge per persona |
+| `statement.paragraph` | bozza, con i nomi interpolati (`{{a}}`, `{{b}}` da `PEOPLE`) | il paragrafo definitivo dello Studio; i nomi restano `{{a}}` e `{{b}}` |
+| `landing.chi.paragraph` | `""` (non si vede) | il paragrafo "chi siamo" della pagina Studio |
+| `landing.persone.bio.denis` / `.nicholas` | `""` (la card mostra solo il nome) | una bio ciascuno, due righe |
 | `landing.servizi.*` | 6 servizi «da confermare» | i servizi confermati (anche meno di 6) |
-| `meta.description` | generica | con i nomi, ≤ 155 caratteri; **anche** in `index.html` (riga statica per i crawler) e `studio/index.html` |
 | `privacy.body` | «in preparazione» | l'informativa completa dal Legale (it **e** en), paragrafi separati da `\n\n` |
+
+I crediti dello statement sono i soli nomi, presi da `PEOPLE` (niente ruoli né città, R23). Le description (`meta.description`, `landing.meta.description`) hanno i nomi interpolati; in `index.html` e `studio/index.html` sono scritti per esteso: se un nome cambia, si cambia in `src/data/people.ts` **e** lì.
 
 Regole: niente "società/studio/founded by"; i nomi sono già in `src/data/people.ts` (`PEOPLE`) — dove possibile interpolare, non riscrivere. Dopo: `npm run build` e il prerender di `/studio/` (`dist/studio/index.html`) deve contenere i testi nuovi.
 

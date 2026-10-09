@@ -79,6 +79,10 @@ export function StudioPage() {
   }, []);
 
   const [ctaLabel, ctaArrow] = splitArrow(t('landing.contatti.cta'));
+  // I testi che i ragazzi devono ancora mandare stanno nei JSON come stringhe
+  // vuote: finché lo sono, il loro blocco non si disegna. Quando arrivano si
+  // riempie la chiave, e il componente non si tocca.
+  const chiParagraph = t('landing.chi.paragraph');
 
   return (
     <div className="page-studio min-h-svh bg-void text-ink">
@@ -126,9 +130,9 @@ export function StudioPage() {
               {t('landing.chi.h1')}
             </h1>
             <p className="m-0 max-w-[52ch] text-[19px] text-ink">{t('landing.chi.lead', NOMI)}</p>
-            <p className="m-0 mt-[18px] max-w-[58ch] text-[17px] text-stone">
-              {t('landing.chi.paragraph')}
-            </p>
+            {chiParagraph ? (
+              <p className="m-0 mt-[18px] max-w-[58ch] text-[17px] text-stone">{chiParagraph}</p>
+            ) : null}
           </section>
 
           <section id="servizi" className="scroll-mt-[110px]">
@@ -172,16 +176,21 @@ export function StudioPage() {
               {t('landing.persone.h2')}
             </h2>
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 min-[861px]:grid-cols-2">
-              {PEOPLE.map((person) => (
-                <div key={person.vat}>
-                  <h3 className="m-0 mb-1 text-[18px] font-medium">{person.name}</h3>
-                  {/* Le due righe arrivano dai ragazzi: finché non ci sono, il
-                      segnaposto resta visibile e dichiarato. Il recapito no:
-                      l'indirizzo del sito è uno solo, ed è quello collettivo
-                      (R23) — qui sotto, nei contatti. */}
-                  <p className="m-0 text-[15px] text-stone">{t('landing.persone.placeholder')}</p>
-                </div>
-              ))}
+              {PEOPLE.map((person) => {
+                // La bio sta in i18n e non in `PEOPLE`: è testo da tradurre,
+                // e `PEOPLE` tiene solo dati che non cambiano con la lingua.
+                const bio = t(`landing.persone.bio.${person.id}`);
+                return (
+                  // Il filo in alto è quello dei servizi: senza bio la card è
+                  // un nome su una riga, e sembra finita così. Il recapito no:
+                  // l'indirizzo del sito è uno solo, ed è quello collettivo
+                  // (R23) — qui sotto, nei contatti.
+                  <div key={person.id} className="border-t border-dust/35 pt-4">
+                    <h3 className="m-0 text-[18px] font-medium">{person.name}</h3>
+                    {bio ? <p className="m-0 mt-1.5 text-[15px] text-stone">{bio}</p> : null}
+                  </div>
+                );
+              })}
             </div>
             <p className="m-0 mt-7 max-w-[58ch] text-[14px] text-stone">
               {t('landing.persone.transparency')}

@@ -115,7 +115,7 @@
     "chi": {
       "h1": "Visual effects for film, series and advertising.",
       "lead": "LockVFX is the shared name {{a}} and {{b}} work under: from a single shot cleanup to a sequence built from scratch, held to the same standard.",
-      "paragraph": "[...]"
+      "paragraph": ""
     },
     "servizi": {
       "h2": "What we do",
@@ -166,7 +166,10 @@
     },
     "persone": {
       "h2": "The people",
-      "placeholder": "[two lines about you — copy coming from LockVFX]",
+      "bio": {
+        "denis": "",
+        "nicholas": ""
+      },
       "transparency": "Two freelancers with separate VAT numbers, working together and with others: LockVFX isn’t a company."
     },
     "contatti": {
