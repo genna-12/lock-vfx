@@ -18,7 +18,7 @@ import { useReducedMotion } from '../../lib/useReducedMotion';
 import { SendError, remainingThrottle, sameAsLastSend, sendContact } from '../../lib/emailjs';
 import { CONTACT, PEOPLE } from '../../data/people';
 import { openPrivacy } from '../../lib/privacy';
-import { MARK_VIEWBOX, SHACKLE_CLOSED } from '../../brand/mark';
+import { MARK_VIEWBOX } from '../../brand/mark';
 import { Mark } from '../brand/Mark';
 
 /**
@@ -28,9 +28,10 @@ import { Mark } from '../brand/Mark';
  * delle luci e batte da sinistra sul marchio grande. A sinistra chi siamo
  * (marchio, due nomi, due email), a destra il modo per parlarci.
  *
- * L'unica cosa che si muove è la staffa: si chiude quando il messaggio è
- * partito, in due fotogrammi, con un fotogramma di rosso. È l'unica volta in
- * cui il marchio fa qualcosa, e per questo si vede.
+ * L'unica cosa che si muove è il marchio: quando il messaggio è partito si
+ * riempie di rosso dal basso, piano, e resta rosso. La staffa resta aperta,
+ * com'è nel logo (Genna, 9/10): non si chiude niente, si accende. È l'unica
+ * volta in cui il marchio fa qualcosa, e per questo si vede.
  *
  * Il form è a tre campi perché ogni campo in più è un dato in più da
  * giustificare (vedi `handoff-legale.md` §2): la casella è una **presa
@@ -40,8 +41,6 @@ import { Mark } from '../brand/Mark';
 
 /** HOLD 4: da 500vh alla fine dei 560. Fuori di qui la stanza è `inert`. */
 const HOLD_FROM = 500 / STAGE_VH;
-/** Mezzo fotogramma di rosso sul marchio: si sente, non si legge. */
-const FLASH_MS = 42;
 /** Larghezza del marchio grande: `clamp(140px, 16vw, 240px)`, 96 su mobile.
  *  Sul telefono il marchio non sta più sotto il pulsante: sotto il pulsante
  *  non c'è più niente, e la Stanza sta in una schermata
@@ -95,8 +94,6 @@ export function Stanza() {
   const [markW, setMarkW] = useState(markWidth);
 
   const fitRef = useRef<HTMLDivElement>(null);
-  const shackleRef = useRef<SVGPathElement>(null);
-  const markRef = useRef<HTMLSpanElement>(null);
   const hpRef = useRef<HTMLInputElement>(null);
   const consentRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -113,7 +110,7 @@ export function Stanza() {
   // la stanza è sempre raggiungibile.
   const live = reduced || inHold;
   const locked = status === 'sending' || status === 'sent';
-  const closed = status === 'sent';
+  const inviato = status === 'sent';
   const markH = (markW * MARK_VIEWBOX.h) / MARK_VIEWBOX.w;
 
   useEffect(() => {
@@ -152,56 +149,21 @@ export function Stanza() {
     return () => ro.disconnect();
   }, []);
 
-  /* ---- la staffa -------------------------------------------------------- */
-  // Stile inline e non una classe: dentro l'SVG un px CSS è un'unità di
-  // viewBox, quindi la discesa è esattamente i 25 del disegno a qualunque
-  // dimensione — e la transizione deve stare sull'elemento, non su una
-  // classe che React sostituirebbe insieme al resto.
-  useLayoutEffect(() => {
-    const el = shackleRef.current;
-    if (!el) return;
-    el.style.transition = reduced ? 'none' : `transform ${MOTION.f2}ms var(--ease-cut)`;
-    const root = markRef.current;
-    if (!closed || reduced) {
-      el.style.transform = closed ? `translateY(${SHACKLE_CLOSED}px)` : 'none';
-      if (root) root.style.color = '';
-      return;
-    }
-    // La staffa parte dall'alto e **poi** scende: sul telefono il marchio
-    // compare solo adesso — prima era `display: none` — e una transizione su
-    // un elemento appena apparso non parte, perché il browser non ha mai
-    // dipinto il valore di partenza. Due fotogrammi di attesa e lo scatto si
-    // vede anche lì, che è il punto: la staffa che si chiude è la conferma.
-    el.style.transform = 'none';
-    const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.style.transform = `translateY(${SHACKLE_CLOSED}px)`;
-      });
-    });
-    // Un solo fotogramma di rosso quando la staffa tocca il corpo e il
-    // marchio si riempie. Con `setTimeout` e non con GSAP: se la scheda va
-    // in secondo piano il ticker si ferma e il rosso resterebbe acceso.
-    let off = 0;
-    const on = window.setTimeout(() => {
-      if (root) root.style.color = 'var(--color-crimson)';
-      off = window.setTimeout(() => {
-        if (root) root.style.color = '';
-      }, FLASH_MS);
-    }, MOTION.f2);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.clearTimeout(on);
-      window.clearTimeout(off);
-      if (root) root.style.color = '';
-    };
-  }, [closed, reduced]);
+  /* ---- il riempimento ------------------------------------------------
+     A invio riuscito il marchio sale di rosso dal basso, in `f40` con la
+     curva d'arrivo, e resta pieno. La salita la fa `Mark` (prop `flood`):
+     qui si decide solo quando, quanto e con che curva. Con reduced motion
+     la durata è 0 e il marchio compare già rosso. */
+  const flood = inviato
+    ? { color: 'var(--color-crimson)', duration: reduced ? 0 : MOTION.f40, easing: MOTION.easeArrive }
+    : undefined;
 
   /* ---- la conferma, e il messaggio dopo --------------------------------
      A invio riuscito il form non c'è più: c'è la conferma (`stanza-spec.md`
      «La conferma»), e il fuoco va lì — il pulsante che lo aveva è sparito
      con il form, e il fuoco non deve cadere sul `body`. Passato il minuto
      del limite compare «Scrivi un altro messaggio»: riapre il form **vuoto**
-     e la staffa. Non torna da solo, e non torna compilato: un clic distratto
+     e il marchio torna del suo colore. Non torna da solo, e non torna compilato: un clic distratto
      rimanderebbe lo stesso messaggio. */
   useEffect(() => {
     if (status !== 'sent') return;
@@ -381,22 +343,18 @@ export function Stanza() {
             esserci niente, così la Stanza sta in una schermata e lo scroll
             interno — con tutti i suoi guai — non ha più ragione di esistere.
             Torna, e solo il marchio, quando il messaggio è partito: è lì che
-            la staffa che si chiude significa qualcosa. I nomi e le P. IVA
+            il marchio che si accende significa qualcosa. I nomi e le P. IVA
             stanno dove devono per legge, nel blocco legale del footer. */}
         <div
           className={clsx(
             'order-2 items-center gap-[16px] md:order-1 md:flex md:flex-col md:items-start md:gap-[28px]',
-            closed ? 'flex' : 'hidden'
+            inviato ? 'flex' : 'hidden'
           )}
         >
-          {/* Il colore sta sul contenitore: il fotogramma rosso della
-              chiusura è del marchio intero, non della sola staffa. */}
-          <span ref={markRef} className="shrink-0 text-ink">
-            {/* Riempito sempre (§9.1): è il loro logo anche qui. L'unica
-                staffa che si muove nel sito resta questa, perché è l'unico
-                posto dove chiudersi vuol dire qualcosa — il messaggio è
-                partito. */}
-            <Mark size={markH} shackleRef={shackleRef} />
+          {/* `text-ink` è il colore di partenza: il rosso sale sopra questo. */}
+          <span className="shrink-0 text-ink">
+            {/* Riempito sempre (§9.1) e aperto: è il loro logo anche qui. */}
+            <Mark size={markH} flood={flood} />
           </span>
           {/* I due nomi, e sotto l'**unico** indirizzo del sito. Niente email
               personali, niente città, niente ruoli (Direzione, 9/9 — R23):
@@ -426,13 +384,13 @@ export function Stanza() {
           </h2>
 
           {/* A invio riuscito il form lascia il posto alla conferma: il
-              marchio che si chiude (nella colonna qui accanto, che sul
+              marchio che si riempie di rosso (nella colonna qui accanto, che sul
               telefono compare adesso), la riga di ringraziamento e l'email a
               cui arriverà la risposta, com'è stata scritta — di tutto quello
               che si è scritto è l'unica cosa che conta ancora. Prende il
               fuoco: è così che lo screen reader la legge (una regione live
               che nasce già piena, molti non la annunciano). */}
-          {closed ? (
+          {inviato ? (
             <div ref={confermaRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
               <p className="m-0 max-w-[40ch] text-[16px] text-stone">{t('contact.status.sent')}</p>
               <p className="m-0 text-[14px] break-all text-stone">{values.email.trim()}</p>

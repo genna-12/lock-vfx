@@ -1,6 +1,6 @@
 # Stanza — spec di dettaglio (contatti + EmailJS)
 
-*v1.3 — 9 settembre 2026 (via le email personali). v1.2 = la conferma d'invio e il mobile dal Lotto M; v1.1 = testo della checkbox e informativa dal Legale. Riferimento navigabile: artifact "LockVFX Stanza Sketch"; sorgente di comportamento `reference-stanza-sketch.html`. Il look è quello della pagina "Look v2" del canvas (artboard Stanza).*
+*v1.4 — 10 ottobre 2026 (Genna: a invio riuscito il lucchetto resta aperto e si riempie di rosso). v1.3 — 9 settembre 2026 (via le email personali). v1.2 = la conferma d'invio e il mobile dal Lotto M; v1.1 = testo della checkbox e informativa dal Legale. Riferimento navigabile: artifact "LockVFX Stanza Sketch"; sorgente di comportamento `reference-stanza-sketch.html`. Il look è quello della pagina "Look v2" del canvas (artboard Stanza).*
 
 ## Cosa c'è a schermo
 
@@ -17,7 +17,7 @@ La stanza **non è uno schermo**: nessun fondo pieno; la **luce di taglio** (`TA
 | idle | `Invia` | sollevata | — |
 | errore | `Invia` | sollevata | sotto ogni campo errato (13 px `stone`): "Come possiamo chiamarti?" · "Serve un'email a cui rispondere." · "Due righe bastano: progetto, tempi, cosa serve." · presa visione: bordo `crimson` |
 | invio | `Invio…` (disabilitato, opacità .6) | sollevata | — |
-| **inviato** | — (il form non c'è più) | **chiusa** | vedi "La conferma" |
+| **inviato** | — (il form non c'è più) | **aperta, il marchio si riempie di rosso** | vedi "La conferma" |
 | fallito | `Invia` | sollevata | "Non è partito. Riprova, o scrivici direttamente: info@…" (`mailto:`) |
 
 **Validazione**: al `blur` del campo (mai mentre si scrive) e all'invio; l'errore sparisce appena il campo torna valido. Email: regex minima `^[^\s@]+@[^\s@]+\.[^\s@]{2,}$`. All'invio con errori: focus sul primo campo errato, nessun invio.
@@ -26,14 +26,14 @@ La stanza **non è uno schermo**: nessun fondo pieno; la **luce di taglio** (`TA
 
 A invio riuscito **il form lascia il posto alla conferma**, su telefono e su desktop, ed è la stessa schermata:
 
-- **Il marchio che si chiude**, grande (96 px su mobile, `clamp(140px, 16vw, 240px)` su desktop): la staffa scende, un solo fotogramma `crimson`, poi `ink`. Era la firma della Stanza sotto il pulsante; nella conferma si vede meglio, ed è lì che significa qualcosa.
+- **Il marchio che si riempie di rosso**, grande (96 px su mobile, `clamp(140px, 16vw, 240px)` su desktop): la staffa resta **aperta**, com'è nel logo, e il `crimson` sale dal basso su tutto il marchio fino a riempirlo; poi resta rosso. Era la firma della Stanza sotto il pulsante; nella conferma si vede meglio, ed è lì che significa qualcosa.
 - **Una riga di ringraziamento**: "Ricevuto. Ti rispondiamo entro due giorni lavorativi."
 - **L'email a cui risponderemo**, ripetuta com'è stata scritta (`stone`, 14 px): di quello che è stato scritto, ciò che conta è dove arriverà la risposta.
-- Un nuovo invio è possibile dopo 60 s: "Scrivi un altro messaggio" riapre il form vuoto e riapre la staffa.
+- Un nuovo invio è possibile dopo 60 s: "Scrivi un altro messaggio" riapre il form vuoto e il marchio torna `ink`.
 
 ## Motion
 
-- **Chiusura della staffa**: `translateY(−6px → 0)` in `f2` (83 ms, lineare, "scatta"); al frame successivo un solo frame (≈42 ms) con tratto `crimson`, poi `ink`. Mai easing morbido. Il marchio della conferma compare in quel momento, quindi la staffa parte **dopo due fotogrammi di attesa**. Con reduced motion la staffa è già chiusa.
+- **Riempimento del marchio**: un livello `crimson` a bordo netto sale dal basso in `f40` (1667 ms, 40 fotogrammi) con `easeArrive`, e resta pieno. La staffa non si muove. Nel codice: `Mark` prop `flood` (sagoma di ritaglio + livello animato con Web Animations). Con reduced motion il marchio compare già rosso.
 - Errori: il messaggio entra in `f5` con salita di 4 px (`easeArrive`); il bordo cambia in `f5`.
 - Stato testuale: `f5` di opacità. Pulsante: `f5` di colore. Niente altro si muove.
 
@@ -69,4 +69,4 @@ Su desktop è il set 4 della carrellata (HOLD 500–560 vh): entra da sotto in T
 
 ## Reduced motion
 
-Staffa chiusa senza transizione, nessuna salita dei messaggi, cambi di stato istantanei.
+Marchio già rosso senza salita, nessuna salita dei messaggi, cambi di stato istantanei.

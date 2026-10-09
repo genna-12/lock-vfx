@@ -60,6 +60,12 @@ export const MOTION = {
   f5: 208,
   f8: 333,
   f12: 500,
+  /**
+   * Il marchio che si riempie di rosso nella conferma della Stanza: 40
+   * fotogrammi, l'unico tempo lungo del sito. E' un livello che sale, non
+   * uno stacco: deve avere il tempo di farsi guardare.
+   */
+  f40: 1667,
   easeCut: 'none',
   easeArrive: 'cubic-bezier(0.2, 0, 0, 1)',
   /**
@@ -207,6 +213,7 @@ const CSS_MIRROR: Array<[string, string]> = [
   ['--f5', `${MOTION.f5}ms`],
   ['--f8', `${MOTION.f8}ms`],
   ['--f12', `${MOTION.f12}ms`],
+  ['--f40', `${MOTION.f40}ms`],
   ['--smooth', `${CAMERA.smooth}s`],
   ['--light-sala', LIGHTS.sala],
   ['--light-taglio', LIGHTS.taglio],

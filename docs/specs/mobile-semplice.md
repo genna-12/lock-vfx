@@ -47,7 +47,7 @@ Il costo, detto una volta: **su telefono spariscono i tre movimenti di camera** 
 ## 4. La Stanza sul telefono: una schermata, e basta
 
 - **Sotto il pulsante non c'è più niente**: via marchio, nomi, città. Titolo, form, presa visione, pulsante.
-- **Il lucchetto si vede nella conferma**: a invio riuscito il form lascia il posto al marchio che si chiude, a una riga di ringraziamento e all'**email a cui risponderemo**. Dettagli in `stanza-spec.md` v1.2.
+- **Il lucchetto si vede nella conferma**: a invio riuscito il form lascia il posto al marchio che si riempie di rosso (staffa aperta), a una riga di ringraziamento e all'**email a cui risponderemo**. Dettagli in `stanza-spec.md` v1.2.
 - Nomi e P. IVA stanno nel **blocco legale del footer**; **le email personali non ci sono più** (decisione del 9/9: non esistono caselle personali): nel footer restano nome, cognome e P. IVA, e l'unico indirizzo del sito è quello collettivo.
 
 ## 5. I video partono da soli (9/9)
