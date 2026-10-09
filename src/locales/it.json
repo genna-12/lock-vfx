@@ -36,7 +36,12 @@
     "pause": "Metti in pausa",
     "audioOn": "Attiva l’audio",
     "audioOff": "Disattiva l’audio",
-    "fullscreen": "Schermo intero"
+    "fullscreen": "Schermo intero",
+    "empty": {
+      "label": "Lavori",
+      "title": "La prima selezione è in arrivo.",
+      "body": "Nel frattempo, scrivici: ti raccontiamo cosa stiamo facendo."
+    }
   },
   "contact": {
     "title": "Parliamone.",

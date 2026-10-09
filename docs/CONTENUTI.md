@@ -12,6 +12,7 @@ Le chiavi stanno in `src/locales/it.json` e `src/locales/en.json`: **ogni modifi
 | `landing.chi.paragraph` | `""` (non si vede) | il paragrafo "chi siamo" della pagina Studio |
 | `landing.persone.bio.denis` / `.nicholas` | `""` (la card mostra solo il nome) | una bio ciascuno, due righe |
 | `landing.servizi.*` | 6 servizi «da confermare» | i servizi confermati (anche meno di 6) |
+| `sala.empty.*` | bozze di cornice: il cartello della Sala senza lavori | dal canale Testi; il cartello sparisce da solo col primo lavoro `cleared` |
 | `privacy.body` | «in preparazione» | l'informativa completa dal Legale (it **e** en), paragrafi separati da `\n\n` |
 
 I crediti dello statement sono i soli nomi, presi da `PEOPLE` (niente ruoli né città, R23). Le description (`meta.description`, `landing.meta.description`) hanno i nomi interpolati; in `index.html` e `studio/index.html` sono scritti per esteso: se un nome cambia, si cambia in `src/data/people.ts` **e** lì.

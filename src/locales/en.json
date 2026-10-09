@@ -36,7 +36,12 @@
     "pause": "Pause",
     "audioOn": "Turn sound on",
     "audioOff": "Turn sound off",
-    "fullscreen": "Full screen"
+    "fullscreen": "Full screen",
+    "empty": {
+      "label": "Work",
+      "title": "The first selection is on its way.",
+      "body": "Meanwhile, write to us: we’ll tell you what we’re working on."
+    }
   },
   "contact": {
     "title": "Let’s talk.",

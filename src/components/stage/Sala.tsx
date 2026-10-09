@@ -5,6 +5,7 @@ import { useEntrati, useSetVisibile, useStageStatic, useStageWindow } from '../.
 import { risparmioDati } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { WORKS_HAVE_VIDEO, type Work } from '../../data/works';
+import { segui } from '../../lib/agganci';
 import { Deck, type DeckHandle } from './Deck';
 
 /**
@@ -86,6 +87,9 @@ export function Sala({ works }: SalaProps) {
   const [compact, setCompact] = useState(false);
 
   const work = works[index];
+  // Nessun lavoro pubblicato: la Sala resta in scena — la carrellata ha un
+  // HOLD su di lei — ma al posto del film c'è il cartello.
+  const vuota = works.length === 0;
 
   /* ---- forma dello schermo -------------------------------------------- */
   useEffect(() => {
@@ -341,7 +345,9 @@ export function Sala({ works }: SalaProps) {
 
   /* ---- tastiera -------------------------------------------------------- */
   useEffect(() => {
-    if (!inHold) return;
+    // Senza lavori non c'è niente da comandare, e la F metterebbe il
+    // cartello a schermo intero.
+    if (!inHold || vuota) return;
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
@@ -379,7 +385,7 @@ export function Sala({ works }: SalaProps) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [inHold, toggleAudio, toggleFullscreen, togglePlay, wake]);
+  }, [inHold, toggleAudio, toggleFullscreen, togglePlay, vuota, wake]);
 
   /* ---- fine video: gira l'anello --------------------------------------- */
   // Senza carrellata non c'è la deck a cui chiedere il passo: il lavoro
@@ -399,6 +405,21 @@ export function Sala({ works }: SalaProps) {
     if (black && !reducedRef.current) black.style.opacity = '1';
     window.setTimeout(() => avantiRef.current(), END_BLACK_MS);
   }, []);
+
+  if (vuota) {
+    // Lo stesso contenitore delle due forme piene: in carrellata è lui a
+    // portare `inert` fuori dall'HOLD, e il link del cartello esce dal Tab
+    // insieme al resto della Sala.
+    return flat ? (
+      <div ref={rootRef} className="u-pad mx-auto flex w-full max-w-[1180px] flex-col">
+        <Cartello forma="riquadro" />
+      </div>
+    ) : (
+      <div ref={rootRef} inert={!inHold} className={`absolute inset-0 bg-void ${portrait ? 'u-pad flex flex-col' : ''}`}>
+        <Cartello forma={portrait ? 'verticale' : 'schermo'} />
+      </div>
+    );
+  }
 
   const context = [work.client, String(work.year), ...work.disciplines].join(' · ');
 
@@ -742,6 +763,74 @@ export function Sala({ works }: SalaProps) {
           </svg>
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Il cartello: la Sala quando non c'è ancora nessun lavoro da proiettare.
+ *
+ * Non un segnaposto e non uno stato vuoto da applicazione: è un cartello di
+ * montaggio, nella stessa cornice dove starebbe il film — a tutto schermo in
+ * carrellata, il 16:9 della pagina semplice e del telefono — così la
+ * composizione e la camera restano quelle della Sala piena. Niente video,
+ * niente HUD, niente deck: un'etichetta, una frase, una riga e la porta
+ * verso la Stanza. Entra con le regole di comparsa del resto della Sala, e
+ * se ne va da solo il giorno in cui `loadWorks()` restituisce un lavoro.
+ *
+ * - `schermo`: carrellata, orizzontale. Occupa il posto del `<video>`.
+ * - `verticale`: carrellata in una finestra stretta in piedi; il 16:9 in
+ *   alto, dove sta il video.
+ * - `riquadro`: pagina semplice. Porta `data-sala-schermo`, quindi prende le
+ *   misure del riquadro del video da `globals.css` (iPad coricato compreso).
+ */
+function Cartello({ forma }: { forma: 'schermo' | 'verticale' | 'riquadro' }) {
+  const { t } = useTranslation();
+  // La freccia sta dentro il testo tradotto: si stacca per muoverla
+  // all'hover, come nello statement.
+  const cta = t('landing.contatti.cta');
+  const match = /^(.*?)\s*(→)\s*$/.exec(cta);
+  const [label, arrow] = match ? [match[1], match[2]] : [cta, null];
+
+  // A tutto schermo il bordo cadrebbe sul bordo della finestra e sembrerebbe
+  // un difetto: lì la cornice è il solo fondo `obsidian`.
+  const cornice = {
+    schermo: 'absolute inset-0 px-[var(--pad)] pb-[clamp(40px,9vh,96px)]',
+    verticale: 'relative mt-[76px] aspect-video w-full shrink-0 rounded-frame border border-dust/20 p-[clamp(20px,3vw,40px)]',
+    riquadro: 'relative aspect-video w-full rounded-frame border border-dust/20 p-[clamp(20px,3vw,40px)]',
+  }[forma];
+
+  return (
+    <div
+      data-sala-cartello
+      data-sala-schermo={forma === 'riquadro' ? '' : undefined}
+      className={`${cornice} flex flex-col items-start justify-end bg-obsidian`}
+    >
+      <p className="u-cap m-0 text-stone">{t('sala.empty.label')}</p>
+      {/* Il corpo è `d4`, un gradino sopra il titolo della didascalia: è la
+          frase che sta al posto del film, non il nome di un lavoro. */}
+      <h2 className="u-display m-0 mt-3.5 max-w-[22ch] text-d4 text-ink text-balance">
+        {t('sala.empty.title')}
+      </h2>
+      <p className="m-0 mt-2.5 max-w-[46ch] text-t4 text-stone sm:text-t3">{t('sala.empty.body')}</p>
+      {/* La strada per la Stanza è quella di tutti i link interni (`segui`):
+          in carrellata la camera ci porta, nella pagina semplice lo scroll
+          con lo snap spento. */}
+      <a
+        href="#contact"
+        onClick={(event) => segui(event, '#contact')}
+        className="group mt-4 inline-flex items-center gap-2 text-[15px] font-medium text-ink underline underline-offset-[3px] transition-colors duration-[var(--f5)] hover:text-crimson"
+      >
+        {label}
+        {arrow ? (
+          <span
+            aria-hidden
+            className="transition-transform duration-[var(--f5)] ease-[var(--ease-arrive)] group-hover:translate-x-1"
+          >
+            {arrow}
+          </span>
+        ) : null}
+      </a>
     </div>
   );
 }
