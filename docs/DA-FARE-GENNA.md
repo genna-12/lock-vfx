@@ -5,7 +5,7 @@
 ## Subito
 
 - [x] ~~Push del bundle `lockvfx-06-10`~~ fatto il 7/10.
-- [ ] **Push** del bundle corrente (`_ufficio/lockvfx-07-10.bundle`: primo tacco che risponde, campi sottolineati, apertura sempre dalla cima): `git fetch .\_ufficio\lockvfx-06-10.bundle v2:v2-cloud` · `git checkout -B v2 v2-cloud` · `git push origin v2`. Poi l'anteprima si aggiorna da sola.
+- [x] ~~Push dei bundle `07-10` e `08-10`~~: `origin/v2` è a `8f54fa0` (verificato il 9/10).
 - [ ] **Prova sul telefono vero** (Safari e Chrome iPhone), prima visita: loader intero (video → logo → volo), reel a pieno schermo, scroll senza scatti, nav che tiene, video dei lavori (quando ci saranno), tendina della lingua di vetro, Stanza in una schermata, invio del form. Scrivi in una riga ciò che non va.
 - [ ] **Prova su PC con la rotella e col trackpad**: lo scroll lento deve essere fluido; i magneti scattano solo a rotella ferma (0,7 s). Se ti sembrano pigri, dillo: le manopole sono `SNAP.idle` e `SNAP.duration` in `carrellata.ts`.
 
@@ -19,11 +19,11 @@
 
 ## Account e pannelli (passi dettagliati in `docs/GUIDA-LANCIO.md`)
 
-- [ ] **Domini**: `lockvfx.com` e `lockvfx.it` sono su Hostinger → spostare i **nameserver** su Cloudflare (gratis; il dominio resta comprato su Hostinger). Serve per Pages, per `media.lockvfx.com` (R2) e per i redirect `.it` → `.com`, `www` → apex. Attenzione ai record della casella `info@lockvfx.com` (MX/SPF/DKIM).
+- [x] ~~**Domini** su Cloudflare DNS~~ (8/10). ~~SPF e DMARC~~ presenti (verificati il 9/10: `v=spf1 include:_spf.google.com ~all`, DMARC `p=none`). Resta da controllare che **DKIM** di Google Workspace sia attivo (Admin console → Gmail → Autentica email).
 
 - [ ] **EmailJS**: crea service + template (parametri `from_name`, `reply_to`, `message`, `lang`, `page`; destinatario `info@lockvfx.com`; `Reply-To: {{reply_to}}`); nel pannello attiva **allowlist del dominio** e un limite giornaliero. Le tre chiavi vanno in Cloudflare Pages → Settings → Environment variables (**Production**): `VITE_EMAILJS_PUBLIC_KEY`, `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID` (+ `VITE_EMAILJS_AUTOREPLY_TEMPLATE_ID` se vuoi la risposta automatica). **Mai** `VITE_EMAILJS_MOCK` in produzione. Dopo il deploy: **un invio vero** dal sito.
-- [ ] **Custom domain** `lockvfx.com` (+ `www`) sul progetto Pages; redirect rules per `www` e per `lockvfx.it`.
-- [ ] **Cloudflare R2**: bucket `lockvfx-media`, custom domain `media.lockvfx.com`. Ci carico io i file codificati (ti passo la cartella `dist-media/`); poi in Pages: `VITE_MEDIA_URL=https://media…` (senza barra finale), `VITE_REEL=on`, `VITE_WORKS=on`.
+- [x] ~~Custom domain `lockvfx.com` + `www` su Pages~~ (8/10). Redirect, stato al 9/10: `lockvfx.it` → `.com` funziona ma è **302**: nella regola metti **301** (permanente). `www.lockvfx.com` **non** reindirizza ancora (serve il sito direttamente): manca la regola `www` → apex, 301 (`GUIDA-LANCIO.md`).
+- [ ] **Cloudflare R2** — al 9/10 ancora **da abilitare** dal pannello (R2 → Purchase/Enable, piano gratuito: chiede una carta ma fino a 10 GB non addebita). Appena fatto dimmelo: il bucket lo creo io dal connettore. Bucket `lockvfx-media`, custom domain `media.lockvfx.com`. Ci carico io i file codificati (ti passo la cartella `dist-media/`); poi in Pages: `VITE_MEDIA_URL=https://media…` (senza barra finale), `VITE_REEL=on`, `VITE_WORKS=on`.
 - [ ] **Variabili di lancio** in Pages: `VITE_SITE_URL=https://lockvfx.com` (senza barra finale) e **togliere `VITE_PREVIEW`**. Con questo il build scrive canonical/OG assoluti, `sitemap.xml`, la riga `Sitemap:` in `robots.txt`, e spegne il `noindex`. Se c'era la password di Cloudflare Access, toglierla.
 - [ ] Dopo il deploy di produzione: `curl -I https://<dominio>/` **senza** `X-Robots-Tag`; sorgente della pagina senza `noindex`; anteprima social con il Facebook Sharing Debugger o LinkedIn Post Inspector.
 - [ ] **Search Console**: proprietà, invio di `sitemap.xml`, richiesta di indicizzazione di `/` e `/studio/`.
