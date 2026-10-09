@@ -27,7 +27,7 @@ La stanza **non è uno schermo**: nessun fondo pieno; la **luce di taglio** (`TA
 A invio riuscito **il form lascia il posto alla conferma**, su telefono e su desktop, ed è la stessa schermata:
 
 - **Il marchio che si riempie di rosso**, grande (96 px su mobile, `clamp(140px, 16vw, 240px)` su desktop): la staffa resta **aperta**, com'è nel logo, e il `crimson` sale dal basso su tutto il marchio fino a riempirlo; poi resta rosso. Era la firma della Stanza sotto il pulsante; nella conferma si vede meglio, ed è lì che significa qualcosa.
-- **Una riga di ringraziamento**: "Ricevuto. Ti rispondiamo entro due giorni lavorativi."
+- **Una riga di ringraziamento**: "Ricevuto. Ti rispondiamo il prima possibile."
 - **L'email a cui risponderemo**, ripetuta com'è stata scritta (`stone`, 14 px): di quello che è stato scritto, ciò che conta è dove arriverà la risposta.
 - Un nuovo invio è possibile dopo 60 s: "Scrivi un altro messaggio" riapre il form vuoto e il marchio torna `ink`.
 

@@ -65,7 +65,7 @@
     "send": "Send",
     "sending": "Sending…",
     "status": {
-      "sent": "Got it. We’ll get back to you within two working days.",
+      "sent": "Got it. We’ll get back to you as soon as possible.",
       "failed": "It didn’t go through. Try again, or write to us directly:"
     },
     "wait": "You can write again in {{s}} seconds.",

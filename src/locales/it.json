@@ -65,7 +65,7 @@
     "send": "Invia",
     "sending": "Invio…",
     "status": {
-      "sent": "Ricevuto. Ti rispondiamo entro due giorni lavorativi.",
+      "sent": "Ricevuto. Ti rispondiamo il prima possibile.",
       "failed": "Non è partito. Riprova, o scrivici direttamente:"
     },
     "wait": "Puoi scriverci di nuovo fra {{s}} secondi.",
