@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--
   Template EmailJS "Notifica" — il messaggio che arriva a info@lockvfx.com.
   Impostazioni del template (scheda Settings):
@@ -5,18 +10,49 @@
     To Email:    info@lockvfx.com
     From Name:   {{from_name}}   (nella posta in arrivo si vede il nome di chi ha scritto)
     Reply To:    {{reply_to}}
-  Parametri inviati dal sito: from_name, reply_to, message, lang, page.
+  Parametri inviati dal sito: from_name, reply_to, message, lang, en, page.
   Le {{doppie graffe}} di EmailJS escapano l'HTML: il testo di chi scrive non può iniettare markup.
-  Niente immagini (bloccate di default dai client di posta) e niente font esterni: solo tabelle e stili in linea.
--->
-<div style="margin:0;padding:0;background-color:#020202;">
-  <!-- Anteprima nella lista della posta -->
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#020202;">{{from_name}} ha scritto dal sito: {{message}}</div>
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#020202;">
+  Tema chiaro e scuro (10/10): la mail nasce CHIARA e dichiara di saper essere anche scura.
+  - Apple Mail, iOS Mail, Outlook per Mac/iOS e simili leggono la @media qui sotto e mostrano
+    la nostra versione scura, quella del sito.
+  - Gmail (app) ignora la @media e scurisce da solo le mail chiare: partendo chiari, nel tema
+    scuro si vede scura e nel chiaro si vede chiara. Partendo scuri succedeva il contrario
+    (Gmail su iPhone inverte tutto, anche ciò che è già scuro).
+  Niente immagini né font esterni: solo tabelle e stili in linea, più le classi lv-* per il tema scuro.
+-->
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<style>
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
+  @media (prefers-color-scheme: dark) {
+    .lv-page { background-color: #020202 !important; }
+    .lv-card { background-color: #0B0B0E !important; border-color: #1C1C21 !important; }
+    .lv-rule { border-color: #1C1C21 !important; }
+    .lv-t1 { color: #F2F0EB !important; }
+    .lv-t2 { color: #B8B5AE !important; }
+    .lv-t3 { color: #7A7873 !important; }
+    .lv-btn { background-color: #F2F0EB !important; }
+    .lv-btn-a { color: #020202 !important; }
+    .lv-hide { color: #020202 !important; }
+  }
+  [data-ogsc] .lv-t1 { color: #F2F0EB !important; }
+  [data-ogsc] .lv-t2 { color: #B8B5AE !important; }
+  [data-ogsc] .lv-t3 { color: #7A7873 !important; }
+  [data-ogsb] .lv-page { background-color: #020202 !important; }
+  [data-ogsb] .lv-card { background-color: #0B0B0E !important; }
+  [data-ogsb] .lv-btn { background-color: #F2F0EB !important; }
+  [data-ogsc] .lv-btn-a { color: #020202 !important; }
+</style>
+</head>
+<body class="lv-page" style="margin:0;padding:0;background-color:#ECEAE5;">
+  <!-- Anteprima nella lista della posta -->
+  <div class="lv-hide" style="display:none;max-height:0;overflow:hidden;opacity:0;color:#ECEAE5;">{{from_name}} ha scritto dal sito: {{message}}</div>
+
+  <table role="presentation" class="lv-page" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ECEAE5;">
     <tr>
       <td align="center" style="padding:40px 16px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:#0B0B0E;border:1px solid #1C1C21;border-radius:6px;">
+        <table role="presentation" class="lv-card" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:#FAF9F6;border:1px solid #DCD8D0;border-radius:6px;">
 
           <!-- Testata: il filo rosso è l'unico colore -->
           <tr>
@@ -26,10 +62,10 @@
             <td style="padding:28px 36px 0 36px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;letter-spacing:0.02em;color:#F2F0EB;">
+                  <td class="lv-t1" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;letter-spacing:0.02em;color:#0B0B0E;">
                     <span style="color:#E60B18;">&#9632;</span>&nbsp;LockVFX
                   </td>
-                  <td align="right" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#7A7873;">
+                  <td class="lv-t3" align="right" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#8A867E;">
                     Nuovo contatto
                   </td>
                 </tr>
@@ -39,13 +75,13 @@
 
           <!-- Chi ha scritto -->
           <tr>
-            <td style="padding:40px 36px 8px 36px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:28px;line-height:1.2;font-weight:300;color:#F2F0EB;">
+            <td class="lv-t1" style="padding:40px 36px 8px 36px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:28px;line-height:1.2;font-weight:300;color:#0B0B0E;">
               {{from_name}} vi ha scritto.
             </td>
           </tr>
           <tr>
             <td style="padding:0 36px 32px 36px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;">
-              <a href="mailto:{{reply_to}}" style="color:#B8B5AE;text-decoration:underline;">{{reply_to}}</a>
+              <a class="lv-t2" href="mailto:{{reply_to}}" style="color:#55524C;text-decoration:underline;">{{reply_to}}</a>
             </td>
           </tr>
 
@@ -54,7 +90,7 @@
             <td style="padding:0 36px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="border-left:2px solid #E60B18;padding:4px 0 4px 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#E4E2DC;white-space:pre-wrap;word-break:break-word;">{{message}}</td>
+                  <td class="lv-t1" style="border-left:2px solid #E60B18;padding:4px 0 4px 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#1E1D1B;white-space:pre-wrap;word-break:break-word;">{{message}}</td>
                 </tr>
               </table>
             </td>
@@ -65,8 +101,8 @@
             <td style="padding:36px 36px 40px 36px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="background-color:#F2F0EB;border-radius:2px;">
-                    <a href="mailto:{{reply_to}}?subject=Re%3A%20il%20tuo%20messaggio%20a%20LockVFX" style="display:inline-block;padding:13px 22px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;color:#020202;text-decoration:none;">Rispondi a {{from_name}} &rarr;</a>
+                  <td class="lv-btn" style="background-color:#0B0B0E;border-radius:2px;">
+                    <a class="lv-btn-a" href="mailto:{{reply_to}}?subject=Re%3A%20il%20tuo%20messaggio%20a%20LockVFX" style="display:inline-block;padding:13px 22px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;color:#F2F0EB;text-decoration:none;">Rispondi a {{from_name}} &rarr;</a>
                   </td>
                 </tr>
               </table>
@@ -75,9 +111,9 @@
 
           <!-- Dettagli tecnici -->
           <tr>
-            <td style="padding:20px 36px 28px 36px;border-top:1px solid #1C1C21;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#7A7873;">
-              Lingua del sito: <span style="color:#B8B5AE;">{{lang}}</span><br>
-              Pagina: <a href="{{page}}" style="color:#B8B5AE;text-decoration:none;">{{page}}</a><br>
+            <td class="lv-t3 lv-rule" style="padding:20px 36px 28px 36px;border-top:1px solid #DCD8D0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8A867E;">
+              Lingua del sito: <span class="lv-t2" style="color:#55524C;">{{lang}}</span><br>
+              Pagina: <a class="lv-t2" href="{{page}}" style="color:#55524C;text-decoration:none;">{{page}}</a><br>
               Arrivato dal modulo contatti di lockvfx.com. Rispondendo a questa email scrivete direttamente a {{from_name}}.
             </td>
           </tr>
@@ -86,4 +122,5 @@
       </td>
     </tr>
   </table>
-</div>
+</body>
+</html>
