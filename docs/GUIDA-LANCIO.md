@@ -39,17 +39,11 @@ Il sito manda il messaggio dal browser a EmailJS, che lo inoltra a `info@lockvfx
    - **To Email**: `info@lockvfx.com`
    - **From Name**: `{{from_name}}` · **Reply To**: `{{reply_to}}` (così "Rispondi" va alla persona)
    - **Subject**: `Nuovo messaggio dal sito — {{from_name}}`
-   - **Content** (testo):
-     ```
-     Da: {{from_name}} <{{reply_to}}>
-     Lingua: {{lang}} · Pagina: {{page}}
-
-     {{message}}
-     ```
+   - **Content**: apri il **Code Editor** del template e incolla tutto `docs/emailjs/notifica.html` (versione grafica in stile LockVFX, già provata).
    I nomi dei parametri sono **esattamente** `from_name`, `reply_to`, `message`, `lang`, `page`: il sito li manda così. Salva; segna il **Template ID** (es. `template_x9y8z7`).
 4. (Facoltativo) Secondo template di **risposta automatica** a chi scrive: To Email `{{reply_to}}`, oggetto «Ricevuto — LockVFX», testo breve («Grazie, ti rispondiamo entro due giorni lavorativi.»). Segna il suo Template ID: va in `VITE_EMAILJS_AUTOREPLY_TEMPLATE_ID`. Se non lo vuoi, non impostare quella variabile.
 5. **Account → General**: copia la **Public Key** (es. `AbCdEfGh123456789`).
-6. **Account → Security**: attiva la **restrizione dei domini** (allowlist) con `lockvfx.com`, `www.lockvfx.com`, `lockvfx.it` **e** `lock-vfx.pages.dev` (per provare dall'anteprima); imposta un **limite** (es. 50 invii/giorno). Serve perché la public key è visibile nel sito. Se il tuo piano non ha quella voce, dimmelo.
+6. **Account → Security**: imposta il **limite di frequenza** (rate limit) se il pannello lo offre. La **restrizione dei domini** (whitelist) secondo la pagina prezzi è solo dal piano Personal (9 $/mese): col gratuito non c'è, e va bene così — il sito ha già honeypot e un invio al minuto per browser, il destinatario è fisso nel template, e il peggio che può fare un bot è mandare spam a info@ o consumare i 200 invii del mese (allora il form mostra l'indirizzo email come rimedio). Se arriva spam vero, si valuta il Personal; reCAPTCHA no (è Google: terzo nel sito, informativa e banner).
 7. Le tre chiavi (`Service ID`, `Template ID`, `Public Key`) vanno su Cloudflare, sez. 5. **Non** nel repo, **non** in `.env` committati.
 8. Dopo il deploy: un **invio vero** dal sito, controllo che arrivi su `info@` e che "Rispondi" vada all'indirizzo di chi ha scritto.
 
