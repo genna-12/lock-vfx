@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type SetId } from '../../brand/tokens';
+import { CORSA_FINITA, corsaInVolo } from '../../lib/scrollProgrammato';
 import { publishVisibile, setStageStatic } from '../../lib/stageProgress';
 import { useCoarsePointer, useReducedMotion, useShortLandscape } from '../../lib/useReducedMotion';
 import { Lights } from './Lights';
@@ -106,22 +107,54 @@ export function Stage({ onActiveChange }: StageProps) {
         if (luci.sala) luci.sala.style.opacity = id === 'studio' ? '1' : '0';
         if (luci.taglio) luci.taglio.style.opacity = id === 'contact' ? '1' : '0';
       };
+      /* Si è entrati in una sezione. Se si è lasciata la Stanza con un
+         campo ancora a fuoco, il fuoco se ne va: scorrere non lo toglie (e
+         su Android nemmeno chiudere la tastiera col tasto indietro), e
+         finché resta lo snap è spento (`.snap:has(input:focus)`) — la
+         pagina diventerebbe un rotolo unico per il resto della visita. */
+      const entra = (el: HTMLElement) => {
+        const id = el.id as SetId;
+        // Vista una volta, vista per sempre: la dissolvenza è un ingresso,
+        // non un effetto che si ripete a ogni passaggio. Ma non durante una
+        // corsa: le sezioni attraversate in volo non sono state viste, e la
+        // loro entrata resta per quando ci si arriva (`CORSA_FINITA`).
+        if (!corsaInVolo()) el.dataset.seen = 'true';
+        notify(id);
+        acceso(id);
+        const campo = document.activeElement;
+        if (
+          id !== 'contact' &&
+          campo instanceof HTMLElement &&
+          campo.matches('input, textarea, select') &&
+          campo.closest('#contact')
+        ) {
+          campo.blur();
+        }
+      };
       const io = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
-            const el = entry.target as HTMLElement;
-            // Vista una volta, vista per sempre: la dissolvenza è un
-            // ingresso, non un effetto che si ripete a ogni passaggio.
-            el.dataset.seen = 'true';
-            const id = el.id as SetId;
-            notify(id);
-            acceso(id);
+            if (entry.isIntersecting) entra(entry.target as HTMLElement);
           }
         },
         { threshold: 0.55 }
       );
       for (const set of sets) io.observe(set);
+
+      // A corsa finita, la sezione d'arrivo entra: l'osservatore l'ha vista
+      // passare la soglia mentre si viaggiava, e non lo ridirà da ferma.
+      const arrivo = () => {
+        const h = window.innerHeight;
+        for (const set of sets) {
+          const r = set.getBoundingClientRect();
+          const visibile = Math.max(0, Math.min(r.bottom, h) - Math.max(r.top, 0));
+          if (r.height > 0 && visibile / Math.min(r.height, h) >= 0.55) {
+            entra(set);
+            break;
+          }
+        }
+      };
+      window.addEventListener(CORSA_FINITA, arrivo);
 
       // Un secondo osservatore, a soglia zero: non "quale si guarda" ma
       // "quali si vedono", anche di un pixel. È quello che dice ai video
@@ -134,6 +167,7 @@ export function Stage({ onActiveChange }: StageProps) {
       return () => {
         io.disconnect();
         vista.disconnect();
+        window.removeEventListener(CORSA_FINITA, arrivo);
         for (const set of sets) publishVisibile(set.id, false);
         for (const light of Object.values(luci)) light?.style.removeProperty('opacity');
         html.classList.remove('static');

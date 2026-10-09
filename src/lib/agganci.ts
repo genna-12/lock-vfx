@@ -33,6 +33,13 @@ import { aScrollFermo, vaiAllaSezione } from './scrollProgrammato';
  * alla prima visita su `/#contact` il fuoco restava sul `body` (QA, D14).
  */
 function fuocoSulForm(): void {
+  // Sulla pagina del telefono no. Un campo a fuoco spegne lo snap
+  // (`.snap:has(input:focus)` in globals.css, per non incastrare chi scrive
+  // con la tastiera aperta), e scorrere non toglie il fuoco: dopo «Scrivici»
+  // la pagina restava senza magneti per tutto il resto della visita (Genna,
+  // 9/10). E sul telefono il fuoco è la tastiera, che copre mezza Stanza
+  // prima che si sia deciso di scrivere: il campo lo apre il dito.
+  if (document.documentElement.classList.contains('snap')) return;
   quandoUsciti(() =>
     aScrollFermo(() => {
       const campo = document.querySelector<HTMLInputElement>('#contact input[name="name"]');

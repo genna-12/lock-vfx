@@ -65,6 +65,24 @@ const TETTO_MS = 4000;
 
 let inCorsa: (() => void) | undefined;
 
+/**
+ * C'è una corsa in volo? Chi osserva le sezioni (lo Stage) non deve contare
+ * come "viste" quelle che la corsa attraversa a tutta velocità: la loro
+ * dissolvenza d'ingresso si consumerebbe fuori dagli occhi, e arrivandoci
+ * col dito dopo non entrerebbero più (misurato il 9/10: dalla cima al foro
+ * "Contatti", Studio e Lavori risultavano già `data-seen`).
+ */
+export function corsaInVolo(): boolean {
+  return inCorsa !== undefined;
+}
+
+/** L'evento che chiude una corsa: lo snap è tornato, la pagina è ferma. */
+export const CORSA_FINITA = 'lockvfx:corsa-finita';
+
+/** I gesti che interrompono una corsa (il tap che l'ha chiesta è già passato). */
+const MANO = ['touchstart', 'wheel', 'keydown'] as const;
+const CATTURA: AddEventListenerOptions = { capture: true, passive: true };
+
 export function scrollProgrammato(vai: () => void): void {
   const scroller = document.scrollingElement ?? document.documentElement;
   if (!(scroller instanceof HTMLElement)) {
@@ -89,7 +107,9 @@ export function scrollProgrammato(vai: () => void): void {
     window.clearTimeout(tetto);
     window.removeEventListener('scrollend', fine);
     window.removeEventListener('scroll', muove);
+    for (const tipo of MANO) window.removeEventListener(tipo, fine, CATTURA);
     scroller.style.removeProperty('scroll-snap-type');
+    window.dispatchEvent(new Event(CORSA_FINITA));
   };
   /** Ogni volta che la pagina si muove la riserva riparte da capo. */
   const arma = () => {
@@ -105,6 +125,11 @@ export function scrollProgrammato(vai: () => void): void {
 
   window.addEventListener('scrollend', fine);
   window.addEventListener('scroll', muove, { passive: true });
+  // La mano di chi guarda batte la corsa: se tocca, trascina o gira la
+  // rotella mentre la pagina viaggia, la corsa è finita lì e lo snap torna
+  // subito — il gesto che parte deve trovare i magneti, non una pagina
+  // libera fino allo scadere della riserva.
+  for (const tipo of MANO) window.addEventListener(tipo, fine, CATTURA);
   arma();
   tetto = window.setTimeout(fine, TETTO_MS);
 
