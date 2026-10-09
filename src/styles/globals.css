@@ -700,6 +700,20 @@
   }
 }
 
+/* ---------- La Sala senza lavori, senza carrellata ----------------------
+   Il cartello è alto quanto un 16:9, e in cima alla sezione lasciava sotto
+   di sé mezzo schermo di nero: una pagina che sembrava finita a metà. Qui la
+   sezione prende lo schermo intero e il cartello sta al centro dello spazio
+   utile — fra il respiro sotto la testata e quello sopra la nav, che sono i
+   padding già scritti sopra (safe area compresa). Solo col cartello: con un
+   lavoro il `:has` non trova niente e la Sala resta quella di prima. */
+.static .stage [data-set='work']:has([data-sala-cartello]) {
+  min-height: 100lvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 /* ---------- La prima schermata (§2.1) -----------------------------------
    L'unica sezione che non prende l'altezza dal suo contenuto: una schermata
    piena, sempre, anche in reduced motion su desktop. E senza padding —
