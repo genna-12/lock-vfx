@@ -52,6 +52,11 @@ function media(slug: string): Pick<Work, 'poster' | 'video' | 'media'> {
   return { poster: r.poster, video: { mp4: sorgente(r) }, media: r };
 }
 
+/**
+ * I tre esempi della forma, non lavori: `pending`, quindi online non si
+ * vedono e la Sala mostra il suo cartello. Restano qui come modello per chi
+ * aggiungerà i veri (`docs/CONTENUTI.md` §2).
+ */
 const PLACEHOLDERS: Work[] = [
   {
     id: 'lavoro-01',
@@ -61,7 +66,7 @@ const PLACEHOLDERS: Work[] = [
     disciplines: ['Environment', 'Compositing'],
     ...media('lavoro-01'),
     fullUrl: 'https://vimeo.com/',
-    rights: 'cleared',
+    rights: 'pending',
     order: 1,
   },
   {
@@ -71,7 +76,7 @@ const PLACEHOLDERS: Work[] = [
     client: 'Cliente',
     disciplines: ['CG integration', 'Cleanup'],
     ...media('lavoro-02'),
-    rights: 'cleared',
+    rights: 'pending',
     order: 2,
   },
   {
@@ -82,14 +87,21 @@ const PLACEHOLDERS: Work[] = [
     disciplines: ['FX / simulazioni', 'Finishing'],
     ...media('lavoro-03'),
     fullUrl: 'https://vimeo.com/',
-    rights: 'cleared',
+    rights: 'pending',
     order: 3,
   },
 ];
 
+/**
+ * Per sviluppo e QA: `VITE_WORKS_DEMO=on` fa entrare anche i lavori
+ * `pending`, così la Sala piena si può ancora guardare. Solo build locali —
+ * in produzione non si imposta mai, o gli esempi finiscono online.
+ */
+const WORKS_DEMO = import.meta.env.VITE_WORKS_DEMO === 'on';
+
 /** Solo i lavori con i diritti liberati, nell'ordine dichiarato. */
 export function loadWorks(): Work[] {
-  return PLACEHOLDERS.filter((w) => w.rights === 'cleared').sort(
+  return PLACEHOLDERS.filter((w) => WORKS_DEMO || w.rights === 'cleared').sort(
     (a, b) => (a.order ?? 0) - (b.order ?? 0)
   );
 }
