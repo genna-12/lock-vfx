@@ -13,7 +13,7 @@
   "meta": {
     "title": "LockVFX — effetti visivi per cinema, serie e pubblicità",
     "ogAlt": "Il marchio LockVFX",
-    "description": "LockVFX — effetti visivi per cinema, serie e pubblicità: compositing, CGI, environment, cleanup e finishing. Il nome con cui [Nome] e [Nome] lavorano insieme."
+    "description": "Effetti visivi per cinema, serie e pubblicità: compositing, CGI, cleanup, finishing. LockVFX è il nome con cui lavorano {{a}} e {{b}}."
   },
   "loader": {
     "label": "Caricamento"
@@ -26,12 +26,7 @@
   },
   "statement": {
     "phrase": "Diamo forma alle immagini che un film immagina e non può girare.",
-    "paragraph": "LockVFX è il nome con cui [Nome] e [Nome] lavorano insieme: compositing, CGI, environment, cleanup, simulazioni e finishing per cinema, serie e pubblicità — con una rete di studi e specialisti che cambia a seconda del progetto.",
-    "credits": {
-      "a": "[Nome] · compositing",
-      "b": "[Nome] · 3D/CGI",
-      "c": "[Città]"
-    },
+    "paragraph": "LockVFX è il nome con cui {{a}} e {{b}} lavorano insieme: compositing, CGI, environment, cleanup, simulazioni e finishing per cinema, serie e pubblicità — con una rete di studi e specialisti che cambia a seconda del progetto.",
     "cta": "Scopri cosa facciamo →"
   },
   "sala": {
@@ -119,7 +114,7 @@
     },
     "chi": {
       "h1": "Effetti visivi per il cinema, la serialità e la pubblicità.",
-      "lead": "LockVFX è il nome collettivo con cui [Nome 1] e [Nome 2] lavorano insieme sui VFX: dalla singola inquadratura da ripulire alla sequenza da costruire da zero, con lo stesso standard.",
+      "lead": "LockVFX è il nome collettivo con cui {{a}} e {{b}} lavorano insieme sui VFX: dalla singola inquadratura da ripulire alla sequenza da costruire da zero, con lo stesso standard.",
       "paragraph": "[...]"
     },
     "servizi": {
@@ -181,7 +176,7 @@
     },
     "meta": {
       "title": "LockVFX — Studio e servizi",
-      "description": "LockVFX è il nome con cui due artisti VFX lavorano insieme: compositing, 3D e CGI, matte painting, simulazioni, finishing. Il metodo, i servizi, i contatti."
+      "description": "LockVFX è il nome con cui lavorano {{a}} e {{b}}: compositing, 3D e CGI, matte painting, simulazioni, finishing. Metodo e contatti."
     }
   }
 }

@@ -11,15 +11,25 @@
  * resta il ruolo di LockVFX **nel lavoro**, che è un'altra cosa.
  */
 export type Person = {
+  /** Chiave stabile: la `key` di React e il nome della bio in i18n
+   * (`landing.persone.bio.<id>`). Non si mostra. */
+  id: string;
   name: string;
   /** Partita IVA: obbligatoria in home page (art. 35 D.P.R. 633/1972). */
   vat: string;
 };
 
 export const PEOPLE: readonly Person[] = [
-  { name: 'Denis Ruscitti', vat: '04397621204' },
-  { name: 'Nicholas Pantieri', vat: '02829650395' },
+  { id: 'denis', name: 'Denis Ruscitti', vat: '04397621204' },
+  { id: 'nicholas', name: 'Nicholas Pantieri', vat: '02829650395' },
 ];
+
+/**
+ * I due nomi nella forma che chiede i18next: i testi che li contengono
+ * (`{{a}}` e `{{b}}`) li prendono da qui, così i JSON non li ripetono e un
+ * nome si corregge in un posto solo.
+ */
+export const NOMI = { a: PEOPLE[0].name, b: PEOPLE[1].name } as const;
 
 /**
  * L'indirizzo collettivo: l'unico del sito — sotto i nomi nella Stanza, nel

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { applyHead } from '../../lib/head';
-import { PEOPLE } from '../../data/people';
+import { NOMI, PEOPLE } from '../../data/people';
 import { Wordmark } from '../chrome/Wordmark';
 import { LangPill } from '../chrome/LangPill';
 import { CollectiveLine, PolicyLinks, VatLines } from '../legal/LegalLines';
@@ -52,7 +52,7 @@ export function StudioPage() {
   useEffect(() => {
     applyHead({
       title: t('landing.meta.title'),
-      description: t('landing.meta.description'),
+      description: t('landing.meta.description', NOMI),
       path: `${import.meta.env.BASE_URL}studio/`,
       lang,
       imageAlt: t('meta.ogAlt'),
@@ -125,7 +125,7 @@ export function StudioPage() {
             <h1 className="u-display m-0 mb-6 max-w-[22ch] text-[clamp(34px,4.2vw,56px)] leading-[1.05] tracking-[-0.02em]">
               {t('landing.chi.h1')}
             </h1>
-            <p className="m-0 max-w-[52ch] text-[19px] text-ink">{t('landing.chi.lead')}</p>
+            <p className="m-0 max-w-[52ch] text-[19px] text-ink">{t('landing.chi.lead', NOMI)}</p>
             <p className="m-0 mt-[18px] max-w-[58ch] text-[17px] text-stone">
               {t('landing.chi.paragraph')}
             </p>

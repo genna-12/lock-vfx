@@ -12,6 +12,7 @@ import { Stage } from './components/stage/Stage';
 import { Footer } from './components/Footer';
 import { PrivacyDialog } from './components/ui/PrivacyDialog';
 import { quandoEntrati } from './lib/loadProgress';
+import { NOMI } from './data/people';
 
 /**
  * Struttura della pagina.
@@ -39,7 +40,7 @@ export default function App() {
   useEffect(() => {
     applyHead({
       title: t('meta.title'),
-      description: t('meta.description'),
+      description: t('meta.description', NOMI),
       path: import.meta.env.BASE_URL,
       lang,
       imageAlt: t('meta.ogAlt'),

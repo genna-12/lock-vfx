@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { STATEMENT_WEIGHT } from '../../brand/tokens';
+import { NOMI, PEOPLE } from '../../data/people';
 
 /**
  * Il secondo set: chi è LockVFX, detto una volta sola.
@@ -15,9 +16,9 @@ import { STATEMENT_WEIGHT } from '../../brand/tokens';
  * di quando succede. Lo stagger è per selettore: i blocchi possono cambiare
  * di numero senza toccare la camera.
  *
- * Il copy qui è la bozza dello sketch, segnaposto: quello definitivo arriva
- * dal canale testi. I `[Nome]` e la `[Città]` sono segnaposto veri, non
- * dimenticanze.
+ * Il copy qui è la bozza dello sketch: quello definitivo arriva dal canale
+ * testi. I nomi no — sono dati, e arrivano da `PEOPLE` (`data/people.ts`),
+ * nel paragrafo per interpolazione e nella riga dei crediti così come sono.
  */
 export function Statement() {
   const { t } = useTranslation();
@@ -46,18 +47,19 @@ export function Statement() {
         {/* Misura della spec: non è nella scala dei token perché è l'unico
             corpo di testo lungo del sito. */}
         <p data-line className="max-w-[40ch] text-[clamp(16px,1.3vw,19px)] leading-[1.5] text-stone">
-          {t('statement.paragraph')}
+          {t('statement.paragraph', NOMI)}
         </p>
         {/* Terza riga: i nomi e, sotto, l'unica porta verso la pagina di
             testo. Stanno nello stesso `[data-line]` perché la camera ne
             muove tre, e tre devono restare. */}
         <div data-line className="flex flex-col gap-5">
           {/* `stone` e non `dust`: qui non c'è un'etichetta, ci sono i nomi
-              delle due persone — è contenuto. */}
+              delle due persone — è contenuto. Solo i nomi: niente ruoli
+              accanto alle persone (R23) e niente città. */}
           <p className="u-cap flex flex-wrap gap-x-6 gap-y-2 text-stone">
-            <span>{t('statement.credits.a')}</span>
-            <span>{t('statement.credits.b')}</span>
-            <span>{t('statement.credits.c')}</span>
+            {PEOPLE.map((person) => (
+              <span key={person.id}>{person.name}</span>
+            ))}
           </p>
           {/* Navigazione vera, non un pannello: la home si smonta e al
               ritorno il loader dura 300 ms. È cliccabile solo quando lo
